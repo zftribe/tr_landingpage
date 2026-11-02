@@ -18,13 +18,15 @@ Start here with any developer or coding agent:
 Node.js 20 or later is sufficient. There are no packages to install or build step.
 
 ```sh
-git clone https://github.com/zftribe/tr_landingpage.git
+git clone --branch codex/welcome-handoff-2026-11-02 https://github.com/zftribe/tr_landingpage.git
 cd tr_landingpage
 node preview.mjs
 ```
 
 Open **http://127.0.0.1:59127/**. The server listens on loopback only. Stop it with
 Ctrl+C. Use `node preview.mjs --port 59128` if that port is occupied.
+The branch option is required while this handoff is an unmerged review branch;
+the new preview files are not present on `main` yet.
 
 ```sh
 node --test preview.test.mjs
