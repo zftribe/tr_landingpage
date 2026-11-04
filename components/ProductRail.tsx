@@ -2,13 +2,18 @@
 
 import { useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
+import type { CurriculumCourse } from '@/lib/lms'
+import { CurriculumDialog } from './CurriculumDialog'
 
 type Item = Product & { checkout: string }
 
 const MAX_COMPARE = 3
 
-export function ProductRail({ products }: { products: Item[] }) {
+export function ProductRail({ products, curriculum }: { products: Item[]; curriculum: CurriculumCourse[] }) {
   const [picked, setPicked] = useState<string[]>([])
+  const [reading, setReading] = useState<Item | null>(null)
+  const coursesOf = (p: Item) =>
+    p.courseIds.map((id) => curriculum.find((c) => c.id === id)).filter((c): c is CurriculumCourse => !!c)
   const [notice, setNotice] = useState('')
 
   const toggle = (id: string) => {
@@ -65,6 +70,11 @@ export function ProductRail({ products }: { products: Item[] }) {
                 <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
                   {on ? '✓ Comparing' : 'Compare'}
                 </button>
+                {coursesOf(p).length > 0 && (
+                  <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setReading(p)}>
+                    Curriculum
+                  </button>
+                )}
               </div>
             </article>
           )
@@ -72,6 +82,8 @@ export function ProductRail({ products }: { products: Item[] }) {
       </div>
 
       <p className="pc-notice" role="status">{notice}</p>
+
+      {reading && <CurriculumDialog name={reading.name} courses={coursesOf(reading)} onClose={() => setReading(null)} />}
 
       {compared.length >= 2 && (
         <div className="pc-table-wrap" aria-label="Comparison">

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { fetchPackages, checkoutUrl } from '@/lib/lms'
+import { fetchPackages, fetchCurriculum, checkoutUrl } from '@/lib/lms'
 import { lineup } from '@/lib/lineup'
 import { ProductRail } from './ProductRail'
 import { Quiz } from './Quiz'
@@ -10,7 +10,8 @@ import { Quiz } from './Quiz'
 const kept = readFileSync(path.join(process.cwd(), 'content/legacy-programs-kept.html'), 'utf8')
 
 export async function Programs() {
-  const products = lineup(await fetchPackages()).map((p) => ({ ...p, checkout: checkoutUrl(p.id) }))
+  const [packages, curriculum] = await Promise.all([fetchPackages(), fetchCurriculum()])
+  const products = lineup(packages).map((p) => ({ ...p, checkout: checkoutUrl(p.id) }))
 
   return (
     <section className="section" id="programs">
@@ -26,7 +27,7 @@ export async function Programs() {
         </div>
 
         <Quiz products={products} />
-        <ProductRail products={products} />
+        <ProductRail products={products} curriculum={curriculum} />
 
         <div dangerouslySetInnerHTML={{ __html: kept }} />
       </div>

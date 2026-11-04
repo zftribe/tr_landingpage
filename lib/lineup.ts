@@ -27,6 +27,8 @@ export type Product = {
   tag: string
   hasTI: boolean
   hasWeb3: boolean
+  /** LMS course ids in this product, in package order. */
+  courseIds: string[]
   /** Membership length, or null when none is included. */
   months: number | null
   price: number
@@ -51,7 +53,7 @@ export function toProduct(p: LmsPackage): Product {
     : `${months}-month membership`
   const tag = parts.length === 2 ? 'Bundle' : parts.length === 1 ? (months ? 'Course + membership' : 'Course') : 'Membership'
 
-  return { id: p.id, name, tag, hasTI, hasWeb3, months, price: p.price, subtotal: p.subtotal, discount: p.discount }
+  return { id: p.id, name, tag, hasTI, hasWeb3, courseIds: courses, months, price: p.price, subtotal: p.subtotal, discount: p.discount }
 }
 
 export function lineup(packages: LmsPackage[]): Product[] {
