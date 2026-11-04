@@ -36,7 +36,7 @@ export function ProductRail({ products }: { products: Item[] }) {
         {products.map((p) => {
           const on = picked.includes(p.id)
           return (
-            <article key={p.id} className={`pc-card${on ? ' pc-on' : ''}`} role="listitem">
+            <article key={p.id} id={`product-${p.id}`} className={`pc-card${on ? ' pc-on' : ''}`} role="listitem">
               <div className="program-tag">{p.tag}</div>
               <h3 className="pc-name">{p.name}</h3>
 

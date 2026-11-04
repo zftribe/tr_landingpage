@@ -43,3 +43,30 @@
   }
   .pc-card { flex: 0 0 82%; scroll-snap-align: start; }
 }
+
+/* "Not sure where to start?" */
+.qz { background: var(--card); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 28px; margin-bottom: 40px; }
+.qz-title { font-family: var(--font-display); color: var(--white); font-size: 22px; margin: 0 0 6px; }
+.qz-sub { color: var(--muted); margin: 0 0 20px; }
+.qz-questions { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.qz-q { border: 0; margin: 0; padding: 0; display: grid; gap: 10px; align-content: start; min-width: 0; }
+.qz-q legend { color: var(--white); font-weight: 600; margin-bottom: 10px; padding: 0; }
+.qz-opt { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--border-2); border-radius: var(--radius-sm); padding: 12px 14px; cursor: pointer; }
+.qz-opt.qz-on { border-color: var(--gold); background: var(--gold-soft); }
+.qz-opt input { margin-top: 4px; accent-color: var(--gold); }
+.qz-opt strong { display: block; color: var(--white); font-weight: 600; }
+.qz-opt small { color: var(--muted); font-size: 13px; }
+.qz-opt:focus-within { outline: 2px solid var(--gold); outline-offset: 2px; }
+.qz-result { margin-top: 24px; border-top: 1px solid var(--border); padding-top: 20px; color: var(--text); }
+.qz-result h4 { font-family: var(--font-display); color: var(--white); font-size: 20px; margin: 4px 0 8px; }
+.qz-result p { margin: 0 0 10px; }
+.qz-eyebrow { color: var(--gold); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; margin: 0 !important; }
+.qz-price { color: var(--white); font-weight: 700; font-size: 20px; }
+.qz-price span { color: var(--muted); font-weight: 400; font-size: 14px; }
+.qz-note, .qz-wait { color: var(--muted); font-size: 14px; }
+.qz-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.pc-card.pc-flash { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-mid); }
+@media (max-width: 768px) {
+  .qz { padding: 20px; }
+  .qz-questions { grid-template-columns: 1fr; }
+}

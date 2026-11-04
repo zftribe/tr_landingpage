@@ -3,6 +3,7 @@ import path from 'node:path'
 import { fetchPackages, checkoutUrl } from '@/lib/lms'
 import { lineup } from '@/lib/lineup'
 import { ProductRail } from './ProductRail'
+import { Quiz } from './Quiz'
 
 // TR4Ever and Pathfinders stay as the original markup until the section is
 // restructured into free / paid / memberships / guidance.
@@ -24,6 +25,7 @@ export async function Programs() {
           </p>
         </div>
 
+        <Quiz products={products} />
         <ProductRail products={products} />
 
         <div dangerouslySetInnerHTML={{ __html: kept }} />
