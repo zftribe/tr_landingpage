@@ -822,3 +822,15 @@
       .partners-row { gap: 32px; }
       .partner-logo { height: 28px; }
     }
+
+/* Phones could swipe the page sideways by ~110px on load: the hero's 500px
+   glow and not-yet-revealed animated elements stick out past the screen, and
+   body's overflow-x: hidden does not stop a mobile browser widening its layout
+   to fit them. clip does, without creating a scroll container — so the fixed
+   nav and anchor scrolling are unaffected. */
+html, body { overflow-x: clip; }
+
+/* The phone menu is fixed to the screen and taller than a phone, so its last
+   links (Community, Exchanges, FAQ, Yield Tracker, Join Discord) sat below the
+   bottom edge with no way to reach them. Let it scroll. */
+.mobile-menu { overflow-y: auto; overscroll-behavior: contain; }
