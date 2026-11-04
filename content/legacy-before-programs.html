@@ -1,0 +1,278 @@
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- ═══════════ NAV ═══════════ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="#home" class="nav-brand"><img src="TR%20logo.png" alt="TR"> TRADING REPUBLIC</a>
+    <ul class="nav-menu">
+      <li><a href="#ethos">Ethos</a></li>
+      <li><a href="#programs">Programs</a></li>
+      <li class="nav-dropdown">
+        <a href="#blueprint">Videos</a>
+        <div class="nav-dropdown-menu">
+          <a href="#blueprint">Blueprint</a>
+          <a href="#hotmoney">Hot Money</a>
+        </div>
+      </li>
+      <li class="nav-dropdown">
+        <a href="#webinars">Webinars</a>
+        <div class="nav-dropdown-menu">
+          <a href="#webinars" onclick="goToSlide(0)">Monday Market Updates</a>
+          <a href="#webinars" onclick="goToSlide(1)">Trader's Journey</a>
+          <a href="#webinars" onclick="goToSlide(2)">Charting Your Way to Profit</a>
+          <a href="#webinars" onclick="goToSlide(3)">FGD Crypto</a>
+          <a href="#webinars" onclick="goToSlide(4)">FGD PSE</a>
+        </div>
+      </li>
+      <li><a href="#community">Community</a></li>
+      <li><a href="#exchanges">Exchanges</a></li>
+      <li><a href="#faq">FAQ</a></li>
+      <li><a href="yield-tracker/index.html">Yield Tracker</a></li>
+    </ul>
+    <a href="https://discord.gg/tradingrepublic" target="_blank" class="nav-cta">
+      Join Discord <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+    <button class="mobile-toggle" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mobile-menu">
+  <a href="#ethos" onclick="this.parentElement.classList.remove('open')">Ethos</a>
+  <a href="#programs" onclick="this.parentElement.classList.remove('open')">Programs</a>
+  <a href="#blueprint" onclick="this.parentElement.classList.remove('open')">Videos</a>
+  <a href="#blueprint" onclick="this.parentElement.classList.remove('open')" class="mobile-sub">Blueprint</a>
+  <a href="#hotmoney" onclick="this.parentElement.classList.remove('open')" class="mobile-sub">Hot Money</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open')">Webinars</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open');goToSlide(0)" class="mobile-sub">Monday Market Updates</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open');goToSlide(1)" class="mobile-sub">Trader's Journey</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open');goToSlide(2)" class="mobile-sub">Charting Your Way to Profit</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open');goToSlide(3)" class="mobile-sub">FGD Crypto</a>
+  <a href="#webinars" onclick="this.parentElement.classList.remove('open');goToSlide(4)" class="mobile-sub">FGD PSE</a>
+  <a href="#community" onclick="this.parentElement.classList.remove('open')">Community</a>
+  <a href="#exchanges" onclick="this.parentElement.classList.remove('open')">Exchanges</a>
+  <a href="#faq" onclick="this.parentElement.classList.remove('open')">FAQ</a>
+  <a href="yield-tracker/index.html" onclick="this.parentElement.classList.remove('open')">Yield Tracker</a>
+  <a href="https://discord.gg/tradingrepublic" target="_blank" style="color:var(--gold)">Join Discord →</a>
+</div>
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="home" style="position:relative">
+  <div class="hero-glow-orb"></div>
+  <div class="hero-glow-orb-2"></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="hero-grid">
+      <div class="hero-content">
+        <img src="TR%20logo.png" alt="Trading Republic by ZFT" class="reveal float-slow" style="height:72px;width:auto;margin-bottom:24px">
+        <h1 class="heading-xl reveal reveal-d1">The New Generation of <span class="gradient-text-animated">Wealth Builders.</span></h1>
+        <p class="text-body reveal reveal-d2">Learn to trade and invest in Stocks, Forex, Commodities, Indices, and everything Crypto. We are dreamers in pursuit of being the best version of ourselves.</p>
+        <div class="btn-row reveal reveal-d3">
+          <a href="https://discord.gg/tradingrepublic" target="_blank" class="btn btn-gold glow-pulse">
+            Get Instant Access
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a href="#programs" class="btn btn-outline">
+            Explore Programs
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </a>
+        </div>
+      </div>
+      <div class="hero-video reveal-scale reveal-d2">
+        <iframe src="https://www.youtube.com/embed/NL3rdANP2vg" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ MARQUEE ═══════════ -->
+<div class="marquee-wrap" style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--bg-2)">
+  <div class="marquee-track">
+    <span class="marquee-item">STOCKS <span class="dot">&bull;</span> FOREX <span class="dot">&bull;</span> CRYPTO <span class="dot">&bull;</span> INDICES <span class="dot">&bull;</span> COMMODITIES <span class="dot">&bull;</span> NFTs <span class="dot">&bull;</span> DeFi <span class="dot">&bull;</span> TECHNICAL ANALYSIS <span class="dot">&bull;</span> RISK MANAGEMENT</span>
+    <span class="marquee-item">STOCKS <span class="dot">&bull;</span> FOREX <span class="dot">&bull;</span> CRYPTO <span class="dot">&bull;</span> INDICES <span class="dot">&bull;</span> COMMODITIES <span class="dot">&bull;</span> NFTs <span class="dot">&bull;</span> DeFi <span class="dot">&bull;</span> TECHNICAL ANALYSIS <span class="dot">&bull;</span> RISK MANAGEMENT</span>
+  </div>
+</div>
+
+<!-- ═══════════ PARTNERS ═══════════ -->
+<div class="partners-strip">
+  <div class="partners-label">Trusted Partners</div>
+  <div class="partners-row">
+    <a href="https://www.binance.com/register?ref=TROFF5" target="_blank" rel="noopener"><img src="logos/binance.png" alt="Binance" class="partner-logo"></a>
+    <img src="logos/bitget.png" alt="Bitget" class="partner-logo">
+    <img src="logos/okx.png" alt="OKX" class="partner-logo">
+    <img src="logos/mexc.png" alt="MEXC" class="partner-logo">
+    <img src="logos/bybit.png" alt="Bybit" class="partner-logo">
+    <a href="https://www.gate.com/share/BULLZONE" target="_blank" rel="noopener"><img src="logos/gate.png" alt="Gate.io" class="partner-logo"></a>
+    <img src="logos/xm.svg" alt="XM" class="partner-logo past">
+    <img src="logos/etoro.svg" alt="eToro" class="partner-logo past">
+  </div>
+</div>
+
+<!-- ═══════════ WEBINARS ═══════════ -->
+<section class="section" id="webinars">
+  <div class="container">
+    <div class="text-center mb-56">
+      <div class="eyebrow reveal" style="justify-content:center">Weekly Webinars</div>
+      <h2 class="heading-lg reveal">Learn from the <span class="gold">best.</span></h2>
+      <p class="text-body max-w-500 mx-auto reveal mt-24">Live sessions every week from TR's top coaches. Show up, take notes, and level up.</p>
+    </div>
+
+    <div class="carousel-wrap reveal">
+      <div class="carousel-track" id="webinarCarousel">
+
+        <!-- Slide 1: Monday Market Updates -->
+        <div class="carousel-slide">
+          <img src="webinars/MMU.webp" alt="Monday Market Updates" class="carousel-slide-img">
+          <div class="carousel-slide-content">
+            <div class="carousel-badge free">Free</div>
+            <h3 class="heading-md">Monday Market Updates</h3>
+            <p class="text-body mt-24">Your weekly edge from Boss Zeefreaks himself — spotting opportunities amid the chaos. A straightforward breakdown of what's moving in the markets right now and where to look next.</p>
+            <p class="text-sm mt-24" style="color:var(--gold);font-style:italic">Pro-tip: A lot of golden nuggets get dropped here.</p>
+            <p class="text-sm mt-24"><strong style="color:var(--white)">Every Monday</strong> <span style="color:var(--dim)">with Boss Zeefreaks</span></p>
+          </div>
+        </div>
+
+        <!-- Slide 2: Trader's Journey -->
+        <div class="carousel-slide">
+          <img src="webinars/tradersjourney.webp" alt="Trader's Journey" class="carousel-slide-img">
+          <div class="carousel-slide-content">
+            <div class="carousel-badge free">Free</div>
+            <h3 class="heading-md">Trader's Journey</h3>
+            <p class="text-body mt-24">Your step-by-step roadmap to building watchlists and turning them into actionable trade ideas. Learn how to generate your own setups instead of relying on someone else's calls.</p>
+            <p class="text-sm mt-24"><strong style="color:var(--white)">Exclusive for TR x MEXC Users</strong> <span style="color:var(--dim)">with Coach Sean</span></p>
+          </div>
+        </div>
+
+        <!-- Slide 3: Charting Your Way to Profit -->
+        <div class="carousel-slide">
+          <img src="webinars/chartingyourway.webp" alt="Charting Your Way to Profit" class="carousel-slide-img">
+          <div class="carousel-slide-content">
+            <div class="carousel-badge free">Free</div>
+            <h3 class="heading-md">Charting Your Way to Profit</h3>
+            <p class="text-body mt-24">A beginner-friendly trading webinar series that covers the essentials — from top-down analysis and market structure to trading psychology and risk management. No fluff, just the skills you need.</p>
+            <p class="text-sm mt-24"><strong style="color:var(--white)">Every Wednesday at 8PM</strong> <span style="color:var(--dim)">with Coach Jico (Glacier)</span></p>
+            <p class="text-sm" style="color:var(--dim)">Exclusive for TR x Bitget Users</p>
+          </div>
+        </div>
+
+        <!-- Slide 4: FGD Crypto -->
+        <div class="carousel-slide">
+          <img src="webinars/fgd%20crypto.webp" alt="FGD Crypto" class="carousel-slide-img">
+          <div class="carousel-slide-content">
+            <div class="carousel-badge exclusive">Citizens Only</div>
+            <h3 class="heading-md">FGD Crypto</h3>
+            <p class="text-body mt-24">Coach Ren's weekly deep dive into live trade walkthroughs and chart breakdowns. Feeling lost or overwhelmed by trading concepts? This is where you fill the gaps and see the bigger picture in crypto.</p>
+            <p class="text-body mt-16">Ask your questions, get real answers, and sharpen your strategy — one session at a time.</p>
+            <p class="text-sm mt-24"><strong style="color:var(--white)">Every Thursday</strong> <span style="color:var(--dim)">with Coach Ren</span></p>
+          </div>
+        </div>
+
+        <!-- Slide 5: FGD PSE -->
+        <div class="carousel-slide">
+          <img src="webinars/fgdpse_rochelle.webp" alt="FGD PSE" class="carousel-slide-img">
+          <div class="carousel-slide-content">
+            <div class="carousel-badge exclusive">Citizens Only</div>
+            <h3 class="heading-md">FGD PSE</h3>
+            <p class="text-body mt-24">Proof that there's still serious money to be made in the Philippine Stock Market. Weekly trade reviews and discussions covering Technical Analysis, Risk Management, and Trading Psychology using the ZFT system.</p>
+            <p class="text-sm mt-24"><strong style="color:var(--white)">Every Friday at 8PM</strong> <span style="color:var(--dim)">with Coach Rochelle</span></p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controls -->
+      <div class="carousel-controls">
+        <button class="carousel-btn" onclick="moveCarousel(-1)" aria-label="Previous">&#8592;</button>
+        <div class="carousel-dots" id="carouselDots">
+          <button class="carousel-dot active" onclick="goToSlide(0)"></button>
+          <button class="carousel-dot" onclick="goToSlide(1)"></button>
+          <button class="carousel-dot" onclick="goToSlide(2)"></button>
+          <button class="carousel-dot" onclick="goToSlide(3)"></button>
+          <button class="carousel-dot" onclick="goToSlide(4)"></button>
+        </div>
+        <button class="carousel-btn" onclick="moveCarousel(1)" aria-label="Next">&#8594;</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CALENDAR ═══════════ -->
+<section class="section section-dark" id="calendar">
+  <div class="container">
+    <div class="text-center mb-56">
+      <div class="eyebrow reveal" style="justify-content:center">Schedule</div>
+      <h2 class="heading-lg reveal">Upcoming <span class="gold">Events</span></h2>
+      <p class="text-body max-w-500 mx-auto reveal mt-24">Webinars, live sessions, and community events — all in one place. Never miss a session.</p>
+    </div>
+    <div class="reveal" style="border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);background:var(--bg-3)">
+      <iframe src="https://calendar.google.com/calendar/embed?src=d90baac1cb808fb5867e9befac50d99389549df92952aebff77f26ec359d24a3%40group.calendar.google.com&ctz=Asia/Manila&bgcolor=%230b0b0f&color=%23F9A825&showTitle=0&showNav=1&showPrint=0&showCalendars=0" style="width:100%;height:560px;border:none;filter:invert(0.88) hue-rotate(180deg) saturate(0.6) contrast(0.9)" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ ETHOS ═══════════ -->
+<section class="section" id="ethos">
+  <div class="container">
+    <div class="text-center mb-56">
+      <div class="eyebrow reveal" style="justify-content:center">Ethos</div>
+      <h2 class="heading-lg reveal">Built on <span class="gold">Purpose.</span></h2>
+    </div>
+
+    <div class="hero-video reveal-scale" style="max-width:740px;margin:0 auto 72px">
+      <iframe src="https://www.youtube.com/embed/HJeZEgCmA7M" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+    </div>
+
+    <!-- Mission -->
+    <div class="two-col">
+      <div class="reveal-left">
+        <div class="eyebrow">Mission</div>
+        <h2 class="heading-md">Empowering confident traders and investors.</h2>
+        <p class="text-body mt-24">We strive to create a vibrant community and a leading institution that fosters learning, growth, and innovation. Through comprehensive educational programs and cutting-edge resources, we provide the knowledge, tools, and support needed to navigate trading and investing with success.</p>
+      </div>
+      <div class="feature-visual reveal-right tilt-card">
+        <div class="feature-big-text">Mission</div>
+        <p class="text-sm">Empower individuals to become confident traders and investors in stocks and crypto.</p>
+      </div>
+    </div>
+
+    <!-- Vision -->
+    <div class="two-col reverse mt-56">
+      <div class="reveal-right">
+        <div class="eyebrow">Vision</div>
+        <h2 class="heading-md">The premier destination for mastering markets.</h2>
+        <p class="text-body mt-24">A thriving community where aspiring traders gather to acquire skills, exchange insights, and forge lasting connections. We embrace innovation and adapt to the ever-evolving landscape. We inspire a new generation of smart money managers who change their lives for the better.</p>
+      </div>
+      <div class="feature-visual reveal-left tilt-card">
+        <div class="feature-big-text">Vision</div>
+        <p class="text-sm">Be the premier destination for learning and mastering trading and investing.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CORE VALUES ═══════════ -->
+<section class="section section-dark">
+  <div class="container">
+    <div class="text-center mb-40">
+      <div class="eyebrow reveal" style="justify-content:center">What We Stand For</div>
+      <h2 class="heading-lg reveal">Five Core <span class="gold">Values</span></h2>
+    </div>
+    <div class="values-grid stagger-children">
+      <div class="value-card"><div class="value-num">01</div><h3>Quality</h3><p>The heartbeat of everything we do. The invisible signature on every product. We build trust through excellence and set elevated standards.</p></div>
+      <div class="value-card"><div class="value-num">02</div><h3>Faith</h3><p>The compass that guides us through uncertainty and challenges. A source of courage and purpose alignment during difficult circumstances.</p></div>
+      <div class="value-card"><div class="value-num">03</div><h3>Growth</h3><p>Our response to change, our hunger to become better, our willingness to embrace discomfort. Progress, discipline, and perspective-seeking.</p></div>
+      <div class="value-card span-2"><div class="value-num">04</div><h3>Integrity</h3><p>The foundation upon which everything else stands. Doing the right thing — even when no one is watching. Honesty, consistency, transparency.</p></div>
+      <div class="value-card"><div class="value-num">05</div><h3>Legacy</h3><p>The mark we leave behind — not just in what we build, but in how we live. Creating ripple effects for future generations.</p></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════ QUOTE ═══════════ -->
+<div class="quote-section">
+  <div class="container">
+    <div class="pull-quote reveal">We are dreamers who are in pursuit of being the <span class="gold">best version of ourselves.</span></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ═══════════ PROGRAMS ═══════════ -->
