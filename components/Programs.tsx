@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { fetchPackages, fetchCurriculum, checkoutUrl } from '@/lib/lms'
 import { lineup } from '@/lib/lineup'
+import { PROMOS } from '@/lib/promos'
 import { ProductRail } from './ProductRail'
 import { Quiz } from './Quiz'
 
@@ -11,7 +12,7 @@ const kept = readFileSync(path.join(process.cwd(), 'content/legacy-programs-kept
 
 export async function Programs() {
   const [packages, curriculum] = await Promise.all([fetchPackages(), fetchCurriculum()])
-  const products = lineup(packages).map((p) => ({ ...p, checkout: checkoutUrl(p.id) }))
+  const products = lineup(packages).map((p) => ({ ...p, checkout: checkoutUrl(p.id), promo: PROMOS[p.id] ?? null }))
 
   return (
     <section className="section" id="programs">

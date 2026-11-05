@@ -4,14 +4,16 @@ import { useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
 import type { CurriculumCourse } from '@/lib/lms'
 import { CurriculumDialog } from './CurriculumDialog'
+import { Panel } from './Panel'
 
-type Item = Product & { checkout: string }
+type Item = Product & { checkout: string; promo: string | null }
 
 const MAX_COMPARE = 3
 
 export function ProductRail({ products, curriculum }: { products: Item[]; curriculum: CurriculumCourse[] }) {
   const [picked, setPicked] = useState<string[]>([])
   const [reading, setReading] = useState<Item | null>(null)
+  const [watching, setWatching] = useState<Item | null>(null)
   const coursesOf = (p: Item) =>
     p.courseIds.map((id) => curriculum.find((c) => c.id === id)).filter((c): c is CurriculumCourse => !!c)
   const [notice, setNotice] = useState('')
@@ -70,6 +72,11 @@ export function ProductRail({ products, curriculum }: { products: Item[]; curric
                 <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
                   {on ? '✓ Comparing' : 'Compare'}
                 </button>
+                {p.promo && (
+                  <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setWatching(p)}>
+                    ▶ Watch intro
+                  </button>
+                )}
                 {coursesOf(p).length > 0 && (
                   <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setReading(p)}>
                     Curriculum
@@ -82,6 +89,20 @@ export function ProductRail({ products, curriculum }: { products: Item[]; curric
       </div>
 
       <p className="pc-notice" role="status">{notice}</p>
+
+      {watching?.promo && (
+        <Panel eyebrow="Intro" title={watching.name} onClose={() => setWatching(null)}>
+          <div className="pv">
+            {/* Loaded only once opened, so the page makes no YouTube request for it before then. */}
+            <iframe
+              src={`https://www.youtube-nocookie.com/embed/${encodeURIComponent(watching.promo)}?autoplay=1&rel=0&playsinline=1`}
+              title={`${watching.name} — intro video`}
+              allow="autoplay; encrypted-media; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </Panel>
+      )}
 
       {reading && <CurriculumDialog name={reading.name} courses={coursesOf(reading)} onClose={() => setReading(null)} />}
 
