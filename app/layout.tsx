@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import './legacy.css'
+import './programs.css'
 
 export const metadata: Metadata = {
   title: 'The Trading Republic by ZFT',
