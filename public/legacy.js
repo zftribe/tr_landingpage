@@ -1,0 +1,120 @@
+// ── WEBINAR CAROUSEL ──
+  let currentSlide = 0;
+  const totalSlides = 5;
+  const track = document.getElementById('webinarCarousel');
+  const dots = document.querySelectorAll('#carouselDots .carousel-dot');
+
+  function goToSlide(n) {
+    currentSlide = n;
+    track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+  }
+
+  function moveCarousel(dir) {
+    goToSlide((currentSlide + dir + totalSlides) % totalSlides);
+  }
+
+  // Auto-advance every 6 seconds
+  let carouselTimer = setInterval(() => moveCarousel(1), 6000);
+  const carouselWrap = document.querySelector('.carousel-wrap');
+  if (carouselWrap) {
+    carouselWrap.addEventListener('mouseenter', () => clearInterval(carouselTimer));
+    carouselWrap.addEventListener('mouseleave', () => { carouselTimer = setInterval(() => moveCarousel(1), 6000); });
+  }
+
+  // ── SCROLL REVEAL (all reveal types) ──
+  const revealObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+  document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .stagger-children').forEach(el => revealObs.observe(el));
+
+  // Fallback
+  setTimeout(() => {
+    document.querySelectorAll('.reveal:not(.visible), .reveal-left:not(.visible), .reveal-right:not(.visible), .reveal-scale:not(.visible), .stagger-children:not(.visible)')
+      .forEach(el => el.classList.add('visible'));
+  }, 3000);
+
+  // ── SCROLL PROGRESS BAR ──
+  const progressBar = document.getElementById('scrollProgress');
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    progressBar.style.width = (scrollY / h * 100) + '%';
+  }, { passive: true });
+
+  // ── NAV SCROLL STATE ──
+  const nav = document.querySelector('.nav');
+  const sects = document.querySelectorAll('section[id]');
+  const navAs = document.querySelectorAll('.nav-menu a');
+
+  window.addEventListener('scroll', () => {
+    // Compact nav
+    nav.classList.toggle('scrolled', scrollY > 60);
+
+    // Active link highlight
+    let cur = '';
+    sects.forEach(s => { if (scrollY >= s.offsetTop - 120) cur = s.id; });
+    navAs.forEach(a => a.style.color = a.getAttribute('href') === '#' + cur ? 'var(--white)' : '');
+  }, { passive: true });
+
+  // ── 3D TILT ON HOVER ──
+  document.querySelectorAll('.tilt-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width - 0.5;
+      const y = (e.clientY - rect.top) / rect.height - 0.5;
+      card.style.transform = `perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg) scale(1.02)`;
+      card.style.boxShadow = `${-x * 20}px ${y * 20}px 40px rgba(0,0,0,0.3), 0 0 20px rgba(249,168,37,0.05)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+      card.style.boxShadow = '';
+    });
+  });
+
+  // ── PARALLAX ON SCROLL (feature visuals) ──
+  const parallaxEls = document.querySelectorAll('.feature-visual');
+  window.addEventListener('scroll', () => {
+    parallaxEls.forEach(el => {
+      const rect = el.getBoundingClientRect();
+      const speed = 0.04;
+      const y = (rect.top - window.innerHeight / 2) * speed;
+      el.style.transform = `translateY(${y}px)`;
+    });
+  }, { passive: true });
+
+  // ── ANIMATED COUNTERS ──
+  const counterObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const el = e.target;
+        const target = parseFloat(el.dataset.target);
+        const suffix = el.dataset.suffix || '';
+        const prefix = el.dataset.prefix || '';
+        const duration = 1500;
+        const start = performance.now();
+        const animate = (now) => {
+          const progress = Math.min((now - start) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3); // ease-out cubic
+          const current = Math.floor(eased * target);
+          el.textContent = prefix + current.toLocaleString() + suffix;
+          if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+        counterObs.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+  document.querySelectorAll('.counter').forEach(el => counterObs.observe(el));
+
+  // ── SMOOTH HOVER LIFT ON ALL CARDS ──
+  document.querySelectorAll('.program-card, .value-card, .drive-card, .support-card, .link-pill, .module-chip, .tier-row').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s, box-shadow 0.35s';
+    });
+  });
