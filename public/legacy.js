@@ -118,3 +118,17 @@
       card.style.transition = 'transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.35s, box-shadow 0.35s';
     });
   });
+
+// Trusted partners: static, readable cards without JS; optional motion with a pause control.
+const partnerStrip = document.querySelector('.partners-strip');
+const partnerMotion = partnerStrip?.querySelector('.partners-motion');
+if (partnerStrip && partnerMotion) {
+  partnerStrip.dataset.motion = 'ready';
+  partnerMotion.hidden = false;
+  partnerMotion.addEventListener('click', () => {
+    const paused = partnerMotion.getAttribute('aria-pressed') !== 'true';
+    partnerStrip.dataset.paused = String(paused);
+    partnerMotion.setAttribute('aria-pressed', String(paused));
+    partnerMotion.textContent = paused ? 'Resume animation' : 'Pause animation';
+  });
+}
