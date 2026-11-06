@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import Script from 'next/script'
 import { Programs } from '@/components/Programs'
+import { structuredData } from '@/lib/seo'
 
 /**
  * The homepage: the original static site, with rebuilt sections in between.
@@ -23,6 +24,10 @@ export const revalidate = 300
 export default function Home() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData()).replace(/</g, '\\u003c') }}
+      />
       <div dangerouslySetInnerHTML={{ __html: before }} />
       <Programs />
       <div dangerouslySetInnerHTML={{ __html: after }} />
