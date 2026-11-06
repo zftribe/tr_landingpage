@@ -1,5 +1,7 @@
 # Welcome site handoff
 
+- 2026-11-06 | Codex | codex/trusted-partner-cards | COMPLETE, LOCAL COMMIT ONLY: Owner approved the design and requested affiliate carryover. Added exact live personal-site links to Bitget, OKX, MEXC, Bybit and XM; retained matching Binance/Gate.io links. eToro has no source affiliate link and remains unlinked. All 28 rendered hrefs and seven keyboard stops verified; safe new-tab attributes and clone exclusions pass. Production build/TypeScript, JS syntax, whitespace checks pass. 320px focus navigation passes. Only partner markup and review documentation changed; see docs/AFFILIATE-REVIEW.md for exact mappings/evidence. Preview server stopped after QA. No push, merge, deployment, affiliate navigation, signup, or third-party contact.
+
 - 2026-11-06 | Codex | codex/trusted-partner-cards | COMPLETE, LOCAL REVIEW ONLY. Matched the existing eight Trusted Partners to the rounded dark cards and two opposing moving rows at georgeasibal.com. Copied the eight corresponding owner-site logo assets into public/partners. Existing Binance/Gate referral destinations retained, with safe new-tab attributes; no new partners or referral destinations. XM/eToro remain visually muted. Detailed exchange section, LMS catalogue, checkout, navigation and all unrelated markup unchanged. Canonical checkout and concurrent LMS work untouched. No push, merge, remote message, or deployment performed.
 
 Changed: app/legacy.css, content/legacy-before-programs.html, public/legacy.js, public/partners/*, HANDOFF.md.
