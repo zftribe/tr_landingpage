@@ -1,0 +1,9 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>body{margin:0;background:#888;display:flex;flex-wrap:wrap;gap:8px}canvas{width:540px;height:auto}</style>
+<script>/*POSTERS_JS*/</script>
+<script>const ASSETS=/*ASSETS_JSON*/;
+(async()=>{const TP=TRPoster;await TP.loadFonts();await TP.loadAssets(ASSETS);
+const by=Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+const jobs=(new URLSearchParams(location.search).get('j')||'meetup:A:square').split(',');
+for(const j of jobs){const [id,lk,sz]=j.split(':');const c=document.createElement('canvas');document.body.appendChild(c);const f=Object.assign({},by[id].fields);if(f.partner)f.partnerImg=TP.IMG['p_'+f.partner];TP.render(c,by[id],f,lk,sz);}
+})();</script>
