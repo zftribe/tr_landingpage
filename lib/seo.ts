@@ -33,7 +33,7 @@ const decode = (s: string) =>
 /** The FAQ exactly as shown on the page, read from its markup so the two never disagree. */
 export function readFaq(html = readFileSync(path.join(process.cwd(), 'content/legacy-after-programs.html'), 'utf8')): { q: string; a: string }[] {
   const items: { q: string; a: string }[] = []
-  const re = /<button class="faq-q"[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-a">([\s\S]*?)<\/div>/g
+  const re = /<button[^>]*class="faq-q"[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-a"[^>]*>([\s\S]*?)<\/div>/g
   for (let m = re.exec(html); m; m = re.exec(html)) items.push({ q: decode(m[1]), a: decode(m[2]) })
   return items
 }

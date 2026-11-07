@@ -17,7 +17,7 @@
       --white: #f5f5f7;
       --text: #cbcbd7;
       --muted: #8a8a9a;
-      --dim: #5c5c6e;
+      --dim: #85859a; /* was #5c5c6e; raised to pass 4.5:1 for small text (audit 8 Nov) */
       --radius: 16px;
       --radius-sm: 12px;
       --radius-pill: 980px;
@@ -867,7 +867,7 @@ html, body { overflow-x: clip; }
 .fx-yt:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 .fx-center { justify-content: center; }
 .fx-center-text { text-align: center; }
-.fx-disclose { margin-top: 18px; font-size: 0.72rem; color: var(--dim); padding: 0 24px; }
+.fx-disclose { margin-top: 18px; font-size: 0.74rem; color: var(--muted); padding: 0 24px; }
 .fx-who { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: center; }
 .fx-who-photo { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border-2); }
 .fx-values { font-size: 0.85rem; color: var(--muted); }
@@ -955,3 +955,12 @@ html, body { overflow-x: clip; }
   .rv-row { overflow-x: auto; }
   .rv-group[aria-hidden] { display: none; }
 }
+
+/* Reduced motion: no ambient animation, no smooth scrolling, sections already visible (audit 8 Nov). */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  .hero-glow-orb, .hero-glow-orb-2, .gradient-text-animated, .glow-pulse, .float-slow, .marquee-track { animation: none !important; }
+  .reveal, .reveal-left, .reveal-right, .reveal-scale, .stagger-children > * { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .carousel-track { transition: none !important; }
+}
+.carousel-pause { font-size: 0.8rem; }

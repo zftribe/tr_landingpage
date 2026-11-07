@@ -130,7 +130,14 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
         </div>
       </div>
 
-      <div className="pc-rail" role="list" aria-label="Programs" ref={rail}>
+      <div
+        className="pc-rail"
+        role="list"
+        aria-label="Programs"
+        ref={rail}
+        // Keyboard users: bring the whole card holding the focused button into view (snapping is paused while focus is inside).
+        onFocus={(e) => (e.target as HTMLElement).closest('.pc-card')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })}
+      >
         {before.map(extra)}
         {products.map((p) => {
           const on = picked.includes(p.id)

@@ -106,3 +106,10 @@
 /* Rank badges (citizen.svg, eternal.svg) carry their own tile, so they fill the slot. */
 .pc-logo:has(img[src$=".svg"]) { background: none; border: 0; }
 .pc-logo img[src$=".svg"] { width: 38px; height: 38px; }
+
+/* Audit fixes (Codex, 8 Nov) */
+.pc-rail:focus-within { scroll-snap-type: none; }
+.pc-card { scroll-margin-inline: 20px; }
+.pc-top { flex-wrap: wrap; row-gap: 6px; }
+.pc-top .program-tag { white-space: normal; text-align: right; }
+@media (max-width: 380px) { .pc-logo { width: 32px; height: 32px; } .pc-logo img { width: 22px; height: 22px; } .pc-logo img[src$=".svg"] { width: 32px; height: 32px; } .pc-coin { width: 24px; height: 24px; font-size: 9px; } }

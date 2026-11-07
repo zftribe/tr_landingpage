@@ -14,12 +14,18 @@
     goToSlide((currentSlide + dir + totalSlides) % totalSlides);
   }
 
-  // Auto-advance every 6 seconds
-  let carouselTimer = setInterval(() => moveCarousel(1), 6000);
+  // Auto-advance every 6 seconds, unless the visitor prefers less motion or pressed Pause.
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let carouselTimer = null, carouselPaused = reduceMotion;
+  const startCarousel = () => { clearInterval(carouselTimer); if (!carouselPaused) carouselTimer = setInterval(() => moveCarousel(1), 6000); };
+  const pauseBtn = document.querySelector('.carousel-pause');
+  const syncPause = () => { if (!pauseBtn) return; pauseBtn.setAttribute('aria-pressed', String(carouselPaused)); pauseBtn.setAttribute('aria-label', carouselPaused ? 'Play slideshow' : 'Pause slideshow'); pauseBtn.textContent = carouselPaused ? '▶' : '❚❚'; };
+  pauseBtn?.addEventListener('click', () => { carouselPaused = !carouselPaused; syncPause(); startCarousel(); });
+  syncPause(); startCarousel();
   const carouselWrap = document.querySelector('.carousel-wrap');
   if (carouselWrap) {
     carouselWrap.addEventListener('mouseenter', () => clearInterval(carouselTimer));
-    carouselWrap.addEventListener('mouseleave', () => { carouselTimer = setInterval(() => moveCarousel(1), 6000); });
+    carouselWrap.addEventListener('mouseleave', startCarousel);
   }
 
   // ── SCROLL REVEAL (all reveal types) ──
@@ -134,4 +140,13 @@ document.querySelectorAll('.fx-yt[data-yt]').forEach((btn) => {
     f.allowFullscreen = true;
     btn.replaceWith(f);
   }, { once: true });
+});
+
+// Tell screen readers whether the FAQ answers and the phone menu are open (the inline handlers toggle the classes first).
+document.addEventListener('click', (e) => {
+  const q = e.target.closest('.faq-q');
+  if (q) q.setAttribute('aria-expanded', String(q.parentElement.classList.contains('open')));
+  const menu = document.querySelector('.mobile-menu');
+  const toggle = document.querySelector('.mobile-toggle');
+  if (menu && toggle) toggle.setAttribute('aria-expanded', String(menu.classList.contains('open')));
 });

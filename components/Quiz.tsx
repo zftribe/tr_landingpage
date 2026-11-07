@@ -7,7 +7,7 @@ type Item = Product & { checkout: string }
 type Goal = 'trading' | 'investing' | 'both'
 type Support = 'self' | 'mentor'
 
-const PATHFINDERS_URL = 'https://georgeasibal.com/'
+const PATHFINDERS_URL = 'https://zeefreaks.gitbook.io/zft-masterclass-pathfinders/'
 
 const GOALS: { value: Goal; label: string; hint: string }[] = [
   { value: 'trading', label: 'Active trading', hint: 'Reading charts, planning trades and managing risk.' },
@@ -43,7 +43,10 @@ export function Quiz({ products }: { products: Item[] }) {
   const show = (id: string) => {
     const card = document.getElementById(`product-${id}`)
     if (!card) return
-    card.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' })
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    card.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center', inline: 'center' })
+    // Move keyboard focus to the card's main action, so keyboard and screen-reader users land there too.
+    card.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true })
     card.classList.add('pc-flash')
     setTimeout(() => card.classList.remove('pc-flash'), 1600)
   }
@@ -100,15 +103,15 @@ export function Quiz({ products }: { products: Item[] }) {
               {peso(product.price)}
               {product.discount > 0 && <span> · save {peso(product.discount)}</span>}
             </p>
-            <p className="qz-note">Want live sessions with mentors too? Each course also comes with a membership — see the options below.</p>
+            <p className="qz-note">Want live sessions with mentors too? Each course also comes with a membership — see the options in the carousel above.</p>
             <div className="qz-actions">
               <a href={product.checkout} className="btn btn-gold">Buy now →</a>
-              <button type="button" className="btn btn-outline" onClick={() => show(product.id)}>See it below</button>
+              <button type="button" className="btn btn-outline" onClick={() => show(product.id)}>Show it in the carousel</button>
             </div>
           </>
         )}
         {goal && support === 'self' && !product && (
-          <p>That program isn&apos;t on sale right now — see everything that is below.</p>
+          <p>That program isn&apos;t on sale right now — see everything in the carousel above.</p>
         )}
         {!(goal && support) && <p className="qz-wait">Answer both to see your recommendation.</p>}
       </div>
