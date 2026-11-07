@@ -119,19 +119,10 @@
     });
   });
 
-// Trusted partners: static, readable cards without JS; optional motion with a pause control.
+// Trusted partners: static, readable cards without JS; with JS the two rows drift
+// (paused on hover or keyboard focus, still for visitors who turn motion off).
 const partnerStrip = document.querySelector('.partners-strip');
-const partnerMotion = partnerStrip?.querySelector('.partners-motion');
-if (partnerStrip && partnerMotion) {
-  partnerStrip.dataset.motion = 'ready';
-  partnerMotion.hidden = false;
-  partnerMotion.addEventListener('click', () => {
-    const paused = partnerMotion.getAttribute('aria-pressed') !== 'true';
-    partnerStrip.dataset.paused = String(paused);
-    partnerMotion.setAttribute('aria-pressed', String(paused));
-    partnerMotion.textContent = paused ? 'Resume animation' : 'Pause animation';
-  });
-}
+if (partnerStrip) partnerStrip.dataset.motion = 'ready';
 
 // Hero video: show the thumbnail first, load the YouTube player only on tap.
 document.querySelectorAll('.fx-yt[data-yt]').forEach((btn) => {
