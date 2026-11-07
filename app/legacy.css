@@ -999,7 +999,9 @@ html, body { overflow-x: clip; }
 .tk-stub { position: relative; display: grid; align-content: center; justify-items: center; gap: 10px; padding: 20px 16px; text-align: center; border-left: 2px dashed rgba(255,255,255,.18); border-radius: 0 20px 20px 0; background: linear-gradient(160deg, #2a1d06, #140f08); transform-origin: 0 0; transition: transform .75s cubic-bezier(.3,1.4,.5,1), opacity .45s .35s; }
 .tk-off { font-family: var(--font-display); font-weight: 800; color: #FFD36A; font-size: 2rem; line-height: 1; letter-spacing: -.03em; }
 .tk-off small { display: block; margin-top: 5px; font-size: .62rem; color: var(--text); letter-spacing: .12em; text-transform: uppercase; }
-.tk-code { font-family: ui-monospace, Consolas, monospace; font-weight: 700; color: var(--white); background: rgba(0,0,0,.35); border: 1px dashed rgba(255,211,106,.55); border-radius: 8px; padding: 6px 10px; font-size: .82rem; letter-spacing: .06em; max-width: 100%; overflow-wrap: anywhere; }
+.tk-codewrap { display: grid; justify-items: center; gap: 3px; }
+.tk-codewrap small { font-size: .62rem; color: var(--text); letter-spacing: .1em; text-transform: uppercase; }
+.tk-code { white-space: nowrap; font-family: ui-monospace, Consolas, monospace; font-weight: 700; color: var(--white); background: rgba(0,0,0,.35); border: 1px dashed rgba(255,211,106,.55); border-radius: 8px; padding: 6px 10px; font-size: .82rem; letter-spacing: .06em; max-width: 100%; overflow-wrap: anywhere; }
 .tk-claim { display: inline-flex; justify-content: center; width: 100%; border-radius: 999px; background: var(--gold); color: #141006; font-family: var(--font-display); font-weight: 800; font-size: .85rem; padding: 11px 14px; text-decoration: none; transition: transform .2s, box-shadow .2s; }
 .tk-claim:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(249,168,37,.35); }
 .tk-claim:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
@@ -1018,8 +1020,20 @@ html, body { overflow-x: clip; }
   .tk-claimed { top: auto; width: auto; left: 0; height: 140px; }
   .tk.torn .tk-stub { transform: translate(0, 60px) rotate(-5deg); }
   .tk-main { padding: 18px; }
+  .tk-codewrap { justify-items: start; }
+}
+@container (max-width: 360px) {
+  .tk-stub { grid-template-columns: 1fr; }
+  .tk-off { font-size: 1.7rem; }
 }
 @media (prefers-reduced-motion: reduce) { .tk-stub, .tk-claimed, .tk-claim { transition: none !important; } }
 .tk-burst { position: fixed; pointer-events: none; z-index: 60; }
 .tk-burst i { position: absolute; width: 7px; height: 7px; border-radius: 2px; animation: tk-fly .9s ease-out forwards; }
 @keyframes tk-fly { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
+
+/* Review reels: a small pause/play control (WCAG 2.2.2), remembered per visitor. */
+.rv-head { position: relative; }
+.rv-toggle { margin-top: 10px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(242,201,76,.35); background: transparent; color: #d8d3c9; font-size: .7rem; cursor: pointer; }
+.rv-toggle:hover, .rv-toggle:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
+.rv-rows.rv-paused .rv-track { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .rv-toggle { display: none; } }

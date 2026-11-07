@@ -156,8 +156,19 @@ document.addEventListener('click', (e) => {
 document.addEventListener('click', (e) => {
   const claim = e.target.closest('.tk-claim');
   if (!claim) return;
-  try { navigator.clipboard?.writeText(claim.dataset.code).catch(() => {}); } catch (err) {}
-  claim.closest('.tk')?.classList.add('torn');
+  const tk = claim.closest('.tk'), code = claim.dataset.code;
+  const msg = tk?.querySelector('.tk-msg');
+  const copied = navigator.clipboard?.writeText ? navigator.clipboard.writeText(code) : Promise.reject(new Error('no clipboard'));
+  copied.then(() => { if (msg) msg.textContent = 'Code ' + code + ' copied'; })
+    .catch(() => { if (msg) msg.textContent = 'Use code ' + code + ' when you sign up'; });
+  if (!tk) return;
+  tk.classList.add('torn');
+  // The torn stub leaves the tab order and the accessibility tree; focus moves to "Open it again".
+  const stub = tk.querySelector('.tk-stub');
+  stub?.setAttribute('aria-hidden', 'true');
+  claim.setAttribute('tabindex', '-1');
+  const again = tk.querySelector('.tk-claimed a');
+  setTimeout(() => again?.focus({ preventScroll: true }), 50);
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const r = claim.getBoundingClientRect(), b = document.createElement('div');
   b.className = 'tk-burst'; b.style.left = (r.left + r.width / 2) + 'px'; b.style.top = r.top + 'px';
@@ -170,3 +181,23 @@ document.addEventListener('click', (e) => {
   document.body.appendChild(b);
   setTimeout(() => b.remove(), 1000);
 });
+
+// Student reviews: pause/play the two moving rows; the choice is remembered on this device.
+(() => {
+  const btn = document.querySelector('.rv-toggle'), rows = document.querySelector('.rv-rows');
+  if (!btn || !rows) return;
+  const set = (paused) => {
+    rows.classList.toggle('rv-paused', paused);
+    btn.setAttribute('aria-pressed', String(paused));
+    btn.setAttribute('aria-label', paused ? 'Play the moving reviews' : 'Pause the moving reviews');
+    btn.textContent = paused ? '▶' : '❚❚';
+  };
+  let saved = false;
+  try { saved = localStorage.getItem('tr-reviews-paused') === '1'; } catch (err) {}
+  set(saved);
+  btn.addEventListener('click', () => {
+    const paused = !rows.classList.contains('rv-paused');
+    set(paused);
+    try { localStorage.setItem('tr-reviews-paused', paused ? '1' : '0'); } catch (err) {}
+  });
+})();
