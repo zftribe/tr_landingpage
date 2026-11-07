@@ -13,7 +13,7 @@ export const DESCRIPTION =
   'Learn to trade and invest in stocks, forex, crypto, indices and commodities. Free Blueprint course, weekly webinars with Boss Zeefreaks, and programs like Technical Intensive.'
 
 export const SAME_AS = [
-  'https://discord.gg/tradingrepublic',
+  'https://discord.gg/SXEEhgmeTn',
   'https://www.youtube.com/@tradingrepubliczft',
   'https://www.tiktok.com/@tradingrepublic.zft',
   'https://www.facebook.com/thetradingrepublic',
