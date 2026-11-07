@@ -930,3 +930,28 @@ html, body { overflow-x: clip; }
   .fx-pillars { grid-template-columns: 1fr; }
   .fx-founder { border-radius: var(--radius); align-items: flex-start; }
 }
+
+/* ─── STUDENT REVIEWS: same look as georgeasibal.com's "What my students say" ─── */
+.rv { overflow: hidden; }
+.rv-head { text-align: center; display: grid; justify-items: center; }
+.rv-head h2 em { color: var(--gold); font-style: normal; }
+.rv-score { display: inline-flex; gap: 6px; margin-top: 18px; padding: 8px 14px; border: 1px solid rgba(242,201,76,.35); border-radius: 999px; color: #d8d3c9; font-size: 13px; text-decoration: none; transition: border-color .25s; }
+.rv-score b { color: var(--gold); }
+.rv-score:hover, .rv-score:focus-visible { border-color: var(--gold); outline: none; }
+.rv-rows { display: grid; gap: 16px; margin-top: 42px; -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent); }
+.rv-row { overflow: hidden; }
+.rv-track { display: flex; width: max-content; animation: rv-drift 84s linear infinite; }
+.rv-reverse .rv-track { animation-direction: reverse; animation-duration: 92s; }
+.rv-rows:hover .rv-track { animation-play-state: paused; }
+.rv-group { display: flex; }
+.rv-card { display: flex; flex-direction: column; flex: 0 0 auto; width: 340px; height: 150px; margin: 0 16px 0 0; padding: 18px 20px; border: 1px solid #262626; border-radius: 18px; background: linear-gradient(145deg, #121212, #090909); }
+.rv-card blockquote { display: -webkit-box; margin: 0; overflow: hidden; color: #f4f1e9; font-family: "Cormorant Garamond", Georgia, serif; font-size: 18px; font-style: italic; line-height: 1.3; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.rv-card figcaption { display: flex; align-items: center; gap: 10px; margin-top: auto; color: #d8d3c9; font-size: 12px; font-weight: 700; letter-spacing: .06em; }
+.rv-card img { width: 34px; height: 34px; border: 1px solid rgba(242,201,76,.35); border-radius: 50%; object-fit: cover; }
+@keyframes rv-drift { to { transform: translateX(-50%); } }
+@media (max-width: 600px) { .rv-card { width: 290px; height: 160px; } }
+@media (prefers-reduced-motion: reduce) {
+  .rv-track { animation: none; }
+  .rv-row { overflow-x: auto; }
+  .rv-group[aria-hidden] { display: none; }
+}
