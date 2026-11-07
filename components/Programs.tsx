@@ -35,7 +35,7 @@ const AFTER: ExtraCard[] = [
       'The Vault: 300+ webinar videos since 2020',
       '₱59,999 if you own Wealth Builder · ₱69,999 with TI or WEB3',
     ],
-    logos: [{ alt: 'The Eternals', text: 'E' }],
+    logos: [{ alt: 'The Eternals', src: '/logos/programs/eternal.svg' }],
     cta: { label: 'Ask us on Discord', href: DISCORD_INVITE, external: true },
   },
   {

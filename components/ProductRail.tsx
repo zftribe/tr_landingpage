@@ -29,7 +29,8 @@ const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
   // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
   web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
-  citizen: { alt: 'Citizen membership', src: '/logos/programs/tr.png' },
+  // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
+  citizen: { alt: 'Citizen membership', src: '/logos/programs/citizen.svg' },
 } satisfies Record<string, Logo>
 
 const logosOf = (p: Product): Logo[] => [
