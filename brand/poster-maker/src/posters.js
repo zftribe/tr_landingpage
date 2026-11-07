@@ -36,14 +36,29 @@
   }
   function font(w, px, fam) { return `${w} ${Math.round(px)}px ${fam}`; }
   function setFont(ctx, w, px, fam, ls) { ctx.font = font(w, px, fam); ctx.letterSpacing = ((ls || 0) * px).toFixed(2) + "px"; }
+  function splitWord(ctx, w, maxW) {
+    const parts = []; let cur = "";
+    for (const ch of Array.from(w)) { if (cur && ctx.measureText(cur + ch).width > maxW) { parts.push(cur); cur = ch; } else cur += ch; }
+    if (cur) parts.push(cur); return parts;
+  }
   function wrap(ctx, text, maxW) {
     const out = [];
     for (const para of String(text || "").split("\n")) {
       let line = "";
-      for (const w of para.split(/\s+/).filter(Boolean)) { const t = line ? line + " " + w : w; if (ctx.measureText(t).width <= maxW || !line) line = t; else { out.push(line); line = w; } }
+      for (const w0 of para.split(/\s+/).filter(Boolean)) {
+        for (const w of (ctx.measureText(w0).width > maxW ? splitWord(ctx, w0, maxW) : [w0])) {
+          const t = line ? line + " " + w : w; if (ctx.measureText(t).width <= maxW || !line) line = t; else { out.push(line); line = w; }
+        }
+      }
       if (line) out.push(line);
     }
     return out;
+  }
+  /* shorten text with an ellipsis until it fits maxW (current ctx font) */
+  function ellipsize(ctx, text, maxW) {
+    text = String(text || ""); if (ctx.measureText(text).width <= maxW) return text;
+    const chars = Array.from(text); while (chars.length && ctx.measureText(chars.join("") + "…").width > maxW) chars.pop();
+    return chars.length ? chars.join("").trimEnd() + "…" : "";
   }
   function fit(ctx, text, fam, w, maxW, maxPx, minPx, maxLines, ls) {
     maxPx = Math.max(minPx, maxPx);
@@ -52,8 +67,8 @@
       if (lines.length <= maxLines && lines.every((l) => ctx.measureText(l).width <= maxW)) return { px, lines };
     }
     setFont(ctx, w, minPx, fam, ls);
-    const lines = wrap(ctx, text, maxW); if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] += "…"; }
-    return { px: minPx, lines };
+    const lines = wrap(ctx, text, maxW); if (lines.length > maxLines) { lines.length = maxLines; lines[maxLines - 1] = ellipsize(ctx, lines[maxLines - 1] + "…", maxW); }
+    return { px: minPx, lines: lines.map((l) => ellipsize(ctx, l, maxW)) };
   }
   function avgColor(ctx, x, y, w, h) {
     try { const d = ctx.getImageData(Math.max(0, x | 0), Math.max(0, y | 0), Math.max(1, w | 0), Math.max(1, h | 0)).data; let r = 0, g = 0, b = 0, n = 0; for (let i = 0; i < d.length; i += 16) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; } return [r / n, g / n, b / n]; } catch (e) { return [20, 20, 24]; }
@@ -351,10 +366,14 @@
     const zw = h * 0.82 * z.width / z.height, tw = h * t.width / t.height, gap = h * 0.45, x0 = xRight - (zw + gap + tw);
     ctx.drawImage(z, x0, y + h * 0.09, zw, h * 0.82); ctx.drawImage(t, x0 + zw + gap, y, tw, h); return zw + gap + tw;
   }
-  function chipSize(ctx, text, px, fam, w, ls) { setFont(ctx, w, px, fam, ls); const pad = Math.max(BOX_PAD, px * 0.75); return { w: ctx.measureText(text).width + pad * 2, h: px + pad * 1.2, pad }; }
+  function chipSize(ctx, text, px, fam, w, ls, maxW) {
+    setFont(ctx, w, px, fam, ls); const pad = Math.max(BOX_PAD, px * 0.75), vpad = Math.max(BOX_PAD, px * 0.6);
+    if (maxW) text = ellipsize(ctx, text, Math.max(10, maxW - pad * 2));
+    return { w: ctx.measureText(text).width + pad * 2, h: px + vpad * 2, pad, text };
+  }
   function chip(ctx, x, y, text, px, o) {
     const fam = o.fam || BODY, w = o.weight || 700, ls = o.ls ?? 0.04;
-    const m = chipSize(ctx, text, px, fam, w, ls); let cw = m.w + (o.dot ? px * 1.1 : 0);
+    const m = chipSize(ctx, text, px, fam, w, ls, o.maxW ? o.maxW - (o.dot ? px * 1.1 : 0) : 0); text = m.text; let cw = m.w + (o.dot ? px * 1.1 : 0);
     rr(ctx, x, y, cw, m.h, o.square ? 6 : m.h / 2); ctx.fillStyle = o.bg; ctx.fill();
     if (o.line && o.line !== "rgba(0,0,0,0)") { ctx.strokeStyle = o.line; ctx.lineWidth = 2; ctx.stroke(); }
     let tx = x + m.pad;
@@ -373,9 +392,11 @@
     ctx.restore();
     ctx.strokeStyle = P.ring; ctx.lineWidth = Math.max(3, R * 0.06); ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.stroke();
   }
-  function footerPill(ctx, canvas, x, y, text, px, align) {
+  function footerPill(ctx, canvas, x, y, text, px, align, maxW) {
     setFont(ctx, 700, px, BODY, 0.06);
-    const pad = Math.max(BOX_PAD, px * 0.9), w = ctx.measureText(text).width + pad * 2 + px * 1.6, h = px + pad * 1.2;
+    const pad = Math.max(BOX_PAD, px * 0.9), vpad = Math.max(BOX_PAD, px * 0.7);
+    if (maxW) text = ellipsize(ctx, text, Math.max(10, maxW - pad * 2 - px * 1.6));
+    const w = ctx.measureText(text).width + pad * 2 + px * 1.6, h = px + vpad * 2;
     const x0 = align === "left" ? x : x - w / 2;
     const [r, g, b] = avgColor(ctx, x0, y, w, h), L = lum(r, g, b);
     ctx.save(); rr(ctx, x0, y, w, h, h / 2); ctx.clip();
@@ -388,7 +409,7 @@
     setFont(ctx, 700, px, BODY, 0.06); ctx.fillStyle = ink; ctx.textBaseline = "middle"; ctx.fillText(text, tx, y + h / 2 + px * 0.04); ctx.textBaseline = "alphabetic";
     return { w, h };
   }
-  function footerHeight(px) { return px + Math.max(BOX_PAD, px * 0.9) * 1.2; }
+  function footerHeight(px) { return px + Math.max(BOX_PAD, px * 0.7) * 2; }
 
   /* draw several speakers big inside a rect (side mode) */
   function speakerGallery(ctx, rect, spk, P, s, alpha, dy) {
@@ -561,14 +582,14 @@
     let lx = M; const cpx = Math.round(22 * s);
     if (F.live) {
       const blink = animated ? 0.55 + 0.45 * Math.abs(Math.cos(TAU * p * 4)) : 1;
-      const ch = cpx + Math.max(BOX_PAD, cpx * 0.75) * 1.2;
+      const ch = chipSize(ctx, "LIVE", cpx, mono ? MONO : BODY, 800, 0.04).h;
       const c = chip(ctx, lx, M + (logoH - ch) / 2, "LIVE", cpx, { bg: "#E5383B", ink: "#fff", dot: `rgba(255,255,255,${blink})`, weight: 800, fam: mono ? MONO : BODY });
       lx += c.w + 14 * s;
     }
     const [ar, ag, ab] = avgColor(ctx, M, M, 300 * s, logoH);
     if (F.where && /fb|youtube|zoom|discord|live/i.test(F.where) && !wide) {
       setFont(ctx, 700, cpx * 0.9, mono ? MONO : BODY, 0.06); ctx.fillStyle = lum(ar, ag, ab) > 0.6 ? "#222" : "rgba(255,255,255,0.85)"; ctx.textBaseline = "middle";
-      ctx.fillText(F.where.toUpperCase(), lx, M + logoH / 2); ctx.textBaseline = "alphabetic";
+      ctx.fillText(ellipsize(ctx, F.where.toUpperCase(), Math.max(0, W - M - 300 * s - lx)), lx, M + logoH / 2); ctx.textBaseline = "alphabetic";
     }
     ctx.restore();
 
@@ -586,7 +607,7 @@
     if (det.length) {
       const dpx = Math.round((wide ? 22 : 28) * s), cg = 12 * s;
       const rows = []; let row = [], rw = 0;
-      for (const d of det) { const m = chipSize(ctx, d, dpx, mono ? MONO : BODY, 700, 0.04); if (row.length && rw + m.w > colW) { rows.push({ items: row, w: rw - cg }); row = []; rw = 0; } row.push({ d, w: m.w, h: m.h }); rw += m.w + cg; }
+      for (const d of det) { const m = chipSize(ctx, d, dpx, mono ? MONO : BODY, 700, 0.04, colW); if (row.length && rw + m.w > colW) { rows.push({ items: row, w: rw - cg }); row = []; rw = 0; } row.push({ d: m.text, w: m.w, h: m.h }); rw += m.w + cg; }
       if (row.length) rows.push({ items: row, w: rw - cg });
       const ch = rows[0].items[0].h, h = rows.length * ch + (rows.length - 1) * cg;
       blocks.push({ k: "chips", h, draw(x, y, a, dy) { ctx.save(); ctx.globalAlpha = a; let yy = y + dy; for (const rw2 of rows) { let xx = center ? x + (colW - rw2.w) / 2 : x; for (const it of rw2.items) { chip(ctx, xx, yy, it.d, dpx, { bg: P.chipBg, ink: P.chipInk, line: P.chipLine, fam: mono ? MONO : BODY, square: mono }); xx += it.w + cg; } yy += ch + cg; } ctx.restore(); } });
@@ -605,19 +626,19 @@
         const textMax = colW - avW - 24 * s;
         const nm = fit(ctx, namesTxt, DISPLAY, 800, textMax, 40 * s * big, 20 * s, n > 1 ? 2 : 1, 0);
         setFont(ctx, 600, 22 * s, textFam, 0.08); const roleW = ctx.measureText(roleTxt).width;
-        setFont(ctx, 800, nm.px, DISPLAY, 0); const nmW = Math.max(...nm.lines.map((l) => ctx.measureText(l).width), roleW);
+        setFont(ctx, 800, nm.px, DISPLAY, 0); const nmW = Math.min(textMax, Math.max(...nm.lines.map((l) => ctx.measureText(l).width), roleW));
         const total = avW + 24 * s + nmW;
         let x0 = center ? x + (colW - total) / 2 : x;
         for (let i = n - 1; i >= 0; i--) avatar(ctx, x0 + Rr + i * (Rr * 2 - ov), y + Rr, Rr, spk[i], P, s);
         const tx = x0 + avW + 24 * s, lh = nm.px * 1.08, blockH = 22 * s * 1.4 + nm.lines.length * lh, ty = y + Rr - blockH / 2;
-        ctx.fillStyle = P.sub; setFont(ctx, 600, 22 * s, textFam, 0.08); ctx.fillText(roleTxt, tx, ty + 22 * s);
+        ctx.fillStyle = P.sub; setFont(ctx, 600, 22 * s, textFam, 0.08); ctx.fillText(ellipsize(ctx, roleTxt, textMax), tx, ty + 22 * s);
         ctx.fillStyle = P.ink; setFont(ctx, 800, nm.px, DISPLAY, 0);
         nm.lines.forEach((l, i) => ctx.fillText(l, tx, ty + 22 * s * 1.4 + lh * (i + 0.85)));
         ctx.restore();
       } });
     } else if (lay.nameOnly && spk.length === 1) {
       const nm = spk[0], px = 36 * s;
-      blocks.push({ k: "spk", h: px * 1.9, draw(x, y, a, dy) { ctx.save(); ctx.globalAlpha = a; y += dy; ctx.fillStyle = P.accent; setFont(ctx, 700, 22 * s, textFam, 0.1); ctx.textAlign = center ? "center" : "left"; const xx = center ? x + colW / 2 : x; ctx.fillText(("with " + (nm.role || "")).trim().toUpperCase(), xx, y + 22 * s); ctx.fillStyle = P.ink; setFont(ctx, 800, px, DISPLAY, 0); ctx.fillText(nm.name || "", xx, y + 22 * s + px * 1.25); ctx.textAlign = "left"; ctx.restore(); } });
+      blocks.push({ k: "spk", h: px * 1.9, draw(x, y, a, dy) { ctx.save(); ctx.globalAlpha = a; y += dy; ctx.fillStyle = P.accent; setFont(ctx, 700, 22 * s, textFam, 0.1); ctx.textAlign = center ? "center" : "left"; const xx = center ? x + colW / 2 : x; ctx.fillText(ellipsize(ctx, ("with " + (nm.role || "")).trim().toUpperCase(), colW), xx, y + 22 * s); ctx.fillStyle = P.ink; setFont(ctx, 800, px, DISPLAY, 0); ctx.fillText(ellipsize(ctx, nm.name || "", colW), xx, y + 22 * s + px * 1.25); ctx.textAlign = "left"; ctx.restore(); } });
     }
     // partner
     if (F.partnerImg) {
@@ -687,7 +708,7 @@
     // footer
     const footText = (opts.footer || "Trading Republic by ZFT") + (F.channel ? "  ·  " + F.channel : "");
     ctx.save(); ctx.globalAlpha = inA(blocks.length + 1);
-    footerPill(ctx, canvas, wide || lay.footerLeft ? M : W / 2, fy, footText.toUpperCase(), fpx, wide || lay.footerLeft ? "left" : "center");
+    footerPill(ctx, canvas, wide || lay.footerLeft ? M : W / 2, fy, footText.toUpperCase(), fpx, wide || lay.footerLeft ? "left" : "center", W - 2 * M);
     ctx.restore();
     ctx.letterSpacing = "0px";
     return canvas;

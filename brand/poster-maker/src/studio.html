@@ -93,7 +93,7 @@ textarea{min-height:64px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 
 .tour-shade{position:fixed;inset:0;background:rgba(5,5,8,.72);z-index:50}
-.tour-ring{position:fixed;z-index:51;border-radius:14px;box-shadow:0 0 0 3px var(--gold),0 0 0 9999px rgba(5,5,8,.72);pointer-events:none;transition:all .25s ease}
+.tour-ring{position:fixed;z-index:51;border-radius:14px;box-shadow:0 0 0 3px var(--gold),0 0 0 9999px rgba(5,5,8,.72);pointer-events:none}
 .tour-tip{position:fixed;z-index:52;width:min(360px,calc(100vw - 24px));background:#16161e;border:1px solid rgba(255,180,0,.5);border-radius:14px;padding:16px;display:grid;gap:8px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
 .tour-tip.center{left:50%!important;top:50%!important;transform:translate(-50%,-50%)}
 .tour-tip.dock{left:12px!important;right:12px;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom,0px));width:auto}
@@ -143,21 +143,21 @@ textarea{min-height:64px;resize:vertical}
     <div class="card">
       <h2>Details <button class="x" id="reset" type="button">Reset to template</button></h2>
       <div class="grid2">
-        <div class="f"><label for="title">Title</label><input type="text" id="title"></div>
-        <div class="f"><label for="kicker">Small line above the title</label><input type="text" id="kicker"></div>
+        <div class="f"><label for="title">Title</label><input type="text" id="title" maxlength="80"></div>
+        <div class="f"><label for="kicker">Small line above the title</label><input type="text" id="kicker" maxlength="60"></div>
       </div>
-      <div class="f"><label for="topic">Topic</label><textarea id="topic"></textarea></div>
+      <div class="f"><label for="topic">Topic</label><textarea id="topic" maxlength="220"></textarea></div>
       <div class="grid3">
         <div class="f"><label for="date">Date</label><input type="date" id="date"></div>
         <div class="f"><label for="time">Start (PH time)</label><input type="time" id="time"></div>
         <div class="f"><label for="endTime">End (optional)</label><input type="time" id="endTime"></div>
       </div>
       <div class="grid2">
-        <div class="f"><label for="where">Where</label><input type="text" id="where" placeholder="FB Live · YouTube, Zoom, Ortigas…"></div>
-        <div class="f"><label for="channel">Discord channel or link</label><input type="text" id="channel" placeholder="#upcoming-events"></div>
+        <div class="f"><label for="where">Where</label><input type="text" id="where" maxlength="60" placeholder="FB Live · YouTube, Zoom, Ortigas…"></div>
+        <div class="f"><label for="channel">Discord channel or link</label><input type="text" id="channel" maxlength="60" placeholder="#upcoming-events"></div>
       </div>
       <div class="grid2">
-        <div class="f"><label for="cta">Call to action</label><input type="text" id="cta" placeholder="Free for everyone"></div>
+        <div class="f"><label for="cta">Call to action</label><input type="text" id="cta" maxlength="80" placeholder="Free for everyone"></div>
         <div class="f"><label for="partner">Partner logo</label><select id="partner"></select></div>
       </div>
       <p class="missing" id="missing"></p>
@@ -220,6 +220,7 @@ const PHOTOS = Object.keys(ASSETS).filter(k=>k.startsWith("ph_")).map(k=>k.slice
 function store(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); }catch(e){} }
 function load(k){ try{ return JSON.parse(localStorage.getItem("trpm:"+k)); }catch(e){ return null; } }
 
+function defaultPhoto(id){ return PHOTOS.includes(id+"-1") ? id+"-1" : ""; }
 function freshFields(id){ const f = JSON.parse(JSON.stringify(byId[id].fields)); f.title = f.title || byId[id].name; f.speakers = (f.speakers||[]).map(s=>({name:s.name,role:s.role})); return f; }
 function currentFields(){
   const f = Object.assign({}, state.f);
@@ -237,6 +238,7 @@ const BASE_SHOWN = 8;
 let hidden = new Set([...(ZT && ZT.hidden ? ZT.hidden : []), ...((load("hidden")||[]))]);
 let showAll = !!load("showAll");
 function teamWide(){ return !!(ZT && ZT.admin); }
+const visibleTemplates = () => TP.TEMPLATES.filter(t=>!hidden.has(t.id));
 async function saveHidden(id, hide){
   if (teamWide()){
     try{ const r = await fetch("prefs.php", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({act: hide?"hide":"restore", id, csrf: ZT.csrf})}); if(!r.ok) throw 0; }
@@ -254,23 +256,36 @@ function buildTemplates(){
     b.append(c); const n=document.createElement("span"); n.textContent=t.name; const sm=document.createElement("small"); sm.textContent=t.blurb; b.append(n,sm);
     b.addEventListener("click",()=>selectTemplate(t.id));
     const x = document.createElement("button"); x.type="button"; x.className="tplx"; x.textContent="×"; x.setAttribute("aria-label","Remove "+t.name);
-    x.addEventListener("click",(e)=>{ e.stopPropagation(); askRemove(w, t); });
+    x.addEventListener("click",(e)=>{ e.stopPropagation(); askRemove(w, t, x); });
     w.append(b, x);
     (t.fav ? $("favs") : $("bases")).append(w);
   }
   $("moreBtn").addEventListener("click", ()=>{ showAll=!showAll; store("showAll", showAll); layoutTemplates(); });
 }
-function askRemove(w, t){
+function askRemove(w, t, trigger){
   if (w.querySelector(".confirm")) return;
   const box=document.createElement("div"); box.className="confirm"; box.setAttribute("role","group"); box.setAttribute("aria-label","Remove "+t.name+"?");
   const title=document.createElement("b"); title.textContent="Remove "+t.name+"?";
-  const msg=document.createElement("span"); msg.textContent = teamWide() ? "Hidden for everyone. You can restore it below." : "Hidden for you. You can restore it below.";
+  const msg=document.createElement("span");
+  const last = visibleTemplates().length <= 1;
+  msg.textContent = last ? "This is the last template. Restore another one first." : (teamWide() ? "Hidden for everyone. You can restore it below." : "Hidden for you. You can restore it below.");
   const row=document.createElement("div"); row.className="row";
-  const yes=document.createElement("button"); yes.type="button"; yes.className="yes"; yes.textContent="Remove";
+  const yes=document.createElement("button"); yes.type="button"; yes.className="yes"; yes.textContent="Remove"; if (last) yes.disabled = true;
   const no=document.createElement("button"); no.type="button"; no.className="no"; no.textContent="Cancel";
   row.append(yes,no); box.append(title,msg,row);
-  no.addEventListener("click",()=>box.remove());
-  yes.addEventListener("click", async ()=>{ if(await saveHidden(t.id,true)){ box.remove(); if(state.tpl===t.id){ const next=TP.TEMPLATES.find(x=>!hidden.has(x.id)); if(next) selectTemplate(next.id); } layoutTemplates(); } });
+  const close=()=>{ box.remove(); trigger.focus(); };
+  no.addEventListener("click", close);
+  box.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ e.preventDefault(); close(); } });
+  yes.addEventListener("click", async ()=>{
+    yes.disabled = true;
+    if(await saveHidden(t.id,true)){
+      box.remove();
+      if(state.tpl===t.id){ const next=visibleTemplates()[0]; if(next) selectTemplate(next.id); }
+      layoutTemplates();
+      const focusTo = document.querySelector(`[data-wrap="${state.tpl}"] .tpl`) || $("removed").querySelector("button");
+      if (focusTo) focusTo.focus();
+    } else yes.disabled = false;
+  });
   w.append(box); no.focus();
 }
 function layoutTemplates(){
@@ -290,11 +305,12 @@ function layoutTemplates(){
   rem.hidden = !hid.length;
   if (hid.length){ rem.append(document.createTextNode(`Removed (${hid.length}):`));
     for (const t of hid){ const r=document.createElement("button"); r.type="button"; r.textContent="↺ "+t.name; r.setAttribute("aria-label","Restore "+t.name);
-      r.addEventListener("click", async ()=>{ if(await saveHidden(t.id,false)) layoutTemplates(); }); rem.append(r); } }
+      r.addEventListener("click", async ()=>{ r.disabled = true; if(await saveHidden(t.id,false)){ layoutTemplates(); const tb=document.querySelector(`[data-wrap="${t.id}"] .tpl`); if(tb && !tb.closest("[hidden]")) tb.focus(); else $("moreBtn").focus(); } else r.disabled=false; }); rem.append(r); } }
 }
 function drawThumbs(){
   document.querySelectorAll(".tpl[data-id]").forEach(b=>{
     const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
+    const dp = defaultPhoto(t.id); if (dp) { f.bgPhoto = TP.IMG["ph_"+dp]; f.grade = state.grade; }
     TP.render(b.querySelector("canvas"), t, f, cfg(), "square");
   });
 }
@@ -303,7 +319,7 @@ function selectTemplate(id){
   state.tpl = id; state.f = load("draft:"+id) || freshFields(id); state.bgPhoto = null;
   (state.f.speakers||[]).forEach(s=>{ delete s._img; delete s.photoData; });
   document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===id)));
-  state.photoKey=""; fillForm(); renderSpeakers(); buildPhotoLib(); draw(); store("last", id);
+  state.photoKey = state.f.photoKey !== undefined ? state.f.photoKey : defaultPhoto(id); fillForm(); renderSpeakers(); buildPhotoLib(); draw(); store("last", id);
 }
 function saveDraft(){ if(!state.f) return; const copy = JSON.parse(JSON.stringify(state.f, (k,v)=>k==="_img"?undefined:v)); store("draft:"+state.tpl, copy); }
 
@@ -339,14 +355,14 @@ function fillForm(){
 }
 for (const k of FIELDS) $(k).addEventListener("input", ()=>{ state.f[k] = $(k).value; queueDraw(); });
 $("live").addEventListener("change", ()=>{ state.f.live = $("live").checked; queueDraw(); });
-$("reset").addEventListener("click", ()=>{ state.f = freshFields(state.tpl); state.bgPhoto=null; store("draft:"+state.tpl, null); fillForm(); renderSpeakers(); draw(); });
+$("reset").addEventListener("click", ()=>{ state.f = freshFields(state.tpl); state.bgPhoto=null; state.photoKey=defaultPhoto(state.tpl); store("draft:"+state.tpl, null); fillForm(); renderSpeakers(); buildPhotoLib(); draw(); });
 
 function readImage(file, max){
   return new Promise((res)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const s=Math.min(1, max/Math.max(img.width,img.height)); if(s===1) return res(img); const c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); const o=new Image(); o.onload=()=>res(o); o.src=c.toDataURL("image/jpeg",0.9); }; img.onerror=()=>res(null); img.src=fr.result; }; fr.onerror=()=>res(null); fr.readAsDataURL(file); });
 }
 $("bgBtn").addEventListener("click", ()=>$("bgFile").click());
 $("bgFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; state.bgPhoto = await readImage(f, 1600); state.photoKey=""; e.target.value=""; buildPhotoLib(); draw(); });
-$("bgClear").addEventListener("click", ()=>{ state.bgPhoto=null; state.photoKey=""; buildPhotoLib(); draw(); });
+$("bgClear").addEventListener("click", ()=>{ state.bgPhoto=null; state.photoKey=""; state.f.photoKey=""; saveDraft(); buildPhotoLib(); draw(); });
 
 /* ---------- photo library ---------- */
 function photosFor(id){ const own = PHOTOS.filter(k=>k.startsWith(id+"-")); const gen = PHOTOS.filter(k=>k.startsWith("generic-")); return own.concat(gen); }
@@ -356,7 +372,7 @@ function buildPhotoLib(){
   if (!list.length){ const p=document.createElement("p"); p.className="note"; p.style.gridColumn="1/-1"; p.textContent="The ZFT photo library is on its way. Until then, upload your own photo: the ZFT grade turns it into the house look."; lib.append(p); }
   for (const k of list){ const b=document.createElement("button"); b.type="button"; b.className="tpl"; b.setAttribute("aria-pressed", String(state.photoKey===k && !state.bgPhoto)); b.setAttribute("aria-label","Photo "+k);
     const im=document.createElement("img"); im.src=ASSETS["ph_"+k]; im.alt=""; im.style.cssText="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;display:block";
-    b.append(im); b.addEventListener("click",()=>{ state.photoKey = state.photoKey===k ? "" : k; state.bgPhoto=null; buildPhotoLib(); markGrade(); draw(); }); lib.append(b); }
+    b.append(im); b.addEventListener("click",()=>{ state.photoKey = state.photoKey===k ? "" : k; state.f.photoKey = state.photoKey; state.bgPhoto=null; saveDraft(); buildPhotoLib(); markGrade(); draw(); }); lib.append(b); }
   $("bgClear").hidden = !(state.bgPhoto || state.photoKey);
 }
 function markGrade(){ document.querySelectorAll("[data-grade]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.grade===state.grade))); }
@@ -372,9 +388,9 @@ function renderSpeakers(){
     const av=document.createElement("button"); av.type="button"; av.className="av"+(s._img?" has":""); av.textContent = s._img ? "" : "Add photo"; av.setAttribute("aria-label", `Photo for speaker ${i+1}`);
     if (s._img) av.style.backgroundImage = `url(${s._img.src})`;
     av.addEventListener("click", ()=>{ spkTarget=i; $("spkFile").click(); });
-    const n=document.createElement("input"); n.type="text"; n.placeholder="Name"; n.value=s.name||""; n.id="spkName"+i; n.setAttribute("aria-label",`Speaker ${i+1} name`);
+    const n=document.createElement("input"); n.type="text"; n.maxLength=40; n.placeholder="Name"; n.value=s.name||""; n.id="spkName"+i; n.setAttribute("aria-label",`Speaker ${i+1} name`);
     n.addEventListener("input",()=>{ s.name=n.value; queueDraw(); });
-    const r=document.createElement("input"); r.type="text"; r.placeholder="Role (Coach, Founder…)"; r.value=s.role||""; r.className="role"; r.id="spkRole"+i; r.setAttribute("aria-label",`Speaker ${i+1} role`);
+    const r=document.createElement("input"); r.type="text"; r.maxLength=40; r.placeholder="Role (Coach, Founder…)"; r.value=s.role||""; r.className="role"; r.id="spkRole"+i; r.setAttribute("aria-label",`Speaker ${i+1} role`);
     r.addEventListener("input",()=>{ s.role=r.value; queueDraw(); });
     const x=document.createElement("button"); x.type="button"; x.className="x"; x.textContent="Remove"; x.addEventListener("click",()=>{ sp.splice(i,1); renderSpeakers(); draw(); });
     row.append(av,n,r,x); list.append(row);
@@ -450,75 +466,116 @@ $("mkGif").addEventListener("click", async ()=>{
 });
 
 /* ---------- first-time guided tour ---------- */
+/* sel = what to spotlight on wide screens; ph = a smaller target on phones so it stays visible above the docked tip */
 const TOUR = [
   { sel: null, title: "Welcome to the TR Poster Maker", text: "A one-minute tour of how to make a poster. You can skip it and replay it any time from \"Take the tour\"." },
-  { sel: "#favs", title: "1 · Your weekly shows", text: "The Hunt, The Council, Monthly Meetup, Charts Decoded and MMU. Tap one to start from its usual look." },
-  { sel: "#bases", title: "2 · Base templates", text: "Everything else: announcements, giveaways, AMAs and more. Tap \"More templates\" to see them all, or × to hide ones you don't use." },
-  { sel: "#styles", title: "3 · Pick a look", text: "Choose a style, then a colour theme below it. The preview updates straight away." },
-  { sel: "#title", up: ".card", title: "4 · Fill in the details", text: "Title, topic, date and time (Philippine time), where it happens and the Discord channel." },
+  { sel: "#favs", ph: "#favs .tw:not([hidden])", title: "1 · Your weekly shows", text: "The Hunt, The Council, Monthly Meetup, Charts Decoded and MMU. Tap one to start from its usual look." },
+  { sel: "#bases", ph: "#moreBtn", title: "2 · Base templates", text: "Everything else: announcements, giveaways, AMAs and more. \"More templates\" shows them all; × hides ones you don't use." },
+  { sel: "#styles", ph: "#styles .chipbtn", title: "3 · Pick a look", text: "Choose a style, then a colour theme below it. The preview updates straight away." },
+  { sel: "#title", up: ".card", ph: "#title", phUp: ".f", title: "4 · Fill in the details", text: "Title, topic, date and time (Philippine time), where it happens and the Discord channel." },
   { sel: "#partner", up: ".f", title: "5 · Partner logo", text: "For a collab, pick the partner here. Only official logos from our library are listed." },
-  { sel: "#photoLib", up: ".f", title: "6 · Backdrop photo", text: "Pick a photo or upload your own. The ZFT grade makes any photo match the brand." },
-  { sel: "#addSpk", up: ".card", title: "7 · Hosts and speakers", text: "Add up to 3. Tap the circle to upload a head-and-shoulders photo." },
+  { sel: "#photoLib", up: ".f", ph: "#bgBtn", title: "6 · Backdrop photo", text: "Pick a photo or upload your own. The ZFT grade makes any photo match the brand." },
+  { sel: "#addSpk", up: ".card", ph: "#addSpk", title: "7 · Hosts and speakers", text: "Add up to 3. Tap the circle to upload a head-and-shoulders photo." },
   { sel: "#sizes", title: "8 · Choose the size", text: "Square or 4:5 for FB/IG posts, 9:16 for stories, and a cover for Discord events." },
   { sel: "#main", up: ".canvaswrap", title: "9 · Check the preview", text: "This is exactly what you'll download. Tick \"Play animation\" to see it move." },
   { sel: "#dlPng", up: ".exports", title: "10 · Download", text: "Download a PNG, or Make GIF for a looping animated version (up to 10 seconds)." },
   { sel: "#tourBtn", title: "Need help?", text: "Ask in #guild-round-table or message George. You can replay this tour from here any time." },
 ];
-let tourIdx = -1, tourEls = null;
-function tourDoneKey(){ return "tourDone"; }
-function tourTarget(st){ if(!st.sel) return null; let el=document.querySelector(st.sel); if(el && st.up){ el = el.closest(st.up) || el; } return el && el.offsetParent !== null ? el : null; }
+let tourIdx = -1, tourEls = null, tourOpener = null;
+const isPhone = () => window.innerWidth < 640;
+function tourTarget(st){
+  const phone = isPhone(), sel = phone && st.ph ? st.ph : st.sel; if(!sel) return null;
+  let el=document.querySelector(sel); const up = phone && st.ph ? st.phUp : st.up;
+  if(el && up){ el = el.closest(up) || el; }
+  return el && el.offsetParent !== null ? el : null;
+}
 function startTour(){
   if (tourEls) endTour(false);
-  if (!showAll) { showAll = true; layoutTemplates(); }
+  tourOpener = document.activeElement;
   const ring=document.createElement("div"); ring.className="tour-ring";
-  const tip=document.createElement("div"); tip.className="tour-tip"; tip.setAttribute("role","dialog"); tip.setAttribute("aria-modal","true"); tip.setAttribute("aria-labelledby","tourTitle");
-  tip.innerHTML = '<div class="tour-step" id="tourStep"></div><h3 id="tourTitle"></h3><p id="tourText"></p><div class="tour-nav"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><span><button type="button" class="tour-back" id="tourBack">Back</button><button type="button" class="tour-next" id="tourNext">Next</button></span></div>';
+  const tip=document.createElement("div"); tip.className="tour-tip"; tip.setAttribute("role","dialog"); tip.setAttribute("aria-modal","true"); tip.setAttribute("aria-labelledby","tourTitle"); tip.setAttribute("aria-describedby","tourText");
+  tip.innerHTML = '<div class="tour-step" id="tourStep" aria-live="polite"></div><h3 id="tourTitle"></h3><p id="tourText"></p><div class="tour-nav"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><span><button type="button" class="tour-back" id="tourBack">Back</button><button type="button" class="tour-next" id="tourNext">Next</button></span></div>';
   const shade=document.createElement("div"); shade.className="tour-shade";
   document.body.append(shade, ring, tip); tourEls={ring,tip,shade};
+  // modal: the app behind is inert until the tour ends
+  const app=document.querySelector(".app"); if(app) app.inert = true;
+  const bar=document.querySelector(".ztbar"); if(bar) bar.inert = true;
   tip.querySelector("#tourSkip").addEventListener("click",()=>endTour(true));
   tip.querySelector("#tourBack").addEventListener("click",()=>tourGo(tourIdx-1));
   tip.querySelector("#tourNext").addEventListener("click",()=>tourIdx>=TOUR.length-1?endTour(true):tourGo(tourIdx+1));
-  document.addEventListener("keydown", tourKeys);
+  tip.addEventListener("keydown", tourKeys);
   window.addEventListener("resize", tourPlace); window.addEventListener("scroll", tourPlace, true);
   tourGo(0);
 }
-function tourKeys(e){ if(!tourEls) return; if(e.key==="Escape") endTour(true); else if(e.key==="ArrowRight") tourEls.tip.querySelector("#tourNext").click(); else if(e.key==="ArrowLeft" && tourIdx>0) tourGo(tourIdx-1); }
+function tourKeys(e){
+  if(!tourEls) return;
+  if(e.key==="Escape"){ e.preventDefault(); endTour(true); return; }
+  if(e.key==="ArrowRight"){ e.preventDefault(); tourEls.tip.querySelector("#tourNext").click(); return; }
+  if(e.key==="ArrowLeft"){ e.preventDefault(); if(tourIdx>0) tourGo(tourIdx-1); return; }
+  if(e.key==="Tab"){ // keep focus inside the tip
+    const f=[...tourEls.tip.querySelectorAll("button:not([hidden])")]; if(!f.length) return;
+    const i=f.indexOf(document.activeElement);
+    if(e.shiftKey && (i<=0)){ e.preventDefault(); f[f.length-1].focus(); }
+    else if(!e.shiftKey && (i===f.length-1 || i<0)){ e.preventDefault(); f[0].focus(); }
+  }
+}
 function tourGo(i){
   tourIdx=Math.max(0,Math.min(TOUR.length-1,i)); const st=TOUR[tourIdx], t=tourEls.tip;
   t.querySelector("#tourStep").textContent = `Step ${tourIdx+1} of ${TOUR.length}`;
   t.querySelector("#tourTitle").textContent = st.title; t.querySelector("#tourText").textContent = st.text;
   t.querySelector("#tourBack").hidden = tourIdx===0;
   t.querySelector("#tourNext").textContent = tourIdx===TOUR.length-1 ? "Start making posters" : "Next";
+  tourPlace();
   const el=tourTarget(st);
-  if (el){ const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; const tall = el.getBoundingClientRect().height > window.innerHeight*0.45 || window.innerWidth < 640; el.scrollIntoView({block: tall?"start":"center", behavior:"auto"}); }
-  tourPlace(); setTimeout(tourPlace, 350);
+  if (el){
+    const tipH = isPhone() ? t.offsetHeight + 24 : 0;
+    document.body.style.paddingBottom = isPhone() ? (tipH + 24) + "px" : "";
+    const r=el.getBoundingClientRect(), avail = window.innerHeight - tipH - 24;
+    // put the target in the free space: centred on wide screens, above the docked tip on phones
+    let dy = isPhone() ? (r.top - 16) : (r.top + r.height/2 - window.innerHeight/2);
+    if (isPhone() && r.height < avail) dy = r.top - Math.max(16, (avail - r.height) / 2);
+    window.scrollBy({top: dy, behavior: "auto"});
+  }
+  tourPlace();
   t.querySelector("#tourNext").focus({preventScroll:true});
 }
 function tourPlace(){
   if(!tourEls) return; const st=TOUR[tourIdx], el=tourTarget(st), {ring,tip,shade}=tourEls;
-  const vw=window.innerWidth, vh=window.innerHeight, phone = vw < 640;
-  if(!el){ ring.hidden=true; shade.hidden=false; tip.classList.add("center"); tip.style.left=""; tip.style.top=""; return; }
+  const vw=window.innerWidth, vh=window.innerHeight, phone = isPhone();
+  tip.style.left=""; tip.style.top="";
+  if(!el){ ring.hidden=true; shade.hidden=false; tip.classList.remove("dock"); tip.classList.add("center"); return; }
   shade.hidden=true; ring.hidden=false; tip.classList.remove("center");
   const r=el.getBoundingClientRect(), pad=8;
   ring.style.left=(r.left-pad)+"px"; ring.style.top=(r.top-pad)+"px"; ring.style.width=(r.width+pad*2)+"px"; ring.style.height=(r.height+pad*2)+"px";
-  if (phone){ tip.classList.add("dock"); tip.style.left=""; tip.style.top=""; return; }
+  if (phone){ tip.classList.add("dock"); return; }
   tip.classList.remove("dock");
   const tw=tip.offsetWidth, th=tip.offsetHeight;
   let top = r.bottom + 16; if (top + th > vh - 12) top = r.top - th - 16; if (top < 12) top = Math.max(12, Math.min(vh - th - 12, r.top + 12));
   let left = Math.min(Math.max(12, r.left), vw - tw - 12);
   tip.style.left=left+"px"; tip.style.top=top+"px";
 }
+function markTourDone(){
+  store("tourDone", true);
+  if (ZT && !ZT.tourDone){
+    fetch("prefs.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({act:"tour_done",csrf:ZT.csrf})})
+      .then(r=>{ if(r.ok){ ZT.tourDone=true; } else throw 0; })
+      .catch(()=>{ $("status").textContent = "Couldn't save that you've seen the tour; it may show again next time."; });
+  }
+}
 function endTour(markDone){
   if(!tourEls) return; Object.values(tourEls).forEach(e=>e.remove()); tourEls=null; tourIdx=-1;
-  document.removeEventListener("keydown", tourKeys); window.removeEventListener("resize", tourPlace); window.removeEventListener("scroll", tourPlace, true);
-  if (markDone){ store(tourDoneKey(), true); if (ZT && !ZT.tourDone){ ZT.tourDone=true; fetch("prefs.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({act:"tour_done",csrf:ZT.csrf})}).catch(()=>{}); } }
-  $("tourBtn").focus({preventScroll:true});
+  const app=document.querySelector(".app"); if(app) app.inert = false;
+  const bar=document.querySelector(".ztbar"); if(bar) bar.inert = false;
+  document.body.style.paddingBottom = "";
+  window.removeEventListener("resize", tourPlace); window.removeEventListener("scroll", tourPlace, true);
+  if (markDone) markTourDone();
+  const back = (tourOpener && tourOpener.isConnected && tourOpener !== document.body) ? tourOpener : $("tourBtn");
+  back.focus({preventScroll:true});
 }
 function maybeAutoTour(){
-  const done = ZT ? !!ZT.tourDone : !!load(tourDoneKey());
+  const done = (ZT && ZT.tourDone) || !!load("tourDone");
   if (!done) setTimeout(startTour, 600);
 }
-
 $("tourBtn").addEventListener("click", startTour);
 
 /* ---------- boot ---------- */
@@ -528,9 +585,11 @@ $("tourBtn").addEventListener("click", startTour);
   state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
   state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
   state.grade = load("grade") || "zft"; markLook(); markSize(); markGrade();
-  const last = load("last"); state.tpl = (byId[last] && !hidden.has(last)) ? last : (TP.TEMPLATES.find(t=>!hidden.has(t.id))||TP.TEMPLATES[0]).id; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
+  const last = load("last"); if (!visibleTemplates().length) { hidden.clear(); store("hidden", []); }
+  state.tpl = (byId[last] && !hidden.has(last)) ? last : visibleTemplates()[0].id; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
   document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
   layoutTemplates();
+  state.photoKey = state.f.photoKey !== undefined ? state.f.photoKey : defaultPhoto(state.tpl);
   fillForm(); renderSpeakers(); buildPhotoLib();
   await TP.loadFonts(); await TP.loadAssets(ASSETS);
   drawThumbs(); draw(); maybeAutoTour();

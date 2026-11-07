@@ -15,6 +15,9 @@ def uri(path, mime=None):
         return f"data:{mime};base64," + base64.b64encode(f.read()).decode()
 
 
+PHOTO_OUT = None   # standalone build: write photos as files here and reference them by URL
+
+
 def assets():
     o = os.path.join(LOGOS, "ours")
     a = {
@@ -38,9 +41,14 @@ def assets():
         import io
         for fn in sorted(os.listdir(ph)):
             if fn.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
-                im = Image.open(os.path.join(ph, fn)).convert("RGB"); im.thumbnail((1280, 1280))
-                buf = io.BytesIO(); im.save(buf, "JPEG", quality=80, optimize=True)
-                a["ph_" + os.path.splitext(fn)[0]] = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
+                im = Image.open(os.path.join(ph, fn)).convert("RGB"); im.thumbnail((1080, 1080))
+                name = os.path.splitext(fn)[0]
+                if PHOTO_OUT:
+                    os.makedirs(PHOTO_OUT, exist_ok=True); im.save(os.path.join(PHOTO_OUT, name + ".jpg"), "JPEG", quality=80, optimize=True, progressive=True)
+                    a["ph_" + name] = "photos/" + name + ".jpg"
+                else:
+                    buf = io.BytesIO(); im.save(buf, "JPEG", quality=78, optimize=True)
+                    a["ph_" + name] = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
     return a
 
 
@@ -66,6 +74,8 @@ SKELETON = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta na
 
 def build_standalone(out):
     """The same tool as a normal web page (for zeefreaks.io/posters, served by index.php after sign-in)."""
+    global PHOTO_OUT
+    PHOTO_OUT = os.path.join(os.path.dirname(out), "photos")
     tmp = out + ".tmp"
     build("studio.html", tmp, None)
     html = open(tmp, encoding="utf-8").read(); os.remove(tmp)
