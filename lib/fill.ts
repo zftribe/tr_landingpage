@@ -3,9 +3,9 @@ import { peso } from './lineup'
 
 /**
  * The one Discord invite every Join button uses. Set DISCORD_INVITE in Vercel
- * to swap it everywhere at once (the old vanity link stopped working in Nov 2026).
+ * to swap it everywhere at once (discord.gg/tradingrepublic stopped working in Nov 2026; this invite never expires).
  */
-export const DISCORD_INVITE = (process.env.DISCORD_INVITE || 'https://discord.gg/tradingrepublic').trim()
+export const DISCORD_INVITE = (process.env.DISCORD_INVITE || 'https://discord.gg/SXEEhgmeTn').trim()
 
 /**
  * Fill the page's placeholders:
