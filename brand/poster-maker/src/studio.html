@@ -76,6 +76,7 @@ textarea{min-height:64px;resize:vertical}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 
+<!--USERBAR-->
 <div class="app">
   <header class="top">
     <div><h1>TR <b>Poster Maker</b></h1><p class="sub">Pick a template, fill in the details, download a PNG or a looping GIF.</p></div>
@@ -303,6 +304,7 @@ let downloads = null;
 function fileBase(){ const t=byId[state.tpl]; const d = state.f.date ? "-"+state.f.date : ""; return `tr-${t.id}${d}-${TP.SIZES[state.size].file}`; }
 async function offer(blob, filename, kind){
   const st=$("status");
+  if (!window.claude){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 60000); st.textContent=`Downloaded ${filename}.`; return; }
   if (downloads){
     try { await downloads.save({filename, data: blob}); st.textContent = `Saved ${filename}.`; return; }
     catch(e){ if (e && e.code==="declined") { st.textContent = "Download cancelled."; return; } }

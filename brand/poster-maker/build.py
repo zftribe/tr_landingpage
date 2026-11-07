@@ -50,7 +50,22 @@ def build(src, out, before_dir):
     print(out, round(len(html) / 1024), "KB")
 
 
+SKELETON = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">'
+            '<meta name="robots" content="noindex,nofollow"><style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>')
+
+
+def build_standalone(out):
+    """The same tool as a normal web page (for zeefreaks.io/posters, served by index.php after sign-in)."""
+    tmp = out + ".tmp"
+    build("studio.html", tmp, None)
+    html = open(tmp, encoding="utf-8").read(); os.remove(tmp)
+    open(out, "w", encoding="utf-8").write(SKELETON + html + "</body></html>\n")
+    print(out, "standalone")
+
+
 if __name__ == "__main__":
+    if sys.argv[1] == "--standalone":
+        build_standalone(sys.argv[2]); sys.exit(0)
     before_dir, out_dir = sys.argv[1], sys.argv[2]
     for src in sys.argv[3:] or ["pick.html"]:
         build(src, os.path.join(out_dir, src), before_dir)
