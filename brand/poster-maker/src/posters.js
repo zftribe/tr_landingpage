@@ -247,6 +247,32 @@
     }
   }
 
+
+  /* ---------- photo backdrops with the ZFT grade ---------- */
+  let GRAIN = null;
+  function grainPattern(ctx) {
+    if (!GRAIN) { const c = document.createElement("canvas"); c.width = c.height = 192; const g = c.getContext("2d"); const d = g.createImageData(192, 192); const r = rng("grain"); for (let i = 0; i < d.data.length; i += 4) { const v = 110 + r() * 145; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } g.putImageData(d, 0, 0); GRAIN = c; }
+    return ctx.createPattern(GRAIN, "repeat");
+  }
+  /* grade: "zft" = dark duotone in the theme's accent + film grain; "natural" = original colours, just darkened */
+  function photoLayer(ctx, img, W, H, P, grade, p, opts) {
+    opts = opts || {};
+    const zoom = (opts.zoom || 1.02) + 0.035 * Math.sin(TAU * p);
+    ctx.save();
+    ctx.globalAlpha = opts.alpha ?? 1;
+    if (grade === "natural") { ctx.filter = "brightness(0.78) contrast(1.05)"; coverImg(ctx, img, 0, 0, W, H, 0.5, opts.fy ?? 0.45, zoom); ctx.filter = "none"; ctx.restore(); return; }
+    ctx.filter = "grayscale(1) contrast(1.28) brightness(0.62)";
+    coverImg(ctx, img, 0, 0, W, H, 0.5, opts.fy ?? 0.45, zoom);
+    ctx.filter = "none";
+    ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = A(P.bg2 || P.bg, 0.55); ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "soft-light"; ctx.fillStyle = A(P.accent, 0.75); ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "screen";
+    const gx = W * (0.78 + 0.05 * Math.sin(TAU * p)), gl = ctx.createRadialGradient(gx, H * 0.12, 0, gx, H * 0.2, Math.max(W, H) * 0.65);
+    gl.addColorStop(0, A(P.accent, 0.32)); gl.addColorStop(1, A(P.accent, 0)); ctx.fillStyle = gl; ctx.fillRect(0, 0, W, H);
+    ctx.globalCompositeOperation = "overlay"; ctx.globalAlpha = (opts.alpha ?? 1) * 0.09; ctx.fillStyle = grainPattern(ctx); ctx.fillRect(0, 0, W, H);
+    ctx.restore();
+  }
+
   /* ---------- templates ---------- */
   const T = [];
   const sp = (name, role) => ({ name, role });
@@ -284,6 +310,18 @@
     ["winners", "Winners", "Congratulate winners", "confetti", { bg: "#0b0b0f", bg2: "#1c1a10", accent: GOLD }, "#1F7A4D", { kicker: "Congratulations", title: "Top volume traders", topic: "Name 1 · Name 2 · Name 3", channel: "#announcement-board" }],
     ["schedule", "Schedule Change", "Moved or cancelled", "calm", { bg: "#0e1d1d", bg2: "#173232", accent: "#5ad1c4" }, "#127475", { kicker: "Schedule update", title: "No MMU tonight", topic: "We're taking a break for the holiday. See you next Monday.", date: "2026-11-02", channel: "#upcoming-events" }],
     ["teaser", "Coming Soon", "Tease a launch", "spot", { bg: "#05060a", bg2: "#141826", accent: GOLD }, "#0B0B0F", { kicker: "Coming soon", title: "A new world awaits", topic: "Something we've been building for a long time.", channel: "#announcement-board" }],
+    ["ama", "AMA", "Ask me anything", "spot", { bg: "#0d0a14", bg2: "#221a33", accent: "#c3a6ff" }, "#4B2E83", { kicker: "Ask me anything", title: "AMA with Zeefreaks", topic: "Drop your questions in Discord before we go live. Markets, mindset, the Republic.", speakers: [sp("Zeefreaks", "Founder")], date: "2026-11-19", time: "21:00", where: "Discord Stage", channel: "#ama-questions", live: true }],
+    ["livetrade", "Live Trading", "Trade along live", "charts", { bg: "#04100a", bg2: "#0b2e1b", accent: "#3ddc84" }, "#0E7A4F", { kicker: "Live trading session", title: "Trade with us, live", topic: "Watch the plan, the entry, the stop and the exit in real time. Paper-trade along.", speakers: [sp("Coach Name", "Coach")], date: "2026-11-17", time: "21:00", where: "Discord Stage", channel: "#live-trading", live: true, cta: "Not financial advice" }],
+    ["replay", "Replay Is Up", "Recording available", "grid", { bg: "#0b0b12", bg2: "#1a1a2a", accent: "#7db2ff" }, "#1d3fbf", { kicker: "Missed it?", title: "The replay is up", topic: "Catch up on the full session, notes and charts included.", channel: "#webinar-recordings", cta: "Members: watch in Discord" }],
+    ["course", "Course Launch", "Enrolment open", "rays", { bg: "#0f0b02", bg2: "#2a1e04", accent: GOLD }, "#C98A00", { kicker: "Enrolment now open", title: "Technical Intensive", topic: "A structured path from chart basics to a full trading plan, with weekly coaching.", date: "2026-12-01", where: "Online", channel: "#create-a-ticket", cta: "Limited seats" }],
+    ["briefing", "Weekly Briefing", "ZFT Research recap", "grid", { bg: "#070b10", bg2: "#122030", accent: "#3fe0d6" }, "#127475", { kicker: "ZFT Research", title: "Weekly market briefing", topic: "BTC, ETH, PSEi and the levels that matter this week, in five minutes.", channel: "#zft-research", cta: "New every Monday" }],
+    ["poll", "Community Poll", "Question of the week", "calm", { bg: "#0f0a16", bg2: "#22163a", accent: "#ff4fb8" }, "#d6248f", { kicker: "Question of the week", title: "What are you watching this week?", topic: "Vote in Discord and tell us why in the thread.", channel: "#all-chat" }],
+    ["welcome", "Welcome", "Greet new members", "festive", { bg: "#0b0703", bg2: "#2a1c08", accent: GOLD }, "#C98A00", { kicker: "Welcome to the Republic", title: "Glad you're here", topic: "Start in #read-me-first, pick your roles, then say hi in #all-chat.", channel: "#read-me-first" }],
+    ["countdown", "Starting Soon", "Last-call reminder", "stripes", { bg: "#0d0a04", bg2: "#2a1e06", accent: GOLD }, "#1c1c1c", { kicker: "Starting in 1 hour", title: "See you in 60 minutes", topic: "Grab a coffee and your charts. Link in Discord.", time: "20:00", channel: "#upcoming-events", live: true }],
+    ["recap", "Event Recap", "Thank you post", "meetup", { bg: "#0b0703", bg2: "#24170a", accent: GOLD }, "#7a4b00", { kicker: "Thank you", title: "What a night, Republic", topic: "Thank you to everyone who came. Photos and notes are up in Discord.", channel: "#event-photos" }],
+    ["rebate", "Partner Rebate", "Exchange promo", "grid", { bg: "#0a0a0a", bg2: "#1a1a1a", accent: "#ffffff" }, "#111111", { kicker: "Members' perk", title: "Trade with a fee rebate", topic: "Sign up through our partner link and get part of your fees back.", channel: "#partners", partner: "okx", cta: "Link in Discord" }],
+    ["challenge", "Trading Challenge", "Community competition", "rays", { bg: "#0a0614", bg2: "#1d1033", accent: GOLD }, "#5B2A86", { kicker: "30-day challenge", title: "Journal every trade", topic: "Post your plan before each trade and your review after. Best journals win.", date: "2026-12-01", channel: "#challenge", cta: "Prizes for the top 3" }],
+    ["hiring", "We're Hiring", "Join the team", "blueprint", { bg: "#0b1a2e", bg2: "#123562", accent: "#9fd0ff" }, "#0B5CAD", { kicker: "Join the team", title: "We're hiring moderators", topic: "Help run the Republic's chats, events and tickets. Part-time, remote.", channel: "#create-a-ticket", cta: "Apply with a ticket" }],
   ];
   for (const [id, name, blurb, art, pal, block, f] of base) {
     add({ id, name, blurb, art, pal: Object.assign({ ink: "#ffffff", sub: "#d8d8e0" }, pal), block: { bg: block, ink: "#ffffff", accent: GOLD }, font: { fam: DISPLAY, w: 800, ls: -0.01 },
@@ -386,19 +424,19 @@
 
   function drawStyle(ctx, canvas, W, H, s, r, P, tpl, f, cfg, p, L) {
     const style = cfg.style, spk = f.speakers || [], artFn = ART[tpl.art] || ART.grid;
-    const photo = f.bgPhoto;
+    const photo = f.bgPhoto, grade = f.grade || "zft";
     const M = L.M, top = L.top, bottom = L.bottom;
     const out = { rect: { x: M, y: top, w: W - 2 * M, h: bottom - top }, align: "left", v: "bottom", side: null };
     if (L.wide && spk.length) { out.rect.w = W * 0.62 - M; out.side = { x: W * 0.64, y: top, w: W * 0.36 - M, h: bottom - top }; }
 
     if (style === "signature") {
       artFn(ctx, W, H, s, r, P, p);
-      if (photo) { coverImg(ctx, photo, 0, 0, W, H, 0.5, 0.5, 1 + 0.03 * Math.sin(TAU * p)); fadeDown(ctx, W, H, P.bg, 0.35, 0.9, 0); }
+      if (photo) { photoLayer(ctx, photo, W, H, P, grade, p); fadeDown(ctx, W, H, P.bg, 0.15, 0.92, 0.25); const tg = ctx.createLinearGradient(0, 0, 0, H * 0.25); tg.addColorStop(0, A(P.bg, 0.55)); tg.addColorStop(1, A(P.bg, 0)); ctx.fillStyle = tg; ctx.fillRect(0, 0, W, H * 0.25); }
       return out;
     }
     if (style === "spotlight") {
       const hero = photo || (spk.length === 1 && spk[0].photo) || null;
-      if (hero) { ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H); coverImg(ctx, hero, 0, 0, W, H, 0.5, 0.25, 1.04 + 0.04 * Math.sin(TAU * p)); }
+      if (hero) { ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H); photoLayer(ctx, hero, W, H, P, grade, p, { fy: 0.25, zoom: 1.05 }); }
       else { artFn(ctx, W, H, s, r, P, p); ctx.fillStyle = A(P.bg, 0.45); ctx.fillRect(0, 0, W, H); }
       // light beam
       const bx = W * (0.75 + 0.06 * Math.sin(TAU * p));
@@ -417,7 +455,7 @@
     }
     if (style === "split") {
       artFn(ctx, W, H, s, r, P, p);
-      if (photo) coverImg(ctx, photo, 0, 0, W, H, 0.5, 0.5);
+      if (photo) photoLayer(ctx, photo, W, H, P, grade, p);
       const vertical = !(L.wide || H / W < 1.1);
       ctx.fillStyle = P.bg2;
       const slant = 60 * s;
@@ -438,7 +476,7 @@
       for (let x = 0; x < W; x += gs) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
       for (let y = 0; y < H; y += gs) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
       candles(ctx, W, H, s, r, P.accent, p, H * 0.38, 0.22);
-      if (photo) { ctx.globalAlpha = 0.35; coverImg(ctx, photo, 0, 0, W, H); ctx.globalAlpha = 1; }
+      if (photo) photoLayer(ctx, photo, W, H, P, grade, p, { alpha: 0.45 });
       // scanlines
       ctx.fillStyle = A(P.bg, 0.25); for (let y = 0; y < H; y += 4 * s) ctx.fillRect(0, y, W, 1.5 * s);
       vignette(ctx, W, H, P.bg, 0.7);
@@ -461,7 +499,7 @@
       const word = (tpl.name.split(" ").slice(-1)[0] || "").toUpperCase();
       setFont(ctx, 800, H * (L.wide ? 0.9 : 0.42), DISPLAY, -0.02); ctx.strokeStyle = A(P.accent, 0.1); ctx.lineWidth = 2 * s;
       const ww = ctx.measureText(word).width; ctx.strokeText(word, W / 2 - ww / 2 + Math.sin(TAU * p) * 30 * s, H * (L.wide ? 0.85 : 0.62));
-      if (photo) { ctx.globalAlpha = 0.25; coverImg(ctx, photo, 0, 0, W, H); ctx.globalAlpha = 1; }
+      if (photo) photoLayer(ctx, photo, W, H, P, grade, p, { alpha: 0.3 });
       ctx.strokeStyle = A(P.ink, 0.25); ctx.lineWidth = 1.5 * s;
       ctx.beginPath(); ctx.moveTo(M, top - 6 * s); ctx.lineTo(W - M, top - 6 * s); ctx.stroke();
       out.align = L.wide ? "left" : "center"; out.v = "center";
@@ -475,7 +513,7 @@
     ctx.beginPath(); ctx.arc(W * 0.04, H * 1.02 + Math.cos(TAU * p) * 18 * s, Math.max(W, H) * 0.26, 0, TAU); ctx.fill();
     ctx.fillStyle = light ? "rgba(0,0,0,0.06)" : "rgba(0,0,0,0.12)";
     ctx.save(); ctx.translate(W * 0.5, H * 0.5); ctx.rotate(-0.2); ctx.fillRect(-W, H * 0.1 + Math.sin(TAU * p) * 10 * s, W * 2, 90 * s); ctx.restore();
-    if (photo) { ctx.globalAlpha = 0.18; coverImg(ctx, photo, 0, 0, W, H); ctx.globalAlpha = 1; }
+    if (photo) photoLayer(ctx, photo, W, H, P, grade, p, { alpha: 0.28 });
     out.big = true;
     return out;
   }

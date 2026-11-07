@@ -31,6 +31,16 @@ def assets():
             if fn.endswith((".png", ".svg")):
                 a["p_" + name] = uri(os.path.join(pdir, name, fn))
                 break
+    # ZFT photo library (Codex renders), resized for the page
+    ph = os.environ.get("PM_PHOTOS", "D:/Media/Claude Renders/poster-maker/photos")
+    if os.path.isdir(ph):
+        from PIL import Image
+        import io
+        for fn in sorted(os.listdir(ph)):
+            if fn.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
+                im = Image.open(os.path.join(ph, fn)).convert("RGB"); im.thumbnail((1280, 1280))
+                buf = io.BytesIO(); im.save(buf, "JPEG", quality=80, optimize=True)
+                a["ph_" + os.path.splitext(fn)[0]] = "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()
     return a
 
 

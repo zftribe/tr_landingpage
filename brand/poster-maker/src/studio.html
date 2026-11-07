@@ -123,8 +123,10 @@ textarea{min-height:64px;resize:vertical}
       </div>
       <p class="missing" id="missing"></p>
       <label class="toggle"><input type="checkbox" id="live"> Show the red LIVE badge</label>
-      <div class="f"><label>Background photo (optional)</label>
-        <div class="row"><button class="btn" type="button" id="bgBtn">Add photo</button><button class="x" type="button" id="bgClear" hidden>Remove photo</button></div>
+      <div class="f"><label>Backdrop photo</label>
+        <div class="tpls" id="photoLib" style="grid-template-columns:repeat(auto-fill,minmax(72px,1fr))"></div>
+        <div class="row"><button class="btn" type="button" id="bgBtn">Upload a photo</button><button class="x" type="button" id="bgClear" hidden>No photo</button></div>
+        <div class="row" role="radiogroup" aria-label="Photo colour"><button class="chipbtn" type="button" data-grade="zft">ZFT grade<small>dark + theme colour + grain</small></button><button class="chipbtn" type="button" data-grade="natural">Natural<small>original colours</small></button></div>
         <input type="file" id="bgFile" accept="image/*" hidden>
       </div>
     </div>
@@ -174,7 +176,8 @@ const FIELDS = ["title","kicker","topic","date","time","endTime","where","channe
 const PARTNERS = Object.keys(ASSETS).filter(k=>k.startsWith("p_")).map(k=>k.slice(2));
 const PNAME = {okx:"OKX",binance:"Binance",bitget:"Bitget",bybit:"Bybit",gate:"Gate",mexc:"MEXC",xm:"XM (past)",etoro:"eToro (past)"};
 
-const state = { tpl:"hunt", style:"signature", theme:"show", size:"square", f:null, bgPhoto:null };
+const state = { tpl:"hunt", style:"signature", theme:"show", size:"square", f:null, bgPhoto:null, photoKey:"", grade:"zft" };
+const PHOTOS = Object.keys(ASSETS).filter(k=>k.startsWith("ph_")).map(k=>k.slice(3));
 function store(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); }catch(e){} }
 function load(k){ try{ return JSON.parse(localStorage.getItem("trpm:"+k)); }catch(e){ return null; } }
 
@@ -182,7 +185,8 @@ function freshFields(id){ const f = JSON.parse(JSON.stringify(byId[id].fields));
 function currentFields(){
   const f = Object.assign({}, state.f);
   f.partnerImg = f.partner ? TP.IMG["p_"+f.partner] : null;
-  f.bgPhoto = state.bgPhoto;
+  f.bgPhoto = state.bgPhoto || (state.photoKey ? TP.IMG["ph_"+state.photoKey] : null);
+  f.grade = state.grade;
   f.speakers = (state.f.speakers||[]).map(s=>Object.assign({}, s, {photo: s._img||null}));
   return f;
 }
@@ -209,7 +213,7 @@ function selectTemplate(id){
   state.tpl = id; state.f = load("draft:"+id) || freshFields(id); state.bgPhoto = null;
   (state.f.speakers||[]).forEach(s=>{ delete s._img; delete s.photoData; });
   document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===id)));
-  fillForm(); renderSpeakers(); draw(); store("last", id);
+  state.photoKey=""; fillForm(); renderSpeakers(); buildPhotoLib(); draw(); store("last", id);
 }
 function saveDraft(){ if(!state.f) return; const copy = JSON.parse(JSON.stringify(state.f, (k,v)=>k==="_img"?undefined:v)); store("draft:"+state.tpl, copy); }
 
@@ -242,7 +246,6 @@ function buildPartner(){
 function fillForm(){
   for (const k of FIELDS) $(k).value = state.f[k] || "";
   $("live").checked = !!state.f.live;
-  $("bgClear").hidden = !state.bgPhoto;
 }
 for (const k of FIELDS) $(k).addEventListener("input", ()=>{ state.f[k] = $(k).value; queueDraw(); });
 $("live").addEventListener("change", ()=>{ state.f.live = $("live").checked; queueDraw(); });
@@ -252,8 +255,22 @@ function readImage(file, max){
   return new Promise((res)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const s=Math.min(1, max/Math.max(img.width,img.height)); if(s===1) return res(img); const c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); const o=new Image(); o.onload=()=>res(o); o.src=c.toDataURL("image/jpeg",0.9); }; img.onerror=()=>res(null); img.src=fr.result; }; fr.onerror=()=>res(null); fr.readAsDataURL(file); });
 }
 $("bgBtn").addEventListener("click", ()=>$("bgFile").click());
-$("bgFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; state.bgPhoto = await readImage(f, 1600); $("bgClear").hidden=!state.bgPhoto; e.target.value=""; draw(); });
-$("bgClear").addEventListener("click", ()=>{ state.bgPhoto=null; $("bgClear").hidden=true; draw(); });
+$("bgFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; state.bgPhoto = await readImage(f, 1600); state.photoKey=""; e.target.value=""; buildPhotoLib(); draw(); });
+$("bgClear").addEventListener("click", ()=>{ state.bgPhoto=null; state.photoKey=""; buildPhotoLib(); draw(); });
+
+/* ---------- photo library ---------- */
+function photosFor(id){ const own = PHOTOS.filter(k=>k.startsWith(id+"-")); const gen = PHOTOS.filter(k=>k.startsWith("generic-")); return own.concat(gen); }
+function buildPhotoLib(){
+  const lib=$("photoLib"); lib.textContent="";
+  const list = photosFor(state.tpl);
+  if (!list.length){ const p=document.createElement("p"); p.className="note"; p.style.gridColumn="1/-1"; p.textContent="The ZFT photo library is on its way. Until then, upload your own photo: the ZFT grade turns it into the house look."; lib.append(p); }
+  for (const k of list){ const b=document.createElement("button"); b.type="button"; b.className="tpl"; b.setAttribute("aria-pressed", String(state.photoKey===k && !state.bgPhoto)); b.setAttribute("aria-label","Photo "+k);
+    const im=document.createElement("img"); im.src=ASSETS["ph_"+k]; im.alt=""; im.style.cssText="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;display:block";
+    b.append(im); b.addEventListener("click",()=>{ state.photoKey = state.photoKey===k ? "" : k; state.bgPhoto=null; buildPhotoLib(); markGrade(); draw(); }); lib.append(b); }
+  $("bgClear").hidden = !(state.bgPhoto || state.photoKey);
+}
+function markGrade(){ document.querySelectorAll("[data-grade]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.grade===state.grade))); }
+document.querySelectorAll("[data-grade]").forEach(b=>b.addEventListener("click",()=>{ state.grade=b.dataset.grade; store("grade",state.grade); markGrade(); draw(); }));
 
 /* ---------- speakers ---------- */
 let spkTarget = 0;
@@ -348,10 +365,10 @@ $("mkGif").addEventListener("click", async ()=>{
   state.style = load("style") || "signature"; if(!TP.STYLES[state.style]) state.style="signature";
   state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
   state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
-  markLook(); markSize();
+  state.grade = load("grade") || "zft"; markLook(); markSize(); markGrade();
   const last = load("last"); state.tpl = byId[last] ? last : "hunt"; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
   document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
-  fillForm(); renderSpeakers();
+  fillForm(); renderSpeakers(); buildPhotoLib();
   await TP.loadFonts(); await TP.loadAssets(ASSETS);
   drawThumbs(); draw();
   try { if (window.claude && window.claude.use) downloads = await window.claude.use("downloads"); } catch(e){}
