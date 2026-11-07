@@ -964,3 +964,62 @@ html, body { overflow-x: clip; }
   .carousel-track { transition: none !important; }
 }
 .carousel-pause { font-size: 0.8rem; }
+
+/* ─── EXCHANGES AS TICKETS (George picked ticket + score ring, 8 Nov) ─── */
+.tk-list { display: grid; gap: 18px; container-type: inline-size; }
+.tk { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 210px; background: var(--card-solid); border: 1px solid var(--border); border-radius: 20px; }
+.tk.tk-top { border-color: rgba(249,168,37,.6); box-shadow: 0 0 0 1px rgba(249,168,37,.25), 0 18px 40px rgba(249,168,37,.08); }
+.tk-badge { position: absolute; top: -12px; left: 22px; z-index: 3; background: var(--gold); color: #141006; font-family: var(--font-display); font-weight: 800; font-size: .66rem; letter-spacing: .12em; text-transform: uppercase; border-radius: 999px; padding: 4px 12px; }
+.tk::before, .tk::after { content: ''; position: absolute; right: 200px; width: 20px; height: 20px; border-radius: 50%; background: #08080b; border: 1px solid var(--border); z-index: 2; }
+.tk::before { top: -11px; } .tk::after { bottom: -11px; }
+.tk-main { padding: 22px 24px; display: grid; gap: 16px; min-width: 0; }
+.tk-head { display: flex; align-items: center; gap: 14px; }
+.tk-logo { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 12px; background: #0d0d12; border: 1px solid var(--border-2); display: grid; place-items: center; overflow: hidden; }
+.tk-logo img { width: 32px; height: 32px; object-fit: contain; border-radius: 6px; }
+.tk-title { flex: 1; min-width: 0; }
+.tk-title h3 { font-family: var(--font-display); color: var(--white); font-size: 1.3rem; margin: 0; }
+.tk-title p { color: var(--muted); font-size: .85rem; font-style: italic; margin: 2px 0 0; }
+.tk-score { display: grid; justify-items: center; gap: 4px; }
+.tk-score b { font-family: var(--font-display); color: var(--white); font-size: .74rem; letter-spacing: .04em; }
+.tk-top .tk-score b { color: var(--gold); }
+.ring { --v: 90; width: 62px; height: 62px; border-radius: 50%; background: conic-gradient(var(--gold) calc(var(--v) * 1%), #2a2a33 0); display: grid; place-items: center; position: relative; }
+.ring::before { content: ''; position: absolute; inset: 6px; border-radius: 50%; background: var(--card-solid); }
+.ring span { position: relative; font-family: var(--font-display); font-weight: 800; color: var(--white); font-size: 1.05rem; line-height: 1; text-align: center; }
+.ring small { display: block; font-size: .5rem; color: var(--muted); font-weight: 600; letter-spacing: .08em; }
+.tk-pc { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; }
+.tk-pc h4 { font-family: var(--font-display); font-size: .7rem; letter-spacing: .12em; text-transform: uppercase; margin: 0 0 6px; }
+.tk-pros h4 { color: #3fcf80; } .tk-cons h4 { color: #ff7b70; }
+.tk-pc ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.tk-pc li { position: relative; padding-left: 18px; font-size: .86rem; color: var(--text); line-height: 1.45; }
+.tk-pros li::before { content: '✓'; position: absolute; left: 0; color: #3fcf80; font-weight: 700; }
+.tk-cons li::before { content: '✕'; position: absolute; left: 0; color: #ff7b70; font-weight: 700; }
+.tk-stats { display: flex; flex-wrap: wrap; gap: 8px; }
+.tk-stats span { background: #0d0d12; border: 1px solid var(--border); border-radius: 8px; padding: 5px 10px; font-size: .74rem; color: var(--muted); }
+.tk-stats b { color: var(--white); font-family: var(--font-display); margin-left: 5px; }
+.tk-stub { position: relative; display: grid; align-content: center; justify-items: center; gap: 10px; padding: 20px 16px; text-align: center; border-left: 2px dashed rgba(255,255,255,.18); border-radius: 0 20px 20px 0; background: linear-gradient(160deg, #2a1d06, #140f08); transform-origin: 0 0; transition: transform .75s cubic-bezier(.3,1.4,.5,1), opacity .45s .35s; }
+.tk-off { font-family: var(--font-display); font-weight: 800; color: #FFD36A; font-size: 2rem; line-height: 1; letter-spacing: -.03em; }
+.tk-off small { display: block; margin-top: 5px; font-size: .62rem; color: var(--text); letter-spacing: .12em; text-transform: uppercase; }
+.tk-code { font-family: ui-monospace, Consolas, monospace; font-weight: 700; color: var(--white); background: rgba(0,0,0,.35); border: 1px dashed rgba(255,211,106,.55); border-radius: 8px; padding: 6px 10px; font-size: .82rem; letter-spacing: .06em; max-width: 100%; overflow-wrap: anywhere; }
+.tk-claim { display: inline-flex; justify-content: center; width: 100%; border-radius: 999px; background: var(--gold); color: #141006; font-family: var(--font-display); font-weight: 800; font-size: .85rem; padding: 11px 14px; text-decoration: none; transition: transform .2s, box-shadow .2s; }
+.tk-claim:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(249,168,37,.35); }
+.tk-claim:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.tk-claimed { position: absolute; top: 0; right: 0; bottom: 0; width: 210px; display: grid; align-content: center; justify-items: center; gap: 6px; padding: 16px; text-align: center; opacity: 0; visibility: hidden; transition: opacity .4s .45s; }
+.tk-claimed b { font-family: var(--font-display); color: var(--white); font-size: .92rem; }
+.tk-claimed span { font-size: .78rem; color: var(--muted); }
+.tk-claimed a { font-size: .8rem; color: var(--gold); }
+.tk.torn .tk-stub { transform: translate(46px, 70px) rotate(18deg); opacity: 0; pointer-events: none; }
+.tk.torn .tk-claimed { opacity: 1; visibility: visible; }
+@container (max-width: 640px) {
+  .tk { grid-template-columns: 1fr; }
+  .tk::before, .tk::after { display: none; }
+  .tk-pc { grid-template-columns: 1fr; }
+  .tk-stub { border-left: 0; border-top: 2px dashed rgba(255,255,255,.18); border-radius: 0 0 20px 20px; grid-template-columns: auto 1fr; justify-items: start; text-align: left; align-items: center; }
+  .tk-stub .tk-claim { grid-column: 1 / -1; }
+  .tk-claimed { top: auto; width: auto; left: 0; height: 140px; }
+  .tk.torn .tk-stub { transform: translate(0, 60px) rotate(-5deg); }
+  .tk-main { padding: 18px; }
+}
+@media (prefers-reduced-motion: reduce) { .tk-stub, .tk-claimed, .tk-claim { transition: none !important; } }
+.tk-burst { position: fixed; pointer-events: none; z-index: 60; }
+.tk-burst i { position: absolute; width: 7px; height: 7px; border-radius: 2px; animation: tk-fly .9s ease-out forwards; }
+@keyframes tk-fly { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }

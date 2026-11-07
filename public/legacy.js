@@ -150,3 +150,23 @@ document.addEventListener('click', (e) => {
   const toggle = document.querySelector('.mobile-toggle');
   if (menu && toggle) toggle.setAttribute('aria-expanded', String(menu.classList.contains('open')));
 });
+
+// Exchange tickets: "Tear & claim" copies the referral code, tears the coupon stub off with a small gold pop,
+// and the link itself opens the sign-up in a new tab (a real link, so it still works without this script).
+document.addEventListener('click', (e) => {
+  const claim = e.target.closest('.tk-claim');
+  if (!claim) return;
+  try { navigator.clipboard?.writeText(claim.dataset.code).catch(() => {}); } catch (err) {}
+  claim.closest('.tk')?.classList.add('torn');
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const r = claim.getBoundingClientRect(), b = document.createElement('div');
+  b.className = 'tk-burst'; b.style.left = (r.left + r.width / 2) + 'px'; b.style.top = r.top + 'px';
+  const colours = ['#FFD36A', '#F9A825', '#fff3c4', '#3fcf80'];
+  for (let i = 0; i < 18; i++) {
+    const a = Math.random() * Math.PI * 2, d = 40 + Math.random() * 60, s = document.createElement('i');
+    s.style.cssText = '--x:' + Math.cos(a) * d + 'px;--y:' + (Math.sin(a) * d - 20) + 'px;--r:' + Math.random() * 360 + 'deg;background:' + colours[i % 4];
+    b.appendChild(s);
+  }
+  document.body.appendChild(b);
+  setTimeout(() => b.remove(), 1000);
+});
