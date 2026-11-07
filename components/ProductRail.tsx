@@ -22,12 +22,13 @@ export type ExtraCard = {
 }
 
 /** Program marks. `src` is a file in public/logos/programs; `text` is a stand-in until a logo exists. */
-export type Logo = { alt: string; src?: string; text?: string }
+export type Logo = { alt: string; src?: string; text?: string; coin?: string }
 
 const MAX_COMPARE = 3
 const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
-  web3: { alt: 'WEB3 Masterclass', text: 'W3' },
+  // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
+  web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
   citizen: { alt: 'Citizen membership', src: '/logos/programs/tr.png' },
 } satisfies Record<string, Logo>
 
@@ -43,6 +44,8 @@ function Badges({ logos }: { logos: Logo[] }) {
       {logos.map((l) =>
         l.src ? (
           <span key={l.alt} className="pc-logo"><img src={l.src} alt="" width="40" height="40" loading="lazy" decoding="async" /></span>
+        ) : l.coin ? (
+          <span key={l.alt} className="pc-logo"><span className="pc-coin">{l.coin}</span></span>
         ) : (
           <span key={l.alt} className="pc-logo pc-logo-text">{l.text}</span>
         ),
