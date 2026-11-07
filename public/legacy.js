@@ -132,3 +132,15 @@ if (partnerStrip && partnerMotion) {
     partnerMotion.textContent = paused ? 'Resume animation' : 'Pause animation';
   });
 }
+
+// Hero video: show the thumbnail first, load the YouTube player only on tap.
+document.querySelectorAll('.fx-yt[data-yt]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube.com/embed/${btn.dataset.yt}?autoplay=1`;
+    f.title = btn.getAttribute('aria-label') || 'Video';
+    f.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+    f.allowFullscreen = true;
+    btn.replaceWith(f);
+  }, { once: true });
+});

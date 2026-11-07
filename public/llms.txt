@@ -9,10 +9,11 @@ Prices and course details change; the homepage (https://welcome.tradingrepublic.
 - Trading Republic Blueprint: a free video course on YouTube for beginners starting from zero (what trading is, support and resistance, moving averages, building a trade plan, trading psychology).
 - Hot Money: a YouTube series of real trades and market breakdowns filmed as they happen (Season 2 is the latest).
 - Weekly webinars: Monday Market Updates with Boss Zeefreaks (free), Trader's Journey, Charting Your Way to Profit, FGD Crypto and FGD PSE (the Philippine Stock Exchange, using the ZFT system).
-- Technical Intensive: a 2-month course with 50+ hours of live instruction across 10 modules (mindset, psychology, Darvas, moving averages, Fibonacci, RSI, risk management, backtesting and probabilities).
-- WEB3 Masterclass: a recorded crypto and Web3 course, sold alone or in bundles with Technical Intensive and a membership.
+- Technical Intensive: a recorded course on the ZFT system (mindset, psychology, Darvas, moving averages, Fibonacci, RSI, risk management, backtesting and probabilities), sold alone or with a membership.
+- WEB3 Masterclass: two recorded courses (Web3 Masterclass and Liquidity Pool Masterclass), sold alone or in bundles with Technical Intensive (ZFT Wealth Builder) and a membership.
 - ZFT Masterclass: Pathfinders: George Asibal's mentorship program. Details: https://zeefreaks.gitbook.io/zft-masterclass-pathfinders/
-- Membership tiers: Explorers (free verified Discord members) and Citizens (paid subscription that unlocks all trading channels, major giveaways and most webinars). #TR4Ever / The Eternals is a one-time lifetime membership with access to The Vault (300+ webinar videos since 2020).
+- Support groups: coach-led FGD sessions for Citizens (FGD Crypto, FGD PSE).
+- Membership tiers: Explorers (free verified Discord members) and Citizens (paid subscription that unlocks all trading channels, major giveaways and most webinars). The Eternals is the one-time, lifetime Citizen membership, with access to The Vault (300+ webinar videos since 2020).
 
 ## How to join
 

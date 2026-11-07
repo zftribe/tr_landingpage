@@ -6,7 +6,7 @@ import { PROMOS } from '@/lib/promos'
 import { ProductRail } from './ProductRail'
 import { Quiz } from './Quiz'
 
-// TR4Ever and Pathfinders stay as the original markup until the section is
+// The Eternals and Pathfinders stay as the original markup until the section is
 // restructured into free / paid / memberships / guidance.
 const kept = readFileSync(path.join(process.cwd(), 'content/legacy-programs-kept.html'), 'utf8')
 

@@ -853,3 +853,80 @@ html, body { overflow-x: clip; }
    links (Community, Exchanges, FAQ, Yield Tracker, Join Discord) sat below the
    bottom edge with no way to reach them. Let it scroll. */
 .mobile-menu { overflow-y: auto; overscroll-behavior: contain; }
+
+/* ─── ONE-PATH FUNNEL (claude/welcome-funnel) ─── */
+.fx-hero .heading-xl, .fx-hero .text-body, .fx-hero .btn-row { opacity: 1; transform: none; }
+.fx-hero-eyebrow { margin-bottom: 18px; }
+.fx-proof { list-style: none; padding: 0; margin: 28px 0 0; display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 0.8rem; color: var(--muted); }
+.fx-proof b { color: var(--white); font-family: var(--font-display); }
+.fx-yt { position: absolute; inset: 0; display: block; width: 100%; height: 100%; padding: 0; border: 0; background: #000; cursor: pointer; }
+.fx-yt img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: .85; transition: opacity .2s; }
+.fx-yt:hover img { opacity: 1; }
+.fx-yt-play { position: absolute; left: 50%; top: 50%; width: 68px; height: 48px; margin: -24px 0 0 -34px; border-radius: 12px; background: #e62117; }
+.fx-yt-play::after { content: ""; position: absolute; left: 27px; top: 14px; border-left: 18px solid #fff; border-top: 10px solid transparent; border-bottom: 10px solid transparent; }
+.fx-yt:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.fx-center { justify-content: center; }
+.fx-center-text { text-align: center; }
+.fx-disclose { margin-top: 18px; font-size: 0.72rem; color: var(--dim); padding: 0 24px; }
+.fx-who { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: center; }
+.fx-who-photo { width: 100%; height: auto; border-radius: var(--radius); border: 1px solid var(--border-2); }
+.fx-values { font-size: 0.85rem; color: var(--muted); }
+.fx-values b { color: var(--white); font-weight: 600; }
+.fx-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 48px; }
+.fx-stats > div { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--card); padding: 18px; }
+.fx-stats b { display: block; font-family: var(--font-display); font-size: 1.35rem; color: var(--gold); }
+.fx-stats span { font-size: 0.8rem; color: var(--muted); }
+.fx-steps { list-style: none; padding: 0; margin: 0 0 40px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fx-steps li { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); padding: 24px; }
+.fx-step-n { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+.fx-steps h3 { font-family: var(--font-display); color: var(--white); font-size: 1.1rem; margin: 10px 0 8px; }
+.fx-steps p { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+.fx-quotes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.fx-quotes figure { margin: 0; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg); padding: 24px; display: grid; gap: 14px; align-content: space-between; }
+.fx-quotes blockquote { margin: 0; color: var(--text); font-size: 0.95rem; line-height: 1.65; }
+.fx-quotes figcaption { color: var(--muted); font-size: 0.8rem; }
+.fx-anchor { scroll-margin-top: 80px; }
+.fx-more-wrap { padding-bottom: 48px; }
+.fx-more { border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-2); }
+.fx-more > summary { cursor: pointer; padding: 18px 22px; color: var(--white); font-family: var(--font-display); font-weight: 600; list-style: none; }
+.fx-more > summary::after { content: " +"; color: var(--gold); }
+.fx-more[open] > summary::after { content: " −"; }
+.fx-more > div, .fx-more > section { margin: 0 16px 16px; }
+.fx-more .reveal, .fx-more .reveal-left, .fx-more .reveal-right, .fx-more .stagger-children > * { opacity: 1; transform: none; }
+.fx-ex { display: grid; gap: 8px; max-width: 860px; margin: 0 auto; }
+.fx-ex details { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg-2); }
+.fx-ex summary { display: grid; grid-template-columns: 28px minmax(0, 1fr) minmax(0, 1.4fr) auto; gap: 14px; align-items: center; padding: 14px 16px; cursor: pointer; list-style: none; }
+.fx-ex summary::-webkit-details-marker { display: none; }
+.fx-ex summary img { border-radius: 7px; }
+.fx-ex-name { color: var(--white); font-family: var(--font-display); font-weight: 700; }
+.fx-ex-name em { font-style: normal; color: var(--gold); font-size: 0.78rem; font-weight: 500; margin-left: 6px; }
+.fx-ex-for { color: var(--muted); font-size: 0.85rem; }
+.fx-ex-go { border-radius: var(--radius-pill); background: var(--gold); color: #141006; font-weight: 700; font-size: 0.78rem; padding: 8px 14px; text-decoration: none; white-space: nowrap; }
+.fx-ex details p { padding: 0 16px 16px 58px; font-size: 0.86rem; color: var(--muted); }
+.fx-ex details[open] { border-color: var(--border-2); }
+#exchanges .fx-disclose { text-align: center; }
+.fx-final { background: radial-gradient(70% 120% at 50% 0%, var(--gold-soft), transparent 70%), var(--bg); border-top: 1px solid var(--border); }
+@media (max-width: 900px) {
+  .fx-who { grid-template-columns: 1fr; gap: 28px; }
+  .fx-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fx-steps, .fx-quotes { grid-template-columns: 1fr; }
+}
+@media (max-width: 600px) {
+  .fx-ex summary { grid-template-columns: 28px minmax(0, 1fr) auto; }
+  .fx-ex-for { grid-column: 2 / 4; grid-row: 2; font-size: 0.8rem; }
+  .fx-ex details p { padding-left: 16px; }
+}
+.fx-pillars { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.fx-pillars article { border: 1px solid var(--border); border-radius: var(--radius); background: var(--card); padding: 22px; }
+.fx-pillars h3 { font-family: var(--font-display); color: var(--white); font-size: 1.05rem; margin: 10px 0 8px; }
+.fx-pillars p { font-size: 0.86rem; color: var(--muted); line-height: 1.6; }
+.fx-founder { display: flex; align-items: center; gap: 16px; max-width: 760px; margin: 40px auto 0; padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--bg-2); }
+.fx-founder img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: 50% 20%; flex: 0 0 52px; }
+.fx-founder p { font-size: 0.85rem; color: var(--text); line-height: 1.55; margin: 0; }
+.fx-founder b { color: var(--white); }
+.fx-founder .fx-values { display: block; margin-top: 2px; font-size: 0.78rem; }
+@media (max-width: 900px) { .fx-pillars { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) {
+  .fx-pillars { grid-template-columns: 1fr; }
+  .fx-founder { border-radius: var(--radius); align-items: flex-start; }
+}
