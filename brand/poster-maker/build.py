@@ -36,7 +36,8 @@ def assets():
 
 def build(src, out, before_dir):
     html = open(os.path.join(HERE, "src", src), encoding="utf-8").read()
-    js = open(os.path.join(HERE, "src", "posters.js"), encoding="utf-8").read()
+    js = open(os.path.join(HERE, "src", "pick-engine-v1.js" if src == "pick.html" else "posters.js"), encoding="utf-8").read()
+    html = html.replace("/*GIF_JS*/", open(os.path.join(HERE, "src", "gif.js"), encoding="utf-8").read())
     html = html.replace("/*POSTERS_JS*/", js).replace("/*ASSETS_JSON*/", json.dumps(assets()))
     if "/*BEFORE_JSON*/" in html:
         before = {}

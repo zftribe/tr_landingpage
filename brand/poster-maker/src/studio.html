@@ -1,0 +1,357 @@
+<title>TR Poster Maker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>
+/* Layout: a working desk. Controls on the left (template → look → details → speakers), the live poster on the right, pinned while you scroll. Phone: poster first, controls below. Single dark look, matched to the Trading Republic site. */
+:root{
+  --bg:#0b0b0f; --panel:#13131a; --panel-2:#1a1a23; --line:#262632; --ink:#f5f5f7; --muted:#9a9aab; --gold:#FFB400; --gold-soft:rgba(255,180,0,.12); --danger:#ff6b6b;
+  --display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif; --body:"DM Sans","Segoe UI",Arial,sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45}
+.app{max-width:1320px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,560px);gap:24px;align-items:start}
+@media (max-width:900px){.app{grid-template-columns:minmax(0,1fr)}.stage{order:-1;position:static!important}header.top{order:-2}}
+header.top{grid-column:1/-1;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:26px;margin:0;letter-spacing:-.01em}
+h1 b{color:var(--gold)}
+.sub{color:var(--muted);margin:2px 0 0}
+.controls{display:grid;gap:16px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0}
+.card h2{font-family:var(--display);font-size:15px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card h2 small{font-family:var(--body);font-weight:500;color:var(--muted);font-size:12px}
+.label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px}
+.tpl{all:unset;cursor:pointer;display:grid;gap:6px;border-radius:10px;padding:6px;border:1px solid transparent}
+.tpl canvas{width:100%;aspect-ratio:1/1;border-radius:7px;display:block;background:#000}
+.tpl span{font-size:12px;font-weight:700;line-height:1.2}
+.tpl small{color:var(--muted);font-size:11px;line-height:1.2}
+.tpl[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.tpl:focus-visible,.chipbtn:focus-visible,.sw:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.chipbtn{all:unset;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px}
+.chipbtn small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.chipbtn[aria-pressed="true"]{background:var(--gold);color:#111;border-color:var(--gold)}
+.chipbtn[aria-pressed="true"] small{color:#3a2a00}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.styles .chipbtn{border-radius:10px;padding:9px 12px}
+.sws{display:flex;gap:8px;flex-wrap:wrap}
+.sw{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 10px 4px 4px;font-size:12px;font-weight:600;background:var(--panel-2)}
+.sw i{width:22px;height:22px;border-radius:50%;display:block;border:1px solid rgba(255,255,255,.2)}
+.sw[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.f{display:grid;gap:4px;min-width:0}
+.f label{font-size:12px;font-weight:700;color:var(--muted)}
+input[type=text],input[type=date],input[type=time],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;min-width:0;width:100%;box-sizing:border-box}
+textarea{min-height:64px;resize:vertical}
+.toggle{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}
+.toggle input{accent-color:var(--gold);width:18px;height:18px}
+.spk{display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:8px}
+@media (max-width:520px){.spk{grid-template-columns:56px minmax(0,1fr) auto}.spk .role{grid-column:2/3}}
+.av{all:unset;cursor:pointer;width:56px;height:56px;border-radius:50%;background:var(--bg) center/cover no-repeat;border:2px dashed var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);text-align:center;line-height:1.1}
+.av.has{border-style:solid;border-color:var(--gold);color:transparent}
+.x{all:unset;cursor:pointer;color:var(--muted);font-size:12px;padding:6px 8px;border-radius:8px}
+.x:hover{color:var(--danger)}
+.btn{all:unset;cursor:pointer;text-align:center;font-weight:800;border-radius:10px;padding:11px 14px;background:var(--panel-2);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#111;border-color:var(--gold)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.stage{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:grid;gap:12px;min-width:0}
+.canvaswrap{background:repeating-conic-gradient(#15151c 0 25%,#1b1b23 0 50%) 0 0/20px 20px;border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;place-items:center}
+#main{max-width:100%;max-height:min(70vh,640px);width:auto;height:auto;display:block;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sizes .chipbtn{border-radius:10px;text-align:center;padding:7px 4px;font-size:12px}
+@media (max-width:420px){.sizes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.exports{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.gifopts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
+@media (max-width:420px){.gifopts{grid-template-columns:minmax(0,1fr)}}
+.bar{height:6px;border-radius:99px;background:var(--panel-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .1s}
+.note{color:var(--muted);font-size:12px}
+.status{font-size:13px;min-height:1.2em}
+.result{display:grid;gap:8px}
+.result img{max-width:100%;border-radius:8px;border:1px solid var(--line)}
+.missing{color:var(--muted);font-size:12px}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div><h1>TR <b>Poster Maker</b></h1><p class="sub">Pick a template, fill in the details, download a PNG or a looping GIF.</p></div>
+    <p class="note">Times are Philippine time. Text always stays 16 px inside every box.</p>
+  </header>
+
+  <section class="controls">
+    <div class="card">
+      <h2>Favourites <small>recurring sessions</small></h2>
+      <div class="tpls" id="favs"></div>
+      <h2>Base templates <small>starting points for anything new</small></h2>
+      <div class="tpls" id="bases"></div>
+    </div>
+
+    <div class="card">
+      <h2>Look</h2>
+      <div class="label">Series looks</div>
+      <div class="styles" id="styles"></div>
+      <div class="label">Bold blocks</div>
+      <div class="styles" id="styles2"></div>
+      <div class="label">Colour theme</div>
+      <div class="sws" id="themes"></div>
+    </div>
+
+    <div class="card">
+      <h2>Details <button class="x" id="reset" type="button">Reset to template</button></h2>
+      <div class="grid2">
+        <div class="f"><label for="title">Title</label><input type="text" id="title"></div>
+        <div class="f"><label for="kicker">Small line above the title</label><input type="text" id="kicker"></div>
+      </div>
+      <div class="f"><label for="topic">Topic</label><textarea id="topic"></textarea></div>
+      <div class="grid3">
+        <div class="f"><label for="date">Date</label><input type="date" id="date"></div>
+        <div class="f"><label for="time">Start (PH time)</label><input type="time" id="time"></div>
+        <div class="f"><label for="endTime">End (optional)</label><input type="time" id="endTime"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label for="where">Where</label><input type="text" id="where" placeholder="FB Live · YouTube, Zoom, Ortigas…"></div>
+        <div class="f"><label for="channel">Discord channel or link</label><input type="text" id="channel" placeholder="#upcoming-events"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label for="cta">Call to action</label><input type="text" id="cta" placeholder="Free for everyone"></div>
+        <div class="f"><label for="partner">Partner logo</label><select id="partner"></select></div>
+      </div>
+      <p class="missing" id="missing"></p>
+      <label class="toggle"><input type="checkbox" id="live"> Show the red LIVE badge</label>
+      <div class="f"><label>Background photo (optional)</label>
+        <div class="row"><button class="btn" type="button" id="bgBtn">Add photo</button><button class="x" type="button" id="bgClear" hidden>Remove photo</button></div>
+        <input type="file" id="bgFile" accept="image/*" hidden>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Speakers <small id="spkCount">up to 3</small></h2>
+      <div id="spkList" style="display:grid;gap:8px"></div>
+      <button class="btn" type="button" id="addSpk">+ Add speaker</button>
+      <p class="note">Tap the circle to add a photo. Square head-and-shoulders photos work best.</p>
+      <input type="file" id="spkFile" accept="image/*" hidden>
+    </div>
+  </section>
+
+  <aside class="stage">
+    <div class="canvaswrap"><canvas id="main" width="1080" height="1080" aria-label="Poster preview"></canvas></div>
+    <div class="sizes" id="sizes"></div>
+    <div class="row" style="justify-content:space-between;align-items:center">
+      <label class="toggle"><input type="checkbox" id="play"> Play animation</label>
+      <span class="note" id="sizeNote"></span>
+    </div>
+    <div class="exports">
+      <button class="btn gold" type="button" id="dlPng">Download PNG</button>
+      <button class="btn" type="button" id="mkGif">Make GIF</button>
+    </div>
+    <div class="card" style="padding:12px">
+      <div class="gifopts">
+        <div class="f"><label for="gifDur">Loop length</label><select id="gifDur"><option value="4">4 s</option><option value="6" selected>6 s</option><option value="8">8 s</option><option value="10">10 s</option></select></div>
+        <div class="f"><label for="gifFps">Smoothness</label><select id="gifFps"><option value="10">10 fps</option><option value="12" selected>12 fps</option><option value="15">15 fps</option></select></div>
+        <div class="f"><label for="gifW">GIF width</label><select id="gifW"><option value="540">540 px (small)</option><option value="720" selected>720 px</option><option value="1080">Full size</option></select></div>
+      </div>
+      <div class="bar" aria-hidden="true"><i id="gifBar"></i></div>
+      <p class="status" id="status" role="status"></p>
+      <div class="result" id="result" hidden></div>
+    </div>
+  </aside>
+</div>
+
+<script>/*GIF_JS*/</script>
+<script>/*POSTERS_JS*/</script>
+<script>
+const ASSETS = /*ASSETS_JSON*/;
+const MISSING = ["OKX Wallet","DragonFi","Meteora"];
+const TP = window.TRPoster;
+const byId = Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+const $ = (id)=>document.getElementById(id);
+const FIELDS = ["title","kicker","topic","date","time","endTime","where","channel","cta","partner"];
+const PARTNERS = Object.keys(ASSETS).filter(k=>k.startsWith("p_")).map(k=>k.slice(2));
+const PNAME = {okx:"OKX",binance:"Binance",bitget:"Bitget",bybit:"Bybit",gate:"Gate",mexc:"MEXC",xm:"XM (past)",etoro:"eToro (past)"};
+
+const state = { tpl:"hunt", style:"signature", theme:"show", size:"square", f:null, bgPhoto:null };
+function store(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); }catch(e){} }
+function load(k){ try{ return JSON.parse(localStorage.getItem("trpm:"+k)); }catch(e){ return null; } }
+
+function freshFields(id){ const f = JSON.parse(JSON.stringify(byId[id].fields)); f.title = f.title || byId[id].name; f.speakers = (f.speakers||[]).map(s=>({name:s.name,role:s.role})); return f; }
+function currentFields(){
+  const f = Object.assign({}, state.f);
+  f.partnerImg = f.partner ? TP.IMG["p_"+f.partner] : null;
+  f.bgPhoto = state.bgPhoto;
+  f.speakers = (state.f.speakers||[]).map(s=>Object.assign({}, s, {photo: s._img||null}));
+  return f;
+}
+function cfg(){ return {style:state.style, theme:state.theme}; }
+
+/* ---------- template picker ---------- */
+function buildTemplates(){
+  for (const t of TP.TEMPLATES){
+    const b = document.createElement("button"); b.className="tpl"; b.type="button"; b.dataset.id=t.id; b.setAttribute("aria-pressed","false");
+    const c = document.createElement("canvas"); c.width = 1080; c.height = 1080; c.setAttribute("aria-hidden","true");
+    b.append(c); const n=document.createElement("span"); n.textContent=t.name; const s=document.createElement("small"); s.textContent=t.blurb; b.append(n,s);
+    b.addEventListener("click",()=>selectTemplate(t.id));
+    (t.fav ? $("favs") : $("bases")).append(b);
+  }
+}
+function drawThumbs(){
+  document.querySelectorAll(".tpl").forEach(b=>{
+    const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
+    TP.render(b.querySelector("canvas"), t, f, cfg(), "square");
+  });
+}
+function selectTemplate(id){
+  saveDraft();
+  state.tpl = id; state.f = load("draft:"+id) || freshFields(id); state.bgPhoto = null;
+  (state.f.speakers||[]).forEach(s=>{ delete s._img; delete s.photoData; });
+  document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===id)));
+  fillForm(); renderSpeakers(); draw(); store("last", id);
+}
+function saveDraft(){ if(!state.f) return; const copy = JSON.parse(JSON.stringify(state.f, (k,v)=>k==="_img"?undefined:v)); store("draft:"+state.tpl, copy); }
+
+/* ---------- look ---------- */
+function buildLook(){
+  for (const [k,s] of Object.entries(TP.STYLES)){
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.style=k; b.innerHTML=`${s.name}<small>${s.note}</small>`;
+    b.addEventListener("click",()=>{ state.style=k; store("style",k); markLook(); drawThumbs(); draw(); });
+    (s.look==="bold" ? $("styles2") : $("styles")).append(b);
+  }
+  for (const [k,t] of Object.entries(TP.THEMES)){
+    const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.theme=k;
+    const i=document.createElement("i"); i.style.background = k==="show" ? "conic-gradient(#e9d3a6 0 20%,#5dff9e 0 40%,#FFB400 0 60%,#ff9a2e 0 80%,#cfd0d4 0)" : `linear-gradient(135deg, ${t.bg} 0 50%, ${t.accent} 50% 100%)`;
+    b.append(i, document.createTextNode(t.name));
+    b.addEventListener("click",()=>{ state.theme=k; store("theme",k); markLook(); drawThumbs(); draw(); });
+    $("themes").append(b);
+  }
+}
+function markLook(){
+  document.querySelectorAll("[data-style]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.style===state.style)));
+  document.querySelectorAll("[data-theme]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.theme===state.theme)));
+}
+
+/* ---------- form ---------- */
+function buildPartner(){
+  const sel=$("partner"); sel.append(new Option("None",""));
+  for (const p of PARTNERS) sel.append(new Option(PNAME[p]||p, p));
+  $("missing").textContent = "Not in the library yet (ask the partner for the official file): " + MISSING.join(", ") + ".";
+}
+function fillForm(){
+  for (const k of FIELDS) $(k).value = state.f[k] || "";
+  $("live").checked = !!state.f.live;
+  $("bgClear").hidden = !state.bgPhoto;
+}
+for (const k of FIELDS) $(k).addEventListener("input", ()=>{ state.f[k] = $(k).value; queueDraw(); });
+$("live").addEventListener("change", ()=>{ state.f.live = $("live").checked; queueDraw(); });
+$("reset").addEventListener("click", ()=>{ state.f = freshFields(state.tpl); state.bgPhoto=null; store("draft:"+state.tpl, null); fillForm(); renderSpeakers(); draw(); });
+
+function readImage(file, max){
+  return new Promise((res)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const s=Math.min(1, max/Math.max(img.width,img.height)); if(s===1) return res(img); const c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); const o=new Image(); o.onload=()=>res(o); o.src=c.toDataURL("image/jpeg",0.9); }; img.onerror=()=>res(null); img.src=fr.result; }; fr.onerror=()=>res(null); fr.readAsDataURL(file); });
+}
+$("bgBtn").addEventListener("click", ()=>$("bgFile").click());
+$("bgFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; state.bgPhoto = await readImage(f, 1600); $("bgClear").hidden=!state.bgPhoto; e.target.value=""; draw(); });
+$("bgClear").addEventListener("click", ()=>{ state.bgPhoto=null; $("bgClear").hidden=true; draw(); });
+
+/* ---------- speakers ---------- */
+let spkTarget = 0;
+function renderSpeakers(){
+  const list=$("spkList"); list.textContent="";
+  const sp = state.f.speakers = state.f.speakers || [];
+  sp.forEach((s,i)=>{
+    const row=document.createElement("div"); row.className="spk";
+    const av=document.createElement("button"); av.type="button"; av.className="av"+(s._img?" has":""); av.textContent = s._img ? "" : "Add photo"; av.setAttribute("aria-label", `Photo for speaker ${i+1}`);
+    if (s._img) av.style.backgroundImage = `url(${s._img.src})`;
+    av.addEventListener("click", ()=>{ spkTarget=i; $("spkFile").click(); });
+    const n=document.createElement("input"); n.type="text"; n.placeholder="Name"; n.value=s.name||""; n.id="spkName"+i; n.setAttribute("aria-label",`Speaker ${i+1} name`);
+    n.addEventListener("input",()=>{ s.name=n.value; queueDraw(); });
+    const r=document.createElement("input"); r.type="text"; r.placeholder="Role (Coach, Founder…)"; r.value=s.role||""; r.className="role"; r.id="spkRole"+i; r.setAttribute("aria-label",`Speaker ${i+1} role`);
+    r.addEventListener("input",()=>{ s.role=r.value; queueDraw(); });
+    const x=document.createElement("button"); x.type="button"; x.className="x"; x.textContent="Remove"; x.addEventListener("click",()=>{ sp.splice(i,1); renderSpeakers(); draw(); });
+    row.append(av,n,r,x); list.append(row);
+  });
+  $("addSpk").disabled = sp.length>=3; $("addSpk").toggleAttribute("disabled", sp.length>=3);
+  $("spkCount").textContent = `${sp.length} of 3`;
+}
+$("addSpk").addEventListener("click", ()=>{ const sp=state.f.speakers; if(sp.length>=3) return; sp.push({name:"",role:""}); renderSpeakers(); draw(); $("spkName"+(sp.length-1))?.focus(); });
+$("spkFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; const img = await readImage(f, 700); if(img && state.f.speakers[spkTarget]) state.f.speakers[spkTarget]._img = img; e.target.value=""; renderSpeakers(); draw(); });
+
+/* ---------- sizes + preview ---------- */
+function buildSizes(){
+  for (const [k,s] of Object.entries(TP.SIZES)){
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.size=k; b.innerHTML=`${s.label}<small>${s.sub}</small>`;
+    b.addEventListener("click",()=>{ state.size=k; store("size",k); markSize(); draw(); });
+    $("sizes").append(b);
+  }
+}
+function markSize(){ document.querySelectorAll("[data-size]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.size===state.size))); const s=TP.SIZES[state.size]; $("sizeNote").textContent = `${s.w} × ${s.h} px`; }
+let raf=0, queued=false, playStart=0;
+function draw(){ if ($("play").checked) return; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size); }
+function queueDraw(){ if(queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; draw(); saveDraft(); }); }
+function loop(now){
+  if (!$("play").checked) { raf=0; draw(); return; }
+  const dur = +$("gifDur").value; const t = ((now - playStart)/1000) % dur;
+  TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {t, dur});
+  raf = requestAnimationFrame(loop);
+}
+$("play").addEventListener("change", ()=>{ if ($("play").checked){ playStart=performance.now(); if(!raf) raf=requestAnimationFrame(loop); } else draw(); });
+$("gifDur").addEventListener("change", ()=>{ playStart=performance.now(); });
+
+/* ---------- export ---------- */
+let downloads = null;
+function fileBase(){ const t=byId[state.tpl]; const d = state.f.date ? "-"+state.f.date : ""; return `tr-${t.id}${d}-${TP.SIZES[state.size].file}`; }
+async function offer(blob, filename, kind){
+  const st=$("status");
+  if (downloads){
+    try { await downloads.save({filename, data: blob}); st.textContent = `Saved ${filename}.`; return; }
+    catch(e){ if (e && e.code==="declined") { st.textContent = "Download cancelled."; return; } }
+  }
+  const url = URL.createObjectURL(blob); const res=$("result"); res.hidden=false; res.textContent="";
+  const img=document.createElement("img"); img.src=url; img.alt=filename;
+  const p=document.createElement("p"); p.className="note"; p.textContent = `Downloads aren't available in this view. Right-click or long-press the ${kind} to save it as ${filename}.`;
+  res.append(p,img); st.textContent="";
+}
+$("dlPng").addEventListener("click", ()=>{
+  const c=document.createElement("canvas"); TP.render(c, byId[state.tpl], currentFields(), cfg(), state.size);
+  c.toBlob((b)=>offer(b, fileBase()+".png", "image"), "image/png");
+});
+let busy=false;
+$("mkGif").addEventListener("click", async ()=>{
+  if (busy) return; busy=true; $("mkGif").setAttribute("disabled",""); $("result").hidden=true;
+  const st=$("status"), bar=$("gifBar");
+  const dur=Math.min(10, +$("gifDur").value), fps=+$("gifFps").value, delay=Math.round(100/fps), n=Math.round(dur*100/delay);
+  const S=TP.SIZES[state.size], gw=Math.min(+$("gifW").value, S.w) , gh=Math.round(S.h*gw/S.w);
+  const big=document.createElement("canvas"), small=document.createElement("canvas"); small.width=gw; small.height=gh; const sctx=small.getContext("2d",{willReadFrequently:true});
+  const tpl=byId[state.tpl], f=currentFields(), c=cfg();
+  const frame=(i)=>{ TP.render(big, tpl, f, c, state.size, {t: i*delay/100, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
+  try{
+    st.textContent="Reading colours…";
+    const samples=[]; const step=Math.max(1, Math.floor(gw*gh/9000));
+    for (let k=0;k<10;k++){ const d=frame(Math.floor(k*n/10)); for (let i=0;i<d.length;i+=4*step) samples.push(d[i],d[i+1],d[i+2]); await new Promise(r=>setTimeout(r)); }
+    const gw2=new TRGif.GifWriter(gw,gh,{dither:5}); gw2.setPalette(new Uint8Array(samples));
+    for (let i=0;i<n;i++){ gw2.addFrame(frame(i), delay); bar.style.width=((i+1)/n*100)+"%"; st.textContent=`Building GIF: frame ${i+1} of ${n}`; if(i%2===0) await new Promise(r=>setTimeout(r)); }
+    const bytes=gw2.finish(); const blob=new Blob([bytes],{type:"image/gif"});
+    const mb=(blob.size/1048576).toFixed(1);
+    st.textContent=`GIF ready: ${dur} s loop, ${gw}×${gh}, ${mb} MB.` + (blob.size>10*1048576 ? " Over Discord's 10 MB free limit: try 540 px or a shorter loop." : "");
+    await offer(blob, fileBase()+".gif", "GIF");
+    if (!downloads) {} else { const res=$("result"); res.hidden=false; res.textContent=""; const img=document.createElement("img"); img.src=URL.createObjectURL(blob); img.alt="GIF preview"; res.append(img); }
+  } catch(e){ st.textContent = "Couldn't build the GIF. Try a smaller width or shorter loop."; }
+  bar.style.width="0"; busy=false; $("mkGif").removeAttribute("disabled");
+});
+
+/* ---------- boot ---------- */
+(async()=>{
+  buildTemplates(); buildLook(); buildPartner(); buildSizes();
+  state.style = load("style") || "signature"; if(!TP.STYLES[state.style]) state.style="signature";
+  state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
+  state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
+  markLook(); markSize();
+  const last = load("last"); state.tpl = byId[last] ? last : "hunt"; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
+  document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
+  fillForm(); renderSpeakers();
+  await TP.loadFonts(); await TP.loadAssets(ASSETS);
+  drawThumbs(); draw();
+  try { if (window.claude && window.claude.use) downloads = await window.claude.use("downloads"); } catch(e){}
+})();
+</script>
