@@ -91,13 +91,33 @@ textarea{min-height:64px;resize:vertical}
 .result img{max-width:100%;border-radius:8px;border:1px solid var(--line)}
 .missing{color:var(--muted);font-size:12px}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+.tour-shade{position:fixed;inset:0;background:rgba(5,5,8,.72);z-index:50}
+.tour-ring{position:fixed;z-index:51;border-radius:14px;box-shadow:0 0 0 3px var(--gold),0 0 0 9999px rgba(5,5,8,.72);pointer-events:none;transition:all .25s ease}
+.tour-tip{position:fixed;z-index:52;width:min(360px,calc(100vw - 24px));background:#16161e;border:1px solid rgba(255,180,0,.5);border-radius:14px;padding:16px;display:grid;gap:8px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.tour-tip.center{left:50%!important;top:50%!important;transform:translate(-50%,-50%)}
+.tour-tip.dock{left:12px!important;right:12px;top:auto!important;bottom:max(12px,env(safe-area-inset-bottom,0px));width:auto}
+.tour-tip h3{font:800 17px var(--display);margin:0}
+.tour-tip p{margin:0;color:#cbcbd7;font-size:14px}
+.tour-step{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.tour-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.tour-nav span{display:flex;gap:8px}
+.tour-nav button{all:unset;cursor:pointer;border-radius:9px;padding:8px 12px;font-weight:800;font-size:13px}
+.tour-nav .tour-skip{color:var(--muted)}
+.tour-nav .tour-back{border:1px solid var(--line)}
+.tour-nav .tour-next{background:var(--gold);color:#111}
+.tour-nav button[hidden]{display:none}
+.tour-nav button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.tour-ring{transition:none}}
+.tourbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px;background:var(--panel-2)}
+.tourbtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 </style>
 
 <!--USERBAR-->
 <div class="app">
   <header class="top">
     <div><h1>TR <b>Poster Maker</b></h1><p class="sub">Pick a template, fill in the details, download a PNG or a looping GIF.</p></div>
-    <p class="note">Times are Philippine time. Text always stays 16 px inside every box.</p>
+    <div class="row" style="align-items:center"><p class="note">Times are Philippine time.</p><button class="tourbtn" type="button" id="tourBtn">▶ Take the tour</button></div>
   </header>
 
   <section class="controls">
@@ -429,6 +449,78 @@ $("mkGif").addEventListener("click", async ()=>{
   bar.style.width="0"; busy=false; $("mkGif").removeAttribute("disabled");
 });
 
+/* ---------- first-time guided tour ---------- */
+const TOUR = [
+  { sel: null, title: "Welcome to the TR Poster Maker", text: "A one-minute tour of how to make a poster. You can skip it and replay it any time from \"Take the tour\"." },
+  { sel: "#favs", title: "1 · Your weekly shows", text: "The Hunt, The Council, Monthly Meetup, Charts Decoded and MMU. Tap one to start from its usual look." },
+  { sel: "#bases", title: "2 · Base templates", text: "Everything else: announcements, giveaways, AMAs and more. Tap \"More templates\" to see them all, or × to hide ones you don't use." },
+  { sel: "#styles", title: "3 · Pick a look", text: "Choose a style, then a colour theme below it. The preview updates straight away." },
+  { sel: "#title", up: ".card", title: "4 · Fill in the details", text: "Title, topic, date and time (Philippine time), where it happens and the Discord channel." },
+  { sel: "#partner", up: ".f", title: "5 · Partner logo", text: "For a collab, pick the partner here. Only official logos from our library are listed." },
+  { sel: "#photoLib", up: ".f", title: "6 · Backdrop photo", text: "Pick a photo or upload your own. The ZFT grade makes any photo match the brand." },
+  { sel: "#addSpk", up: ".card", title: "7 · Hosts and speakers", text: "Add up to 3. Tap the circle to upload a head-and-shoulders photo." },
+  { sel: "#sizes", title: "8 · Choose the size", text: "Square or 4:5 for FB/IG posts, 9:16 for stories, and a cover for Discord events." },
+  { sel: "#main", up: ".canvaswrap", title: "9 · Check the preview", text: "This is exactly what you'll download. Tick \"Play animation\" to see it move." },
+  { sel: "#dlPng", up: ".exports", title: "10 · Download", text: "Download a PNG, or Make GIF for a looping animated version (up to 10 seconds)." },
+  { sel: "#tourBtn", title: "Need help?", text: "Ask in #guild-round-table or message George. You can replay this tour from here any time." },
+];
+let tourIdx = -1, tourEls = null;
+function tourDoneKey(){ return "tourDone"; }
+function tourTarget(st){ if(!st.sel) return null; let el=document.querySelector(st.sel); if(el && st.up){ el = el.closest(st.up) || el; } return el && el.offsetParent !== null ? el : null; }
+function startTour(){
+  if (tourEls) endTour(false);
+  if (!showAll) { showAll = true; layoutTemplates(); }
+  const ring=document.createElement("div"); ring.className="tour-ring";
+  const tip=document.createElement("div"); tip.className="tour-tip"; tip.setAttribute("role","dialog"); tip.setAttribute("aria-modal","true"); tip.setAttribute("aria-labelledby","tourTitle");
+  tip.innerHTML = '<div class="tour-step" id="tourStep"></div><h3 id="tourTitle"></h3><p id="tourText"></p><div class="tour-nav"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><span><button type="button" class="tour-back" id="tourBack">Back</button><button type="button" class="tour-next" id="tourNext">Next</button></span></div>';
+  const shade=document.createElement("div"); shade.className="tour-shade";
+  document.body.append(shade, ring, tip); tourEls={ring,tip,shade};
+  tip.querySelector("#tourSkip").addEventListener("click",()=>endTour(true));
+  tip.querySelector("#tourBack").addEventListener("click",()=>tourGo(tourIdx-1));
+  tip.querySelector("#tourNext").addEventListener("click",()=>tourIdx>=TOUR.length-1?endTour(true):tourGo(tourIdx+1));
+  document.addEventListener("keydown", tourKeys);
+  window.addEventListener("resize", tourPlace); window.addEventListener("scroll", tourPlace, true);
+  tourGo(0);
+}
+function tourKeys(e){ if(!tourEls) return; if(e.key==="Escape") endTour(true); else if(e.key==="ArrowRight") tourEls.tip.querySelector("#tourNext").click(); else if(e.key==="ArrowLeft" && tourIdx>0) tourGo(tourIdx-1); }
+function tourGo(i){
+  tourIdx=Math.max(0,Math.min(TOUR.length-1,i)); const st=TOUR[tourIdx], t=tourEls.tip;
+  t.querySelector("#tourStep").textContent = `Step ${tourIdx+1} of ${TOUR.length}`;
+  t.querySelector("#tourTitle").textContent = st.title; t.querySelector("#tourText").textContent = st.text;
+  t.querySelector("#tourBack").hidden = tourIdx===0;
+  t.querySelector("#tourNext").textContent = tourIdx===TOUR.length-1 ? "Start making posters" : "Next";
+  const el=tourTarget(st);
+  if (el){ const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches; const tall = el.getBoundingClientRect().height > window.innerHeight*0.45 || window.innerWidth < 640; el.scrollIntoView({block: tall?"start":"center", behavior:"auto"}); }
+  tourPlace(); setTimeout(tourPlace, 350);
+  t.querySelector("#tourNext").focus({preventScroll:true});
+}
+function tourPlace(){
+  if(!tourEls) return; const st=TOUR[tourIdx], el=tourTarget(st), {ring,tip,shade}=tourEls;
+  const vw=window.innerWidth, vh=window.innerHeight, phone = vw < 640;
+  if(!el){ ring.hidden=true; shade.hidden=false; tip.classList.add("center"); tip.style.left=""; tip.style.top=""; return; }
+  shade.hidden=true; ring.hidden=false; tip.classList.remove("center");
+  const r=el.getBoundingClientRect(), pad=8;
+  ring.style.left=(r.left-pad)+"px"; ring.style.top=(r.top-pad)+"px"; ring.style.width=(r.width+pad*2)+"px"; ring.style.height=(r.height+pad*2)+"px";
+  if (phone){ tip.classList.add("dock"); tip.style.left=""; tip.style.top=""; return; }
+  tip.classList.remove("dock");
+  const tw=tip.offsetWidth, th=tip.offsetHeight;
+  let top = r.bottom + 16; if (top + th > vh - 12) top = r.top - th - 16; if (top < 12) top = Math.max(12, Math.min(vh - th - 12, r.top + 12));
+  let left = Math.min(Math.max(12, r.left), vw - tw - 12);
+  tip.style.left=left+"px"; tip.style.top=top+"px";
+}
+function endTour(markDone){
+  if(!tourEls) return; Object.values(tourEls).forEach(e=>e.remove()); tourEls=null; tourIdx=-1;
+  document.removeEventListener("keydown", tourKeys); window.removeEventListener("resize", tourPlace); window.removeEventListener("scroll", tourPlace, true);
+  if (markDone){ store(tourDoneKey(), true); if (ZT && !ZT.tourDone){ ZT.tourDone=true; fetch("prefs.php",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({act:"tour_done",csrf:ZT.csrf})}).catch(()=>{}); } }
+  $("tourBtn").focus({preventScroll:true});
+}
+function maybeAutoTour(){
+  const done = ZT ? !!ZT.tourDone : !!load(tourDoneKey());
+  if (!done) setTimeout(startTour, 600);
+}
+
+$("tourBtn").addEventListener("click", startTour);
+
 /* ---------- boot ---------- */
 (async()=>{
   buildTemplates(); buildLook(); buildPartner(); buildSizes();
@@ -441,7 +533,7 @@ $("mkGif").addEventListener("click", async ()=>{
   layoutTemplates();
   fillForm(); renderSpeakers(); buildPhotoLib();
   await TP.loadFonts(); await TP.loadAssets(ASSETS);
-  drawThumbs(); draw();
+  drawThumbs(); draw(); maybeAutoTour();
   try { if (window.claude && window.claude.use) downloads = await window.claude.use("downloads"); } catch(e){}
 })();
 </script>
