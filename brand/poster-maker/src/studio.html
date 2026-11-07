@@ -27,6 +27,23 @@ h1 b{color:var(--gold)}
 .tpl span{font-size:12px;font-weight:700;line-height:1.2}
 .tpl small{color:var(--muted);font-size:11px;line-height:1.2}
 .tpl[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.tw{position:relative;min-width:0}
+.tw>.tpl{width:100%;box-sizing:border-box}
+.tw[hidden]{display:none!important}
+.tplx{all:unset;cursor:pointer;position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(11,11,15,.82);color:#f5f5f7;font-size:16px;line-height:1;border:1px solid rgba(255,255,255,.25);opacity:0;transition:opacity .15s}
+.tw:hover .tplx,.tplx:focus-visible{opacity:1}
+@media (hover:none){.tplx{opacity:.9}}
+.tplx:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.confirm{position:absolute;inset:6px;border-radius:9px;background:rgba(11,11,15,.94);display:grid;align-content:center;gap:8px;padding:10px;text-align:center;font-size:12px}
+.confirm b{font-size:13px}
+.confirm .row{justify-content:center}
+.confirm button{all:unset;cursor:pointer;border-radius:8px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid var(--line)}
+.confirm .yes{background:var(--danger);color:#111;border-color:var(--danger)}
+.confirm button:focus-visible{outline:2px solid var(--gold)}
+.morebar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.removed{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.removed button{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--ink)}
+.removed button:focus-visible{outline:2px solid var(--gold)}
 .tpl:focus-visible,.chipbtn:focus-visible,.sw:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
 .chipbtn{all:unset;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px}
@@ -89,6 +106,8 @@ textarea{min-height:64px;resize:vertical}
       <div class="tpls" id="favs"></div>
       <h2>Base templates <small>starting points for anything new</small></h2>
       <div class="tpls" id="bases"></div>
+      <div class="morebar"><button class="btn" type="button" id="moreBtn" aria-expanded="false" aria-controls="bases"></button><span class="note" id="hideNote"></span></div>
+      <div class="removed" id="removed" hidden></div>
     </div>
 
     <div class="card">
@@ -192,18 +211,69 @@ function currentFields(){
 }
 function cfg(){ return {style:state.style, theme:state.theme}; }
 
-/* ---------- template picker ---------- */
+/* ---------- template picker: collapsible base list + remove/restore ---------- */
+const ZT = window.ZT || null;               // set by zeefreaks.io for signed-in users
+const BASE_SHOWN = 8;
+let hidden = new Set([...(ZT && ZT.hidden ? ZT.hidden : []), ...((load("hidden")||[]))]);
+let showAll = !!load("showAll");
+function teamWide(){ return !!(ZT && ZT.admin); }
+async function saveHidden(id, hide){
+  if (teamWide()){
+    try{ const r = await fetch("prefs.php", {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({act: hide?"hide":"restore", id, csrf: ZT.csrf})}); if(!r.ok) throw 0; }
+    catch(e){ $("status").textContent = "Couldn't save that for the team. Try again."; return false; }
+  } else {
+    const mine = new Set(load("hidden")||[]); hide ? mine.add(id) : mine.delete(id); store("hidden", [...mine]);
+  }
+  hide ? hidden.add(id) : hidden.delete(id); return true;
+}
 function buildTemplates(){
   for (const t of TP.TEMPLATES){
+    const w = document.createElement("div"); w.className="tw"; w.dataset.wrap=t.id;
     const b = document.createElement("button"); b.className="tpl"; b.type="button"; b.dataset.id=t.id; b.setAttribute("aria-pressed","false");
     const c = document.createElement("canvas"); c.width = 1080; c.height = 1080; c.setAttribute("aria-hidden","true");
-    b.append(c); const n=document.createElement("span"); n.textContent=t.name; const s=document.createElement("small"); s.textContent=t.blurb; b.append(n,s);
+    b.append(c); const n=document.createElement("span"); n.textContent=t.name; const sm=document.createElement("small"); sm.textContent=t.blurb; b.append(n,sm);
     b.addEventListener("click",()=>selectTemplate(t.id));
-    (t.fav ? $("favs") : $("bases")).append(b);
+    const x = document.createElement("button"); x.type="button"; x.className="tplx"; x.textContent="×"; x.setAttribute("aria-label","Remove "+t.name);
+    x.addEventListener("click",(e)=>{ e.stopPropagation(); askRemove(w, t); });
+    w.append(b, x);
+    (t.fav ? $("favs") : $("bases")).append(w);
   }
+  $("moreBtn").addEventListener("click", ()=>{ showAll=!showAll; store("showAll", showAll); layoutTemplates(); });
+}
+function askRemove(w, t){
+  if (w.querySelector(".confirm")) return;
+  const box=document.createElement("div"); box.className="confirm"; box.setAttribute("role","group"); box.setAttribute("aria-label","Remove "+t.name+"?");
+  const title=document.createElement("b"); title.textContent="Remove "+t.name+"?";
+  const msg=document.createElement("span"); msg.textContent = teamWide() ? "Hidden for everyone. You can restore it below." : "Hidden for you. You can restore it below.";
+  const row=document.createElement("div"); row.className="row";
+  const yes=document.createElement("button"); yes.type="button"; yes.className="yes"; yes.textContent="Remove";
+  const no=document.createElement("button"); no.type="button"; no.className="no"; no.textContent="Cancel";
+  row.append(yes,no); box.append(title,msg,row);
+  no.addEventListener("click",()=>box.remove());
+  yes.addEventListener("click", async ()=>{ if(await saveHidden(t.id,true)){ box.remove(); if(state.tpl===t.id){ const next=TP.TEMPLATES.find(x=>!hidden.has(x.id)); if(next) selectTemplate(next.id); } layoutTemplates(); } });
+  w.append(box); no.focus();
+}
+function layoutTemplates(){
+  let shown=0; const baseVisible = TP.TEMPLATES.filter(t=>!t.fav && !hidden.has(t.id));
+  for (const t of TP.TEMPLATES){
+    const w=document.querySelector(`[data-wrap="${t.id}"]`); if(!w) continue;
+    let vis = !hidden.has(t.id);
+    if (vis && !t.fav){ shown++; if (!showAll && shown > BASE_SHOWN && t.id!==state.tpl) vis=false; }
+    w.hidden = !vis;
+  }
+  const extra = Math.max(0, baseVisible.length - BASE_SHOWN);
+  $("moreBtn").hidden = extra===0;
+  $("moreBtn").textContent = showAll ? "Show fewer ▴" : `More templates (${extra}) ▾`;
+  $("moreBtn").setAttribute("aria-expanded", String(showAll));
+  $("hideNote").textContent = teamWide() ? "Removing a template hides it for the whole team." : "Press × on a template to remove it.";
+  const rem=$("removed"); rem.textContent=""; const hid=TP.TEMPLATES.filter(t=>hidden.has(t.id));
+  rem.hidden = !hid.length;
+  if (hid.length){ rem.append(document.createTextNode(`Removed (${hid.length}):`));
+    for (const t of hid){ const r=document.createElement("button"); r.type="button"; r.textContent="↺ "+t.name; r.setAttribute("aria-label","Restore "+t.name);
+      r.addEventListener("click", async ()=>{ if(await saveHidden(t.id,false)) layoutTemplates(); }); rem.append(r); } }
 }
 function drawThumbs(){
-  document.querySelectorAll(".tpl").forEach(b=>{
+  document.querySelectorAll(".tpl[data-id]").forEach(b=>{
     const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
     TP.render(b.querySelector("canvas"), t, f, cfg(), "square");
   });
@@ -212,7 +282,7 @@ function selectTemplate(id){
   saveDraft();
   state.tpl = id; state.f = load("draft:"+id) || freshFields(id); state.bgPhoto = null;
   (state.f.speakers||[]).forEach(s=>{ delete s._img; delete s.photoData; });
-  document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===id)));
+  document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===id)));
   state.photoKey=""; fillForm(); renderSpeakers(); buildPhotoLib(); draw(); store("last", id);
 }
 function saveDraft(){ if(!state.f) return; const copy = JSON.parse(JSON.stringify(state.f, (k,v)=>k==="_img"?undefined:v)); store("draft:"+state.tpl, copy); }
@@ -366,8 +436,9 @@ $("mkGif").addEventListener("click", async ()=>{
   state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
   state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
   state.grade = load("grade") || "zft"; markLook(); markSize(); markGrade();
-  const last = load("last"); state.tpl = byId[last] ? last : "hunt"; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
-  document.querySelectorAll(".tpl").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
+  const last = load("last"); state.tpl = (byId[last] && !hidden.has(last)) ? last : (TP.TEMPLATES.find(t=>!hidden.has(t.id))||TP.TEMPLATES[0]).id; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
+  document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
+  layoutTemplates();
   fillForm(); renderSpeakers(); buildPhotoLib();
   await TP.loadFonts(); await TP.loadAssets(ASSETS);
   drawThumbs(); draw();
