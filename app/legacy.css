@@ -1318,3 +1318,7 @@ html, body { overflow-x: clip; }
 
 /* Polish round 4 (8 Nov): no dash before the TR Score edition line. */
 .sxA2 .eyebrow::before { display: none; }
+
+/* Polish round 5 (8 Nov): Official Links in real brand colours. */
+.link-pill svg { width: 22px; height: 22px; }
+.link-pill:hover { border-color: rgba(255,255,255,.25); }
