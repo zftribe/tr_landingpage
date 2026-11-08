@@ -5,6 +5,7 @@
   const dots = document.querySelectorAll('#carouselDots .carousel-dot');
 
   function goToSlide(n) {
+    if (!track) return; // the slideshow was replaced by the weekly-sessions cards (8 Nov)
     currentSlide = n;
     track.style.transform = `translateX(-${currentSlide * 100}%)`;
     dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
