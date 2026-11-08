@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
 import type { CurriculumCourse } from '@/lib/lms'
 import { CurriculumDialog } from './CurriculumDialog'
@@ -8,15 +8,66 @@ import { Panel } from './Panel'
 
 type Item = Product & { checkout: string; promo: string | null }
 
-const MAX_COMPARE = 3
+/** A card that is not an LMS package: the free Blueprint course, The Eternals, Pathfinders. */
+export type ExtraCard = {
+  key: string
+  tag: string
+  name: string
+  price: string
+  priceNote?: string
+  lines: string[]
+  logos: Logo[]
+  cta: { label: string; href: string; external?: boolean }
+  free?: boolean
+}
 
-export function ProductRail({ products, curriculum }: { products: Item[]; curriculum: CurriculumCourse[] }) {
+/** Program marks. `src` is a file in public/logos/programs; `text` is a stand-in until a logo exists. */
+export type Logo = { alt: string; src?: string; text?: string; coin?: string }
+
+const MAX_COMPARE = 3
+const L = {
+  ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
+  // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
+  web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
+  // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
+  citizen: { alt: 'Citizen membership', src: '/logos/programs/citizen.svg' },
+} satisfies Record<string, Logo>
+
+const logosOf = (p: Product): Logo[] => [
+  ...(p.hasTI ? [L.ti] : []),
+  ...(p.hasWeb3 ? [L.web3] : []),
+  ...(p.months ? [L.citizen] : []),
+]
+
+function Badges({ logos }: { logos: Logo[] }) {
+  return (
+    <div className="pc-logos" aria-hidden="true">
+      {logos.map((l) =>
+        l.src ? (
+          <span key={l.alt} className="pc-logo"><img src={l.src} alt="" width="40" height="40" loading="lazy" decoding="async" /></span>
+        ) : l.coin ? (
+          <span key={l.alt} className="pc-logo"><span className="pc-coin">{l.coin}</span></span>
+        ) : (
+          <span key={l.alt} className="pc-logo pc-logo-text">{l.text}</span>
+        ),
+      )}
+    </div>
+  )
+}
+
+export function ProductRail({ products, curriculum, before = [], after = [] }: {
+  products: Item[]
+  curriculum: CurriculumCourse[]
+  before?: ExtraCard[]
+  after?: ExtraCard[]
+}) {
   const [picked, setPicked] = useState<string[]>([])
   const [reading, setReading] = useState<Item | null>(null)
   const [watching, setWatching] = useState<Item | null>(null)
+  const [notice, setNotice] = useState('')
+  const rail = useRef<HTMLDivElement>(null)
   const coursesOf = (p: Item) =>
     p.courseIds.map((id) => curriculum.find((c) => c.id === id)).filter((c): c is CurriculumCourse => !!c)
-  const [notice, setNotice] = useState('')
 
   const toggle = (id: string) => {
     setNotice('')
@@ -30,21 +81,73 @@ export function ProductRail({ products, curriculum }: { products: Item[]; curric
     })
   }
 
+  /** Move the carousel by about one screen of cards. */
+  const page = (dir: 1 | -1) => {
+    const el = rail.current
+    if (!el) return
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: reduce ? 'auto' : 'smooth' })
+  }
+
   const compared = picked.map((id) => products.find((p) => p.id === id)!).filter(Boolean)
+  const total = before.length + products.length + after.length
+
+  const extra = (c: ExtraCard) => (
+    <article key={c.key} id={`card-${c.key}`} className={`pc-card${c.free ? ' pc-free' : ''}`} role="listitem">
+      <div className="pc-top">
+        <Badges logos={c.logos} />
+        <div className="program-tag">{c.tag}</div>
+      </div>
+      <h3 className="pc-name">{c.name}</h3>
+      <div className="program-price pc-price">
+        <span className="now">{c.price}</span>
+        {c.priceNote && <span className="pc-price-note">{c.priceNote}</span>}
+      </div>
+      <ul className="pc-includes">
+        {c.lines.map((l) => <li key={l}>{l}</li>)}
+      </ul>
+      <div className="pc-actions">
+        <a
+          href={c.cta.href}
+          className={`btn ${c.free ? 'btn-gold' : 'btn-outline'}`}
+          {...(c.cta.external ? { target: '_blank', rel: 'noopener' } : {})}
+        >
+          {c.cta.label}
+        </a>
+      </div>
+    </article>
+  )
 
   return (
     <div className="pc">
-      <p className="pc-hint">
-        {products.length} programs · <span className="pc-hint-swipe">swipe to see them all · </span>
-        pick two or three to compare
-      </p>
+      <div className="pc-bar">
+        <p className="pc-hint">
+          {total} programs · swipe or use the arrows · tap Compare on up to three
+        </p>
+        <div className="pc-arrows">
+          <button type="button" className="carousel-btn" onClick={() => page(-1)} aria-label="Previous programs">&#8592;</button>
+          <button type="button" className="carousel-btn" onClick={() => page(1)} aria-label="More programs">&#8594;</button>
+        </div>
+      </div>
 
-      <div className="pc-rail" role="list" aria-label="Programs">
+      <div
+        className="pc-rail"
+        role="list"
+        aria-label="Programs"
+        ref={rail}
+        // Keyboard users: bring the whole card holding the focused button into view (snapping is paused while focus is inside).
+        onFocus={(e) => (e.target as HTMLElement).closest('.pc-card')?.scrollIntoView({ block: 'nearest', inline: 'nearest' })}
+      >
+        {before.map(extra)}
         {products.map((p) => {
           const on = picked.includes(p.id)
+          const courses = coursesOf(p)
           return (
             <article key={p.id} id={`product-${p.id}`} className={`pc-card${on ? ' pc-on' : ''}`} role="listitem">
-              <div className="program-tag">{p.tag}</div>
+              <div className="pc-top">
+                <Badges logos={logosOf(p)} />
+                <div className="program-tag">{p.tag}</div>
+              </div>
               <h3 className="pc-name">{p.name}</h3>
 
               <div className="program-price pc-price">
@@ -58,34 +161,39 @@ export function ProductRail({ products, curriculum }: { products: Item[]; curric
               </div>
 
               <ul className="pc-includes">
-                {p.hasTI && <li>Technical Intensive — recorded course</li>}
-                {p.hasWeb3 && <li>WEB3 Masterclass — recorded course</li>}
-                {p.months && <li>{p.months} months of membership — live sessions with mentors and the community</li>}
+                {/* A single course already names itself in the title, so its card says what you get instead. */}
+                {!p.months && p.hasTI !== p.hasWeb3 ? (
+                  <li>Full recorded course, yours to keep</li>
+                ) : (
+                  <>
+                    {p.hasTI && <li>Technical Intensive course</li>}
+                    {p.hasWeb3 && <li>WEB3 Masterclass course</li>}
+                  </>
+                )}
+                {p.months && <li>{p.months} months as a Citizen: live sessions, support groups, every channel</li>}
               </ul>
 
-              {(p.hasTI || p.hasWeb3) && (
-                <p className="pc-note">Recorded lessons are yours to keep, with or without a membership.</p>
+              {/* George, 8 Nov: Curriculum and Watch intro sit as pills above Buy now / Compare. */}
+              {(p.promo || courses.length > 0) && (
+                <div className="pc-links">
+                  {p.promo && (
+                    <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setWatching(p)}>▶ Watch intro</button>
+                  )}
+                  {courses.length > 0 && (
+                    <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setReading(p)}>Curriculum</button>
+                  )}
+                </div>
               )}
-
               <div className="pc-actions">
-                <a href={p.checkout} className="btn btn-gold">Buy now →</a>
+                <a href={p.checkout} className="btn btn-gold">Buy now</a>
                 <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
                   {on ? '✓ Comparing' : 'Compare'}
                 </button>
-                {p.promo && (
-                  <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setWatching(p)}>
-                    ▶ Watch intro
-                  </button>
-                )}
-                {coursesOf(p).length > 0 && (
-                  <button type="button" className="pc-curriculum" aria-haspopup="dialog" onClick={() => setReading(p)}>
-                    Curriculum
-                  </button>
-                )}
               </div>
             </article>
           )
         })}
+        {after.map(extra)}
       </div>
 
       <p className="pc-notice" role="status">{notice}</p>

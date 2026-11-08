@@ -31,16 +31,17 @@ const decode = (s: string) =>
     .trim()
 
 /** The FAQ exactly as shown on the page, read from its markup so the two never disagree. */
-export function readFaq(): { q: string; a: string }[] {
-  const html = readFileSync(path.join(process.cwd(), 'content/legacy-after-programs.html'), 'utf8')
+export function readFaq(html = readFileSync(path.join(process.cwd(), 'content/legacy-after-programs.html'), 'utf8')): { q: string; a: string }[] {
   const items: { q: string; a: string }[] = []
-  const re = /<button class="faq-q"[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-a">([\s\S]*?)<\/div>/g
-  for (let m = re.exec(html); m; m = re.exec(html)) items.push({ q: decode(m[1]), a: decode(m[2]) })
+  const re = /<button[^>]*class="faq-q"[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-a"[^>]*>([\s\S]*?)<\/div>/g
+  // The gold "next step" links (class faq-go) are page navigation, not part of the answer.
+  for (let m = re.exec(html); m; m = re.exec(html)) items.push({ q: decode(m[1]), a: decode(m[2].replace(/<a class="faq-go"[\s\S]*?<\/a>/g, '')) })
   return items
 }
 
-export function structuredData() {
-  const faq = readFaq()
+/** `pageHtml` is the filled lower half of the page, so FAQ prices match what visitors see. */
+export function structuredData(pageHtml?: string) {
+  const faq = readFaq(pageHtml)
   return {
     '@context': 'https://schema.org',
     '@graph': [

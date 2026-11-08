@@ -11,7 +11,8 @@ export const LINEUP = [
   'ae67d608-901a-40a7-ace3-9ed3950d5dc6', // Web3
   '01cee606-d6ea-4694-a935-d16a07f3eafa', // TI + 12 months
   '6d2f2b79-fd93-4ba7-aa96-0138802345f5', // Web3 + 12 months
-  'c48fb1a4-c746-4aff-b725-9aa8605d4a16', // TI + Web3
+  'c48fb1a4-c746-4aff-b725-9aa8605d4a16', // TI + Web3 (ZFT Wealth Builder)
+  '253e056c-58a8-4727-a00b-05a65a3b596e', // TI + Web3 + 24 months (ZFT Wealth Builder MAX)
   'c8aa3cd1-77e6-4169-94c5-1e06ec20fc8c', // TI + Web3 + 6 months (LMS #21, draft)
   'f31f93a6-9d3c-4267-ac9d-67a1ce08edf3', // TI + Web3 + 12 months (LMS #21, draft)
   '38f59cd9-f07d-486a-b34d-c238a95b95ee', // 12 months
