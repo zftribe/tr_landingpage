@@ -1031,13 +1031,6 @@ html, body { overflow-x: clip; }
 .tk-burst i { position: absolute; width: 7px; height: 7px; border-radius: 2px; animation: tk-fly .9s ease-out forwards; }
 @keyframes tk-fly { to { transform: translate(var(--x), var(--y)) rotate(var(--r)); opacity: 0; } }
 
-/* Review reels: a small pause/play control (WCAG 2.2.2), remembered per visitor. */
-.rv-head { position: relative; }
-.rv-toggle { margin-top: 10px; width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(242,201,76,.35); background: transparent; color: #d8d3c9; font-size: .7rem; cursor: pointer; }
-.rv-toggle:hover, .rv-toggle:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
-.rv-rows.rv-paused .rv-track { animation-play-state: paused; }
-@media (prefers-reduced-motion: reduce) { .rv-toggle { display: none; } }
-
 /* Top four show; "See more" opens the rest (George picked A with four, 8 Nov). */
 .tk-more { display: grid; gap: 18px; }
 .tk-more[hidden] { display: none; }

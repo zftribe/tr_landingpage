@@ -183,26 +183,6 @@ document.addEventListener('click', (e) => {
   setTimeout(() => b.remove(), 1000);
 });
 
-// Student reviews: pause/play the two moving rows; the choice is remembered on this device.
-(() => {
-  const btn = document.querySelector('.rv-toggle'), rows = document.querySelector('.rv-rows');
-  if (!btn || !rows) return;
-  const set = (paused) => {
-    rows.classList.toggle('rv-paused', paused);
-    btn.setAttribute('aria-pressed', String(paused));
-    btn.setAttribute('aria-label', paused ? 'Play the moving reviews' : 'Pause the moving reviews');
-    btn.textContent = paused ? '▶' : '❚❚';
-  };
-  let saved = false;
-  try { saved = localStorage.getItem('tr-reviews-paused') === '1'; } catch (err) {}
-  set(saved);
-  btn.addEventListener('click', () => {
-    const paused = !rows.classList.contains('rv-paused');
-    set(paused);
-    try { localStorage.setItem('tr-reviews-paused', paused ? '1' : '0'); } catch (err) {}
-  });
-})();
-
 // Exchanges: the first four tickets show; the button opens the rest. Without this script all of them stay visible.
 (() => {
   const more = document.getElementById('tk-more'), btn = document.querySelector('.tk-morebtn');
