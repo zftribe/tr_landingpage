@@ -1037,3 +1037,11 @@ html, body { overflow-x: clip; }
 .rv-toggle:hover, .rv-toggle:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
 .rv-rows.rv-paused .rv-track { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .rv-toggle { display: none; } }
+
+/* Top four show; "See more" opens the rest (George picked A with four, 8 Nov). */
+.tk-more { display: grid; gap: 18px; }
+.tk-more[hidden] { display: none; }
+.tk-morebtn { justify-self: center; margin-top: 4px; border: 1px solid rgba(249,168,37,.5); background: transparent; color: var(--gold); font-family: var(--font-display); font-weight: 700; font-size: .9rem; border-radius: 999px; padding: 12px 22px; cursor: pointer; }
+.tk-morebtn[hidden] { display: none; }
+.tk-morebtn:hover, .tk-morebtn:focus-visible { background: rgba(249,168,37,.1); outline: none; }
+.tk-morebtn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }

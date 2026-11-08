@@ -201,3 +201,19 @@ document.addEventListener('click', (e) => {
     try { localStorage.setItem('tr-reviews-paused', paused ? '1' : '0'); } catch (err) {}
   });
 })();
+
+// Exchanges: the first four tickets show; the button opens the rest. Without this script all of them stay visible.
+(() => {
+  const more = document.getElementById('tk-more'), btn = document.querySelector('.tk-morebtn');
+  if (!more || !btn) return;
+  const n = more.querySelectorAll('.tk').length, label = 'See ' + n + ' more exchanges ▾';
+  more.hidden = true; btn.hidden = false;
+  btn.addEventListener('click', () => {
+    const open = more.hidden;
+    more.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'Show fewer ▴' : label;
+    if (open) more.querySelector('.tk-title h3')?.closest('.tk')?.scrollIntoView({ block: 'nearest' });
+    else document.getElementById('exchanges')?.querySelector('.tk-list')?.scrollIntoView({ block: 'start' });
+  });
+})();
