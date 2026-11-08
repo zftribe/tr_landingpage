@@ -227,3 +227,17 @@ document.addEventListener('click', (e) => {
   prev.addEventListener('click', () => step(-1)); next.addEventListener('click', () => step(1));
   rail.addEventListener('scroll', sync, { passive: true }); addEventListener('resize', sync); sync();
 })();
+
+// Membership: leadership and lifetime tiers open with one button. Without this script they all stay visible.
+(() => {
+  const more = document.getElementById('tier-more'), btn = document.querySelector('.tier-morebtn');
+  if (!more || !btn) return;
+  const label = btn.textContent;
+  more.hidden = true; btn.hidden = false;
+  btn.addEventListener('click', () => {
+    const open = more.hidden;
+    more.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+    btn.textContent = open ? 'Show fewer ▴' : label;
+  });
+})();

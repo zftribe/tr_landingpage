@@ -1097,3 +1097,14 @@ html, body { overflow-x: clip; }
 .yt-arrow:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 @media (max-width: 760px) { .yt-arrow { display: none !important; } .yt-rail { grid-auto-columns: 78%; } .yt-sub { width: 100%; justify-content: center; } }
 @media (prefers-reduced-motion: reduce) { .yt-card { transition: none; } }
+
+/* Membership: a button on Explorers and Citizens; leadership and lifetime tiers fold away (George, 8 Nov). */
+.tier-cta { margin-top: 14px; display: inline-flex; padding: 10px 18px; font-size: 13px; }
+.tier-more { display: flex; flex-direction: column; gap: 12px; }
+.tier-more[hidden], .tier-morebtn[hidden] { display: none; }
+.tier-morebtn { align-self: center; margin-top: 4px; border: 1px solid rgba(249,168,37,.5); background: transparent; color: var(--gold); font-family: var(--font-display); font-weight: 700; font-size: .9rem; border-radius: 999px; padding: 12px 22px; cursor: pointer; }
+.tier-morebtn:hover { background: rgba(249,168,37,.1); }
+.tier-morebtn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+/* How it works: step 2 points at the Free on YouTube section. */
+.fx-step-link { display: inline-block; margin-top: 8px; color: var(--gold); font-weight: 600; font-size: .85rem; text-decoration: none; }
+.fx-step-link:hover, .fx-step-link:focus-visible { text-decoration: underline; }

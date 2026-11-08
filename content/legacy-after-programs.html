@@ -187,12 +187,13 @@
     <div class="tier-list stagger-children">
       <div class="tier-row">
         <div class="tier-left"><h4>Explorers</h4><div class="tier-badge">Free</div></div>
-        <div class="tier-right"><p>Verified members without active paid subscription.</p><ul class="perk-pills"><li>Select events</li><li>Certain giveaways</li><li>Free webinars</li></ul></div>
+        <div class="tier-right"><p>Verified members without active paid subscription.</p><ul class="perk-pills"><li>Select events</li><li>Certain giveaways</li><li>Free webinars</li></ul><a href="{{discord}}" target="_blank" rel="noopener" class="btn btn-outline tier-cta">Join free on Discord</a></div>
       </div>
       <div class="tier-row featured">
         <div class="tier-left"><h4>Citizens</h4><div class="tier-badge">Paid Sub</div></div>
-        <div class="tier-right"><p>Active TR subscription holders: {{price:dacb45cb-c13b-4b88-a111-33c27604989b}} for 6 months, {{price:38f59cd9-f07d-486a-b34d-c238a95b95ee}} for 12 or {{price:078e0652-0b47-429d-9919-1a606a731e42}} for 24. All Citizens are verified Explorers first.</p><ul class="perk-pills"><li>All Explorer perks</li><li>All trading channels</li><li>FGD support groups</li><li>Most webinars</li><li>Major giveaways</li><li>Discord vanity icon</li></ul></div>
+        <div class="tier-right"><p>Active TR subscription holders: {{price:dacb45cb-c13b-4b88-a111-33c27604989b}} for 6 months, {{price:38f59cd9-f07d-486a-b34d-c238a95b95ee}} for 12 or {{price:078e0652-0b47-429d-9919-1a606a731e42}} for 24. All Citizens are verified Explorers first.</p><ul class="perk-pills"><li>All Explorer perks</li><li>All trading channels</li><li>FGD support groups</li><li>Most webinars</li><li>Major giveaways</li><li>Discord vanity icon</li></ul><a href="#programs" class="btn btn-gold tier-cta">See membership plans</a></div>
       </div>
+      <div class="tier-more" id="tier-more">
       <div class="tier-row">
         <div class="tier-left"><h4>Community Leaders</h4><div class="tier-badge">Selected</div></div>
         <div class="tier-right"><p>Recommended by Guild Leaders while actively directing projects.</p><ul class="perk-pills"><li>Reward: sub or ₱1K</li><li>50% sub discount</li><li>Priority events</li><li>Volunteer priority</li><li>Guild Leader pathway</li><li>Exclusive merch</li></ul></div>
@@ -205,6 +206,8 @@
         <div class="tier-left"><h4>Guild Leaders</h4><div class="tier-badge">Invited</div></div>
         <div class="tier-right"><p>Architects of the community. By invitation plus continuous contributions.</p><ul class="perk-pills"><li>All Leader perks</li><li>Full channel/Drive access</li><li>Perpetual sub eligibility</li><li>Unique insignia</li></ul></div>
       </div>
+      </div>
+      <button type="button" class="tier-morebtn" aria-expanded="false" aria-controls="tier-more" hidden>See the leadership and lifetime tiers ▾</button>
     </div>
   </div>
 </section>
@@ -253,14 +256,14 @@
           <div class="tk-head">
             <span class="tk-logo"><img src="/logos/okx.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
             <div class="tk-title"><h3>OKX</h3><p>Best for all-in-one power users</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 4.6 out of 5, Top pick">
-              <div class="ring" style="--v:92"><span>4.6<small>OF 5</small></span></div>
+            <div class="tk-score" role="img" aria-label="TR rating 4.8 out of 5, Top pick">
+              <div class="ring" style="--v:96"><span>4.8<small>OF 5</small></span></div>
               <b>Top pick</b>
             </div>
           </div>
           <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>No hack of the exchange on record</li><li>Monthly Proof-of-Reserves, 100%+ on BTC, ETH and USDT</li><li>EU MiCA, Dubai and US licences</li><li>Web3 Wallet, copy trading and bots built in</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>Fewer coins than most on this list</li></ul></div>
+            <div class="tk-pros"><h4>Good</h4><ul><li>No exchange hack on record</li><li>Monthly Proof-of-Reserves</li><li>Best support and VIP access</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>Fewer coins than most</li><li>Some features vary by country</li></ul></div>
           </div>
           <div class="tk-stats"><span>Spot fee<b>0.08%</b></span><span>Coins<b>340+</b></span><span>Leverage<b>100×</b></span></div>
         </div>
@@ -274,16 +277,39 @@
       <article class="tk">
         <div class="tk-main">
           <div class="tk-head">
-            <span class="tk-logo"><img src="/logos/bybit.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-            <div class="tk-title"><h3>Bybit</h3><p>Best for futures and pro traders</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 4.4 out of 5, Excellent">
-              <div class="ring" style="--v:88"><span>4.4<small>OF 5</small></span></div>
+            <span class="tk-logo"><img src="/partners/binance.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
+            <div class="tk-title"><h3>Binance</h3><p>Best for the deepest liquidity</p></div>
+            <div class="tk-score" role="img" aria-label="TR rating 4.3 out of 5, Excellent">
+              <div class="ring" style="--v:86"><span>4.3<small>OF 5</small></span></div>
               <b>Excellent</b>
             </div>
           </div>
           <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>Second-largest spot volume in 2026</li><li>Audited reserves around 102% (Oct 2026)</li><li>EU MiCA and a Dubai exchange licence</li><li>Copy trading, bots and P2P with GCash and Maya</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>2025 hack, fully covered by Bybit</li><li>Closed its separate Web3 wallet</li></ul></div>
+            <div class="tk-pros"><h4>Good</h4><ul><li>Deepest liquidity worldwide</li><li>Best app and trading screen</li><li>500+ coins, bots and Earn</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>Oct 2026 hack, pledged covered</li><li>Your rebate here is only 5%</li></ul></div>
+          </div>
+          <div class="tk-stats"><span>Spot fee<b>0.1%</b></span><span>Coins<b>500+</b></span><span>Leverage<b>125×</b></span></div>
+        </div>
+        <div class="tk-stub">
+          <div class="tk-off">5%<small>fee rebate with our link</small></div>
+          <span class="tk-codewrap"><small>Referral code</small><span class="tk-code">TROFF5</span></span>
+          <a class="tk-claim" href="https://www.binance.com/register?ref=TROFF5" target="_blank" rel="noopener noreferrer sponsored" data-code="TROFF5">Tear &amp; claim<span class="pc-sr"> 5% fee rebate at Binance (opens in a new tab)</span></a>
+        </div>
+        <div class="tk-claimed" aria-live="polite"><b class="tk-msg">Code TROFF5 copied</b><span>Binance sign-up opened in a new tab.</span><a href="https://www.binance.com/register?ref=TROFF5" target="_blank" rel="noopener noreferrer sponsored">Open it again ↗</a></div>
+      </article>
+      <article class="tk">
+        <div class="tk-main">
+          <div class="tk-head">
+            <span class="tk-logo"><img src="/logos/bybit.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
+            <div class="tk-title"><h3>Bybit</h3><p>Best for futures and pro traders</p></div>
+            <div class="tk-score" role="img" aria-label="TR rating 4.2 out of 5, Excellent">
+              <div class="ring" style="--v:84"><span>4.2<small>OF 5</small></span></div>
+              <b>Excellent</b>
+            </div>
+          </div>
+          <div class="tk-pc">
+            <div class="tk-pros"><h4>Good</h4><ul><li>Second-largest spot volume</li><li>Smooth app, strong futures</li><li>P2P with GCash and Maya</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>2025 hack, fully covered</li><li>Closed its Web3 wallet</li></ul></div>
           </div>
           <div class="tk-stats"><span>Futures fee<b>0.055%</b></span><span>Coins<b>700+</b></span><span>Leverage<b>100×</b></span></div>
         </div>
@@ -297,39 +323,16 @@
       <article class="tk">
         <div class="tk-main">
           <div class="tk-head">
-            <span class="tk-logo"><img src="/logos/gate.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-            <div class="tk-title"><h3>Gate</h3><p>Best for early altcoin listings</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 4.3 out of 5, Excellent">
-              <div class="ring" style="--v:86"><span>4.3<small>OF 5</small></span></div>
-              <b>Excellent</b>
-            </div>
-          </div>
-          <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>No hack in 2024–2026</li><li>Reserves around 118% (Oct 2026)</li><li>EU MiCA and Dubai licences</li><li>2,000+ coins and a launchpad for new listings</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>0.1% base spot fee, above OKX</li><li>Smaller volume than the big three</li></ul></div>
-          </div>
-          <div class="tk-stats"><span>Spot fee<b>0.1%</b></span><span>Coins<b>2,000+</b></span><span>Futures fee<b>0.05%</b></span></div>
-        </div>
-        <div class="tk-stub">
-          <div class="tk-off">20%<small>fee rebate with our link</small></div>
-          <span class="tk-codewrap"><small>Referral code</small><span class="tk-code">BULLZONE</span></span>
-          <a class="tk-claim" href="https://www.gate.com/share/BULLZONE" target="_blank" rel="noopener noreferrer sponsored" data-code="BULLZONE">Tear &amp; claim<span class="pc-sr"> 20% fee rebate at Gate (opens in a new tab)</span></a>
-        </div>
-        <div class="tk-claimed" aria-live="polite"><b class="tk-msg">Code BULLZONE copied</b><span>Gate sign-up opened in a new tab.</span><a href="https://www.gate.com/share/BULLZONE" target="_blank" rel="noopener noreferrer sponsored">Open it again ↗</a></div>
-      </article>
-      <article class="tk">
-        <div class="tk-main">
-          <div class="tk-head">
             <span class="tk-logo"><img src="/logos/bitget.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
             <div class="tk-title"><h3>Bitget</h3><p>Best for copy trading</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 4.1 out of 5, Great">
-              <div class="ring" style="--v:82"><span>4.1<small>OF 5</small></span></div>
-              <b>Great</b>
+            <div class="tk-score" role="img" aria-label="TR rating 3.8 out of 5, Good">
+              <div class="ring" style="--v:76"><span>3.8<small>OF 5</small></span></div>
+              <b>Good</b>
             </div>
           </div>
           <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>The biggest copy-trading community</li><li>Bitget Wallet for Web3</li><li>Protection fund rebuilt to about $300M</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>Sep 2026 hack, covered by its protection fund</li><li>No EU MiCA licence yet</li></ul></div>
+            <div class="tk-pros"><h4>Good</h4><ul><li>Biggest copy-trading community</li><li>Bitget Wallet for Web3</li><li>About $300M protection fund</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>Sep 2026 hack, fund covered it</li><li>No EU MiCA licence yet</li></ul></div>
           </div>
           <div class="tk-stats"><span>Spot fee<b>0.1%</b></span><span>Coins<b>700+</b></span><span>Leverage<b>125×</b></span></div>
         </div>
@@ -344,39 +347,39 @@
       <article class="tk">
         <div class="tk-main">
           <div class="tk-head">
-            <span class="tk-logo"><img src="/partners/binance.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
-            <div class="tk-title"><h3>Binance</h3><p>Best for the deepest liquidity</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 3.7 out of 5, Good">
-              <div class="ring" style="--v:74"><span>3.7<small>OF 5</small></span></div>
+            <span class="tk-logo"><img src="/logos/gate.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
+            <div class="tk-title"><h3>Gate</h3><p>Best for early altcoin listings</p></div>
+            <div class="tk-score" role="img" aria-label="TR rating 3.6 out of 5, Good">
+              <div class="ring" style="--v:72"><span>3.6<small>OF 5</small></span></div>
               <b>Good</b>
             </div>
           </div>
           <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>Largest exchange by volume</li><li>500+ coins, copy trading, bots and Earn</li><li>Pays 25% less in fees when you use BNB</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>Your rebate here is 5%, not 20%</li><li>Oct 2026 hot-wallet hack; Binance pledged to cover it in full</li><li>No EU MiCA licence</li></ul></div>
+            <div class="tk-pros"><h4>Good</h4><ul><li>2,000+ coins, early listings</li><li>No hack in 2024–2026</li><li>Reserves around 118%</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>Thin order books on many pairs</li><li>App can feel buggy</li></ul></div>
           </div>
-          <div class="tk-stats"><span>Spot fee<b>0.1%</b></span><span>Coins<b>500+</b></span><span>Leverage<b>125×</b></span></div>
+          <div class="tk-stats"><span>Spot fee<b>0.1%</b></span><span>Coins<b>2,000+</b></span><span>Futures fee<b>0.05%</b></span></div>
         </div>
         <div class="tk-stub">
-          <div class="tk-off">5%<small>fee rebate with our link</small></div>
-          <span class="tk-codewrap"><small>Referral code</small><span class="tk-code">TROFF5</span></span>
-          <a class="tk-claim" href="https://www.binance.com/register?ref=TROFF5" target="_blank" rel="noopener noreferrer sponsored" data-code="TROFF5">Tear &amp; claim<span class="pc-sr"> 5% fee rebate at Binance (opens in a new tab)</span></a>
+          <div class="tk-off">20%<small>fee rebate with our link</small></div>
+          <span class="tk-codewrap"><small>Referral code</small><span class="tk-code">BULLZONE</span></span>
+          <a class="tk-claim" href="https://www.gate.com/share/BULLZONE" target="_blank" rel="noopener noreferrer sponsored" data-code="BULLZONE">Tear &amp; claim<span class="pc-sr"> 20% fee rebate at Gate (opens in a new tab)</span></a>
         </div>
-        <div class="tk-claimed" aria-live="polite"><b class="tk-msg">Code TROFF5 copied</b><span>Binance sign-up opened in a new tab.</span><a href="https://www.binance.com/register?ref=TROFF5" target="_blank" rel="noopener noreferrer sponsored">Open it again ↗</a></div>
+        <div class="tk-claimed" aria-live="polite"><b class="tk-msg">Code BULLZONE copied</b><span>Gate sign-up opened in a new tab.</span><a href="https://www.gate.com/share/BULLZONE" target="_blank" rel="noopener noreferrer sponsored">Open it again ↗</a></div>
       </article>
       <article class="tk">
         <div class="tk-main">
           <div class="tk-head">
             <span class="tk-logo"><img src="/logos/mexc.png" alt="" width="40" height="40" loading="lazy" decoding="async"></span>
             <div class="tk-title"><h3>MEXC</h3><p>Best for the lowest fees</p></div>
-            <div class="tk-score" role="img" aria-label="TR rating 3.7 out of 5, Good">
-              <div class="ring" style="--v:74"><span>3.7<small>OF 5</small></span></div>
-              <b>Good</b>
+            <div class="tk-score" role="img" aria-label="TR rating 3.4 out of 5, Fair">
+              <div class="ring" style="--v:68"><span>3.4<small>OF 5</small></span></div>
+              <b>Fair</b>
             </div>
           </div>
           <div class="tk-pc">
-            <div class="tk-pros"><h4>Good</h4><ul><li>Zero maker fees on spot</li><li>2,000+ coins and fast new listings</li></ul></div>
-            <div class="tk-cons"><h4>Watch out</h4><ul><li>Nov 2026: US Treasury cut MEXC off from US banks</li><li>Repeated reports of frozen accounts</li><li>No top-tier licence</li></ul></div>
+            <div class="tk-pros"><h4>Good</h4><ul><li>Zero maker fees on spot</li><li>2,000+ coins, fast listings</li><li>High leverage on futures</li></ul></div>
+            <div class="tk-cons"><h4>Watch out</h4><ul><li>Cut off from US banks (Nov 2026)</li><li>No top-tier licence</li></ul></div>
           </div>
           <div class="tk-stats"><span>Spot fee<b>0%</b></span><span>Coins<b>2,000+</b></span><span>Leverage<b>200×</b></span></div>
         </div>
@@ -392,7 +395,7 @@
     </div>
     <details class="tk-how">
       <summary>How we score (TR Score 2026)</summary>
-      <ul><li><b>Your rebate with our link · 20%</b><span>The fee rebate you get when you sign up with a Trading Republic link: 20% scores 10, 5% scores 2.5.</span></li><li><b>Volume and liquidity · 19%</b><span>How deep the order books are, from 2026 volume rankings.</span></li><li><b>Coins and features · 18%</b><span>Coins listed, copy trading, bots, Web3 wallet, Earn.</span></li><li><b>Safety and reserves · 16%</b><span>Proof-of-Reserves, protection fund, track record. A hack the exchange fully covered costs a little, not a lot.</span></li><li><b>Licences and standing · 14%</b><span>Top-tier licences (EU MiCA, Dubai VARA and similar) and regulator actions.</span></li><li><b>Trading fees · 13%</b><span>Base spot and futures fees before any discount.</span></li></ul>
+      <ul><li><b>Fees after your rebate · 20%</b><span>Base trading fees, minus the rebate you get with our link.</span></li><li><b>Volume and liquidity · 20%</b><span>How deep the order books are, so your orders fill at a fair price.</span></li><li><b>Coins and features · 20%</b><span>Coins listed, copy trading, bots, Web3 wallet, Earn.</span></li><li><b>Safety and standing · 20%</b><span>Proof-of-Reserves, protection fund, licences and track record. A hack the exchange fully covered costs a little, not a lot.</span></li><li><b>Platform and support · 20%</b><span>How the app feels, how fast support answers, and VIP perks open to regular traders, not only big names.</span></li></ul>
       <p>Each part is scored 0–10 and weighted; the total is shown out of 5. Checked November 2026.</p>
     </details>
     <p class="fx-disclose fx-center-text">Partner links: your rebate is what you get back on fees when you sign up with our link. Scores and picks are Trading Republic’s own view.</p>
