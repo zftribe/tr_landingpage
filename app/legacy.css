@@ -1045,3 +1045,12 @@ html, body { overflow-x: clip; }
 .tk-morebtn[hidden] { display: none; }
 .tk-morebtn:hover, .tk-morebtn:focus-visible { background: rgba(249,168,37,.1); outline: none; }
 .tk-morebtn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+/* "How we score" (TR Score 2026). */
+.tk-how { max-width: 760px; margin: 22px auto 0; background: var(--card-solid); border: 1px solid var(--border); border-radius: 14px; padding: 0 18px; }
+.tk-how summary { cursor: pointer; padding: 14px 0; font-family: var(--font-display); font-weight: 700; color: var(--white); font-size: .92rem; }
+.tk-how summary:focus-visible { outline: 3px solid #fff; outline-offset: 3px; border-radius: 6px; }
+.tk-how ul { list-style: none; margin: 0; padding: 0 0 6px; display: grid; gap: 10px; }
+.tk-how li { display: grid; gap: 2px; font-size: .85rem; color: var(--muted); }
+.tk-how li b { color: var(--text); font-family: var(--font-display); font-size: .86rem; }
+.tk-how p { font-size: .8rem; color: var(--muted); margin: 6px 0 16px; }
