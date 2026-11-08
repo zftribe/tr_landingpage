@@ -1452,3 +1452,16 @@ button { font-family: inherit; }
 /* Sections A · Hairline: a thin line with a short gold accent where one section ends and the next begins. */
 main section.section + section.section, section.section + section.section { border-top: 1px solid rgba(255,255,255,.06); position: relative; }
 section.section + section.section::before { content: ''; position: absolute; top: -1px; left: 50%; width: 56px; height: 2px; margin-left: -28px; background: var(--gold); border-radius: 2px; }
+
+/* Polish round 10 (8 Nov). */
+/* Republic: three cards, the third one wider (support groups + events), and a founder strip as wide as the cards. */
+.fx-pillars { grid-template-columns: 1fr 1fr 1.6fr !important; }
+.fx-pillars article { display: flex; flex-direction: column; }
+.fx-pillars .fx-apps { margin-top: auto; }
+.fx-pillars p { margin-bottom: 14px; }
+.fx-wide { border-color: rgba(249,168,37,.35) !important; }
+.fx-wide-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fx-wide-cols b { color: var(--white); font-weight: 600; }
+.fx-founder { max-width: none !important; margin-top: 16px !important; border-radius: var(--radius) !important; padding: 16px 22px !important; }
+@media (max-width: 900px) { .fx-pillars { grid-template-columns: 1fr 1fr !important; } .fx-wide { grid-column: 1 / -1; } }
+@media (max-width: 600px) { .fx-pillars { grid-template-columns: 1fr !important; } .fx-wide-cols { grid-template-columns: 1fr; gap: 0; } }
