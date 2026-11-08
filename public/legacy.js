@@ -241,3 +241,8 @@ document.addEventListener('click', (e) => {
     btn.textContent = open ? 'Show fewer ▴' : label;
   });
 })();
+
+// TR Score: How we score opens a panel under the seal header (closed by default; open without this script).
+(() => { const b = document.querySelector('.sxA2-pill'), p = document.getElementById('sx-how-panel'); if (!b || !p) return;
+  p.hidden = true; b.hidden = false;
+  b.addEventListener('click', () => { const o = p.hidden; p.hidden = !o; b.setAttribute('aria-expanded', String(o)); }); })();
