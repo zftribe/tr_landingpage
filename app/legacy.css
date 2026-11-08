@@ -1382,3 +1382,14 @@ html, body { overflow-x: clip; }
 .wxC-list img { width: 84px; height: 56px; object-fit: cover; border-radius: 10px; } .wxC-list b { color: var(--white); font-size: .92rem; display: block; } .wxC-list small { color: var(--muted); font-size: .76rem; }
 @media (max-width: 900px) { .wxA { grid-template-columns: 1fr 1fr; } .wxB { grid-template-columns: 1fr; } .wxB-day { min-height: 0; grid-template-columns: 52px 1fr; align-items: center; } .wxB-day:not(.on) { display: none; } .wxC { grid-template-columns: 1fr; gap: 24px; } }
 @media (max-width: 520px) { .wxA { grid-template-columns: 1fr; } .wb-cta .btn { flex: 1 1 100%; justify-content: center; } }
+
+/* Polish round 8 (8 Nov): fonts and sizes. */
+/* Trusted Partners heading in the same font, weight and size as every other section heading. */
+#trusted-partners h2 { font-family: var(--font-display) !important; font-weight: 700 !important; letter-spacing: -0.03em !important; font-size: clamp(1.8rem, 3.5vw, 2.6rem) !important; line-height: 1.15 !important; }
+/* Arrow and play buttons use the site font instead of Arial. */
+button { font-family: inherit; }
+/* Small labels: nothing under 11 px, so tags and badges stay readable on phones. */
+.program-tag, .tier-badge, .pc-price .save, .yt-badge, .wb-tag, .tk-badge, .tk-off small, .tk-codewrap small, .sxA2-tile small { font-size: 11px !important; }
+.pc-coin { font-size: 10.5px; } .fx-app .fx-coin { font-size: 8px; }
+/* Student quotes in the site's own font (DM Sans italic) instead of a third, serif font. */
+#students blockquote { font-family: var(--font-body, 'DM Sans'), sans-serif !important; font-style: italic; font-weight: 400; font-size: .95rem !important; line-height: 1.6 !important; }
