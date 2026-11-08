@@ -122,7 +122,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
     <div className="pc">
       <div className="pc-bar">
         <p className="pc-hint">
-          {total} ways to learn · pick two or three courses to compare · recorded lessons are yours to keep
+          {total} programs · swipe or use the arrows · tap Compare on up to three
         </p>
         <div className="pc-arrows">
           <button type="button" className="carousel-btn" onClick={() => page(-1)} aria-label="Previous programs">&#8592;</button>
@@ -161,8 +161,15 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
               </div>
 
               <ul className="pc-includes">
-                {p.hasTI && <li>Technical Intensive course</li>}
-                {p.hasWeb3 && <li>WEB3 Masterclass course</li>}
+                {/* A single course already names itself in the title, so its card says what you get instead. */}
+                {!p.months && p.hasTI !== p.hasWeb3 ? (
+                  <li>Full recorded course, yours to keep</li>
+                ) : (
+                  <>
+                    {p.hasTI && <li>Technical Intensive course</li>}
+                    {p.hasWeb3 && <li>WEB3 Masterclass course</li>}
+                  </>
+                )}
                 {p.months && <li>{p.months} months as a Citizen: live sessions, support groups, every channel</li>}
               </ul>
 

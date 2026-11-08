@@ -59,7 +59,7 @@ export async function Programs() {
         <div className="text-center mb-40">
           <div className="eyebrow reveal" style={{ justifyContent: 'center' }}>Courses &amp; memberships</div>
           <h2 className="heading-lg reveal">
-            Start free. <span className="gold">Go as deep as you want.</span>
+            Pick your <span className="gold">path.</span>
           </h2>
         </div>
 
