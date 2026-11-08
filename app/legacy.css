@@ -1315,3 +1315,6 @@ html, body { overflow-x: clip; }
   .nav-cta svg { display: none; }
 }
 
+
+/* Polish round 4 (8 Nov): no dash before the TR Score edition line. */
+.sxA2 .eyebrow::before { display: none; }

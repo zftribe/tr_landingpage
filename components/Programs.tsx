@@ -57,7 +57,7 @@ export async function Programs() {
     <section className="section" id="programs">
       <div className="container">
         <div className="text-center mb-40">
-          <div className="eyebrow reveal" style={{ justifyContent: 'center' }}>Courses &amp; memberships</div>
+
           <h2 className="heading-lg reveal">
             Pick your <span className="gold">path.</span>
           </h2>
