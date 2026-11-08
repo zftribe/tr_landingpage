@@ -217,3 +217,13 @@ document.addEventListener('click', (e) => {
     else document.getElementById('exchanges')?.querySelector('.tk-list')?.scrollIntoView({ block: 'start' });
   });
 })();
+
+// Free on YouTube: arrows page the playlist row on web (swipe works on its own); each arrow hides at its end.
+(() => {
+  const rail = document.querySelector('.yt-rail'), prev = document.querySelector('.yt-prev'), next = document.querySelector('.yt-next');
+  if (!rail || !prev || !next) return;
+  const step = (d) => rail.scrollBy({ left: d * rail.clientWidth * 0.8, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  const sync = () => { prev.hidden = rail.scrollLeft < 8; next.hidden = rail.scrollLeft + rail.clientWidth > rail.scrollWidth - 8; };
+  prev.addEventListener('click', () => step(-1)); next.addEventListener('click', () => step(1));
+  rail.addEventListener('scroll', sync, { passive: true }); addEventListener('resize', sync); sync();
+})();

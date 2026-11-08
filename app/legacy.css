@@ -1054,3 +1054,46 @@ html, body { overflow-x: clip; }
 .tk-how li { display: grid; gap: 2px; font-size: .85rem; color: var(--muted); }
 .tk-how li b { color: var(--text); font-family: var(--font-display); font-size: .86rem; }
 .tk-how p { font-size: .8rem; color: var(--muted); margin: 6px 0 16px; }
+
+/* Phone coupon: rebate and button on one row, code underneath (George, 8 Nov polish round). */
+@container (max-width: 640px) {
+  .tk-stub { grid-template-columns: 1fr auto; align-items: center; gap: 8px 14px; padding: 14px 18px; }
+  .tk-off { font-size: 1.6rem; }
+  .tk-off small { margin-top: 3px; }
+  .tk-stub .tk-claim { grid-column: 2; grid-row: 1; width: auto; padding: 11px 18px; }
+  .tk-codewrap { grid-column: 1 / -1; grid-auto-flow: column; justify-content: start; align-items: center; gap: 8px; }
+  .tk-claimed { height: 112px; }
+}
+@container (max-width: 360px) {
+  .tk-stub { grid-template-columns: 1fr auto; }
+  .tk-stub .tk-claim { grid-column: 2; grid-row: 1; width: auto; }
+  .tk-off { font-size: 1.6rem; }
+}
+@container (max-width: 260px) {
+  .tk-stub { grid-template-columns: 1fr; }
+  .tk-stub .tk-claim { grid-column: 1; grid-row: auto; width: 100%; }
+}
+
+/* Free on YouTube: one section, a swipeable row of playlists, Blueprint first (George, 8 Nov). */
+.yt-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin-bottom: 32px; }
+.yt-sub { flex: none; }
+.yt-railwrap { position: relative; }
+.yt-rail { display: grid; grid-auto-flow: column; grid-auto-columns: 300px; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 4px 2px 14px; scrollbar-width: thin; }
+.yt-card { scroll-snap-align: start; display: grid; gap: 6px; align-content: start; text-decoration: none; color: var(--text); background: var(--card-solid); border: 1px solid var(--border); border-radius: 16px; padding: 10px 10px 14px; transition: border-color .2s, transform .2s; }
+.yt-card:hover { border-color: rgba(249,168,37,.6); transform: translateY(-2px); }
+.yt-card:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.yt-card.yt-start { border-color: rgba(249,168,37,.6); box-shadow: 0 0 0 1px rgba(249,168,37,.25); }
+.yt-thumb { position: relative; display: block; aspect-ratio: 16/9; border-radius: 10px; overflow: hidden; background: #0d0d12; box-shadow: 6px -6px 0 -2px #23232b, 11px -11px 0 -4px #1a1a20; margin: 8px 12px 6px 0; }
+.yt-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.yt-count { position: absolute; right: 6px; bottom: 6px; background: rgba(0,0,0,.8); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 6px; }
+.yt-play { position: absolute; inset: 0; margin: auto; width: 46px; height: 32px; border-radius: 9px; background: #e62117; color: #fff; display: grid; place-items: center; font-size: 13px; opacity: .92; }
+.yt-badge { position: absolute; left: 6px; top: 6px; background: var(--gold); color: #141006; font-family: var(--font-display); font-weight: 800; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; }
+.yt-card b { font-family: var(--font-display); color: var(--white); font-size: 15px; line-height: 1.3; padding: 0 4px; }
+.yt-card small { color: var(--muted); font-size: 13px; line-height: 1.45; padding: 0 4px; }
+.yt-arrow { position: absolute; top: 34%; z-index: 2; width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border-2); background: rgba(13,13,18,.92); color: var(--white); font-size: 22px; cursor: pointer; }
+.yt-arrow[hidden] { display: none; }
+.yt-prev { left: -14px; } .yt-next { right: -14px; }
+.yt-arrow:hover { border-color: var(--gold); color: var(--gold); }
+.yt-arrow:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (max-width: 760px) { .yt-arrow { display: none !important; } .yt-rail { grid-auto-columns: 78%; } .yt-sub { width: 100%; justify-content: center; } }
+@media (prefers-reduced-motion: reduce) { .yt-card { transition: none; } }

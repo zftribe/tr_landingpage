@@ -34,7 +34,8 @@
 .pc-includes li::before { content: '✓'; position: absolute; left: 0; color: var(--gold); }
 .pc-actions { margin-top: auto; display: flex; gap: 8px; }
 .pc-actions .btn { flex: 1 1 0; justify-content: center; padding: 11px 12px; font-size: 13px; }
-.pc-links { display: flex; justify-content: center; gap: 16px; }
+.pc-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 8px; }
+.pc-links + .pc-actions { margin-top: 12px; }
 .pc-compare[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
 .pc-notice { min-height: 20px; color: var(--gold); font-size: 14px; margin: 8px 0 0; }
 .pc-table-wrap { margin-top: 12px; overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); }
@@ -81,7 +82,9 @@
 }
 
 /* Curriculum */
-.pc-curriculum { background: none; border: 0; color: var(--gold); padding: 6px 0 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; font: inherit; font-size: 14px; }
+.pc-curriculum { background: rgba(249,168,37,.08); border: 1px solid rgba(249,168,37,.45); border-radius: 999px; color: var(--gold); padding: 6px 14px; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600; line-height: 1.2; }
+.pc-curriculum:hover { background: rgba(249,168,37,.18); border-color: var(--gold); }
+.pc-curriculum:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 /* margin: auto centres a modal dialog; the original stylesheet's * { margin: 0 } removes it. */
 .cd { margin: auto; width: min(640px, calc(100vw - 32px)); max-height: min(80vh, 760px); padding: 0; border: 1px solid var(--border-2); border-radius: var(--radius); background: var(--card-solid); color: var(--text); }
 .cd::backdrop { background: rgba(0,0,0,.7); }

@@ -173,12 +173,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                 {p.months && <li>{p.months} months as a Citizen: live sessions, support groups, every channel</li>}
               </ul>
 
-              <div className="pc-actions">
-                <a href={p.checkout} className="btn btn-gold">Buy now</a>
-                <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
-                  {on ? '✓ Comparing' : 'Compare'}
-                </button>
-              </div>
+              {/* George, 8 Nov: Curriculum and Watch intro sit as pills above Buy now / Compare. */}
               {(p.promo || courses.length > 0) && (
                 <div className="pc-links">
                   {p.promo && (
@@ -189,6 +184,12 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                   )}
                 </div>
               )}
+              <div className="pc-actions">
+                <a href={p.checkout} className="btn btn-gold">Buy now</a>
+                <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
+                  {on ? '✓ Comparing' : 'Compare'}
+                </button>
+              </div>
             </article>
           )
         })}
