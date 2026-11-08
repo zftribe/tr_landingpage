@@ -246,3 +246,6 @@ document.addEventListener('click', (e) => {
 (() => { const b = document.querySelector('.sxA2-pill'), p = document.getElementById('sx-how-panel'); if (!b || !p) return;
   p.hidden = true; b.hidden = false;
   b.addEventListener('click', () => { const o = p.hidden; p.hidden = !o; b.setAttribute('aria-expanded', String(o)); }); })();
+
+// FAQ topic tabs: one topic shows at a time (all are in the page).
+(() => { document.querySelectorAll('.faq-tab').forEach((t) => t.addEventListener('click', () => { document.querySelectorAll('.faq-tab').forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); document.getElementById(x.getAttribute('aria-controls')).hidden = !on; }); })); })();

@@ -34,7 +34,8 @@ const decode = (s: string) =>
 export function readFaq(html = readFileSync(path.join(process.cwd(), 'content/legacy-after-programs.html'), 'utf8')): { q: string; a: string }[] {
   const items: { q: string; a: string }[] = []
   const re = /<button[^>]*class="faq-q"[^>]*>([\s\S]*?)<\/button>\s*<div class="faq-a"[^>]*>([\s\S]*?)<\/div>/g
-  for (let m = re.exec(html); m; m = re.exec(html)) items.push({ q: decode(m[1]), a: decode(m[2]) })
+  // The gold "next step" links (class faq-go) are page navigation, not part of the answer.
+  for (let m = re.exec(html); m; m = re.exec(html)) items.push({ q: decode(m[1]), a: decode(m[2].replace(/<a class="faq-go"[\s\S]*?<\/a>/g, '')) })
   return items
 }
 

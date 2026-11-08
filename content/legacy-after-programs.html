@@ -426,42 +426,33 @@
 <!-- ═══════════ FAQ ═══════════ -->
 <section class="section" id="faq">
   <div class="container">
-    <div class="text-center mb-56">
-      <h2 class="heading-lg">Frequently Asked <span class="gold">Questions</span></h2>
-    </div>
-    <div class="faq-list">
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-1" onclick="this.parentElement.classList.toggle('open')">How do I join the Trading Republic?</button>
-        <div class="faq-a" id="faq-a-1"><p>Join <a href="{{discord}}" target="_blank" rel="noopener" style="color:var(--gold)">our Discord</a> and complete the short verification: verify, disable DMs, accept the prompt, complete the captcha, read the intro channel, follow the steps and agree to the rules. You start as an Explorer, free.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-2" onclick="this.parentElement.classList.toggle('open')">What's the difference between Explorers and Citizens?</button>
-        <div class="faq-a" id="faq-a-2"><p>Explorers are free verified members with select events, certain giveaways and free webinars. Citizens hold an active TR subscription and unlock every trading channel, the FGD support groups, most webinars and the major giveaways. A subscription is {{price:dacb45cb-c13b-4b88-a111-33c27604989b}} for 6 months, {{price:38f59cd9-f07d-486a-b34d-c238a95b95ee}} for 12 months or {{price:078e0652-0b47-429d-9919-1a606a731e42}} for 24 months.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-3" onclick="this.parentElement.classList.toggle('open')">What is The Eternals?</button>
-        <div class="faq-a" id="faq-a-3"><p>The Eternals is our one-time, lifetime Citizen membership: you pay once and stay a Citizen for life, with no future price increases. Eternals also get The Vault (300+ webinar videos since 2020), priority event passes, sit-in privileges for live course sessions, exclusive recordings and Eternals-only giveaways. Prices are on The Eternals card under Courses; it is not sold in the online shop yet, so message us on Discord to join.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-4" onclick="this.parentElement.classList.toggle('open')">What is in the Technical Intensive, and what does it cost?</button>
-        <div class="faq-a" id="faq-a-4"><p>Technical Intensive teaches the ZFT system: mindset and psychology, Darvas boxes, moving averages, Fibonacci, RSI, risk management, backtesting and probabilities. It is a recorded course you keep: {{price:f9601ac9-f916-4bf4-b200-68c8457cef09}} on its own, or {{price:01cee606-d6ea-4694-a935-d16a07f3eafa}} with a 12-month Citizen membership.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-5" onclick="this.parentElement.classList.toggle('open')">What is in the WEB3 Masterclass?</button>
-        <div class="faq-a" id="faq-a-5"><p>Two recorded courses, the Web3 Masterclass and the Liquidity Pool Masterclass: {{price:ae67d608-901a-40a7-ace3-9ed3950d5dc6}} on its own, or {{price:6d2f2b79-fd93-4ba7-aa96-0138802345f5}} with a 12-month Citizen membership. The ZFT Wealth Builder bundle has both courses plus Technical Intensive for {{price:c48fb1a4-c746-4aff-b725-9aa8605d4a16}}, or {{price:253e056c-58a8-4727-a00b-05a65a3b596e}} with a 24-month membership.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-6" onclick="this.parentElement.classList.toggle('open')">Which crypto exchange should I use?</button>
-        <div class="faq-a" id="faq-a-6"><p>Our top pick is OKX: an all-in-one exchange with a strong security record. Binance has the deepest liquidity, Bitget suits beginners and social trading, Gate.io has early altcoin listings, Bybit is for pro futures traders, and MEXC has zero maker spot fees for altcoin hunters. Signing up through a TR link gives you a permanent fee discount: 20% on most, 5% on Binance.</p></div>
-      </div>
-      <div class="faq-item">
-        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-a-7" onclick="this.parentElement.classList.toggle('open')">How do I get support?</button>
-        <div class="faq-a" id="faq-a-7"><p>Open a ticket on Discord under the right category: TR Subscription, Product Helpdesk, Merchandise, Report an Anomaly or SOS. Reply within 24 hours, or the ticket closes on its own.</p></div>
-      </div>
-    </div>
-    <p class="fx-disclose fx-center-text">Prices come straight from the TR shop and update on their own.</p>
+    <div class="text-center mb-40"><h2 class="heading-lg">Questions, <span class="gold">answered.</span></h2></div><div class="faq-tabs" role="tablist" aria-label="FAQ topics"><button type="button" role="tab" class="faq-tab" aria-selected="true" aria-controls="ft-0" id="ftb-0">Getting started</button><button type="button" role="tab" class="faq-tab" aria-selected="false" aria-controls="ft-1" id="ftb-1">Membership</button><button type="button" role="tab" class="faq-tab" aria-selected="false" aria-controls="ft-2" id="ftb-2">Courses</button><button type="button" role="tab" class="faq-tab" aria-selected="false" aria-controls="ft-3" id="ftb-3">Exchanges</button><button type="button" role="tab" class="faq-tab" aria-selected="false" aria-controls="ft-4" id="ftb-4">Help</button></div>
+    <div class="faq-list faq-panel" role="tabpanel" id="ft-0" aria-labelledby="ftb-0">
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-1" onclick="this.parentElement.classList.toggle('open')">Is Trading Republic free to join?</button>
+        <div class="faq-a" id="fq-1"><p>Yes. Joining our Discord is free: you start as an Explorer with free webinars, select events and giveaways. You only pay if you want more.</p><p><a class="faq-go" href="{{discord}}" target="_blank" rel="noopener">Join free on Discord →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-2" onclick="this.parentElement.classList.toggle('open')">I’m a complete beginner. Where do I start?</button>
+        <div class="faq-a" id="fq-2"><p>Watch Blueprint, our free beginner course on YouTube, then join the Discord and ask questions in the free channels.</p><p><a class="faq-go" href="#youtube">Watch Blueprint free →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-3" onclick="this.parentElement.classList.toggle('open')">How do I join?</button>
+        <div class="faq-a" id="fq-3"><p>Tap Join free on Discord, pass the quick check, and you’re in as an Explorer. It takes about a minute.</p><p><a class="faq-go" href="{{discord}}" target="_blank" rel="noopener">Join free on Discord →</a></p></div></div></div><div class="faq-list faq-panel" role="tabpanel" id="ft-1" aria-labelledby="ftb-1" hidden>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-4" onclick="this.parentElement.classList.toggle('open')">What’s the difference between Explorers and Citizens?</button>
+        <div class="faq-a" id="fq-4"><p>Explorers are free members. Citizens hold a TR subscription and unlock every trading channel, the FGD support groups, most webinars and the major giveaways: {{price:dacb45cb-c13b-4b88-a111-33c27604989b}} for 6 months, {{price:38f59cd9-f07d-486a-b34d-c238a95b95ee}} for 12 or {{price:078e0652-0b47-429d-9919-1a606a731e42}} for 24.</p><p><a class="faq-go" href="#membership">See membership →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-5" onclick="this.parentElement.classList.toggle('open')">What is The Eternals?</button>
+        <div class="faq-a" id="fq-5"><p>A one-time, lifetime Citizen membership: pay once, stay a Citizen for life. It adds The Vault (300+ webinar videos since 2020), priority event passes and sit-ins on live course sessions. It isn’t in the online shop yet, so message us on Discord.</p><p><a class="faq-go" href="{{discord}}" target="_blank" rel="noopener">Ask about The Eternals →</a></p></div></div></div><div class="faq-list faq-panel" role="tabpanel" id="ft-2" aria-labelledby="ftb-2" hidden>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-6" onclick="this.parentElement.classList.toggle('open')">What is in the Technical Intensive?</button>
+        <div class="faq-a" id="fq-6"><p>The ZFT system step by step: mindset, Darvas boxes, moving averages, Fibonacci, RSI, risk management and backtesting. A recorded course you keep: {{price:f9601ac9-f916-4bf4-b200-68c8457cef09}}, or {{price:01cee606-d6ea-4694-a935-d16a07f3eafa}} with 12 months as a Citizen.</p><p><a class="faq-go" href="#programs">See the course →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-7" onclick="this.parentElement.classList.toggle('open')">What is in the WEB3 Masterclass?</button>
+        <div class="faq-a" id="fq-7"><p>Two recorded courses, Web3 Masterclass and Liquidity Pool Masterclass: {{price:ae67d608-901a-40a7-ace3-9ed3950d5dc6}}, or {{price:6d2f2b79-fd93-4ba7-aa96-0138802345f5}} with 12 months as a Citizen. The Wealth Builder bundle adds Technical Intensive for {{price:c48fb1a4-c746-4aff-b725-9aa8605d4a16}}.</p><p><a class="faq-go" href="#programs">See the course →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-8" onclick="this.parentElement.classList.toggle('open')">Is it only crypto, or stocks too?</button>
+        <div class="faq-a" id="fq-8"><p>Both. The ZFT system works on crypto and Philippine stocks, and the FGD PSE support group with Coach Rochelle covers the PSE. For PSE trading we use DragonFi.</p><p><a class="faq-go" href="https://www.dragonfi.ph/register?ref=F2B4F" target="_blank" rel="noopener">Open DragonFi (partner link) →</a></p></div></div></div><div class="faq-list faq-panel" role="tabpanel" id="ft-3" aria-labelledby="ftb-3" hidden>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-9" onclick="this.parentElement.classList.toggle('open')">Which crypto exchange should I use?</button>
+        <div class="faq-a" id="fq-9"><p>OKX is #1 in this month’s TR Score: a clean security record, the best support and a 20% fee rebate with our link. See the full ranking for Binance, Bybit, Bitget, Gate and MEXC.</p><p><a class="faq-go" href="#exchanges">Compare exchanges →</a></p></div></div>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-10" onclick="this.parentElement.classList.toggle('open')">Do you give signals or guaranteed profits?</button>
+        <div class="faq-a" id="fq-10"><p>No. We teach a system so you can make your own decisions. Trading carries risk, so never trade money you can’t afford to lose. Nothing here is financial advice.</p></div></div></div><div class="faq-list faq-panel" role="tabpanel" id="ft-4" aria-labelledby="ftb-4" hidden>
+      <div class="faq-item"><button type="button" class="faq-q" aria-expanded="false" aria-controls="fq-11" onclick="this.parentElement.classList.toggle('open')">How do I get help?</button>
+        <div class="faq-a" id="fq-11"><p>Open a ticket in our Discord and we reply within 24 hours.</p><p><a class="faq-go" href="{{discord}}" target="_blank" rel="noopener">Ask us on Discord →</a></p></div></div></div><p class="faq-stuck">Still stuck? <a href="{{discord}}" target="_blank" rel="noopener">Ask us on Discord →</a></p>
   </div>
 </section>
+
 
 <!-- ═══════════ FINAL CALL ═══════════ -->
 <section class="section fx-final" id="join">
