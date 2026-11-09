@@ -217,15 +217,6 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin: 40px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* layout options */
-#finder.collapsible .tree, #finder.collapsible .tree-result { display: none; }
-#finder.collapsible.expanded .tree { display: grid; }
-#finder.collapsible.expanded .tree-result:not([hidden]) { display: block; }
-.help-btn { margin-top: 18px; font-size: .9rem; padding: 10px 22px; }
-.lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-.lane { display: flex; flex-direction: column; gap: 10px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; color: inherit; transition: border-color .2s, transform .15s; }
-.lane:hover { border-color: var(--gold); text-decoration: none; transform: translateY(-2px); }
-
 /* responsive */
 @media (max-width: 1080px) {
   body[data-view=advanced] .row-main { grid-template-columns: minmax(180px, 2fr) 1fr 1fr 1.1fr 24px; }
@@ -233,7 +224,7 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 }
 @media (max-width: 960px) {
   .calc-grid, .method { grid-template-columns: 1fr; }
-  .picks, .lanes { grid-template-columns: 1fr 1fr; }
+  .picks { grid-template-columns: 1fr 1fr; }
   .picks .pick:first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 720px) {
@@ -253,7 +244,6 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
   .tier-label { text-align: left; padding: 0; }
   .node { min-width: 0; flex: 1 1 calc(50% - 10px); }
   .picks { grid-template-columns: 1fr; }
-  .lanes { grid-template-columns: 1fr; }
   .filters { justify-content: flex-start; }
   .chips { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; padding-bottom: 2px; scrollbar-width: none; }
   .chips button { white-space: nowrap; }

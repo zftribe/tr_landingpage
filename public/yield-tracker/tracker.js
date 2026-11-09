@@ -379,7 +379,7 @@ function setView(v) {
   renderAll();
 }
 function syncChips() { $$('.chips').forEach((c) => $$('button', c).forEach((b) => b.setAttribute('aria-pressed', String(S.f[c.dataset.key] === b.dataset.v)))); }
-function renderAll() { renderStats(); renderRates(); renderLanes(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
+function renderAll() { renderStats(); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
 function wire() {
   $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
   $('#taxToggle').addEventListener('change', (e) => { S.tax = e.target.checked; renderAll(); });
@@ -410,12 +410,6 @@ function wire() {
     S.f = { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }; S.q = ''; $('#searchInput').value = ''; syncChips(); S.open.add(id); { const rr = ROWS.find((x) => x.id === id); if (rr) S.openProv.add(rr.category + '|' + rr.provider); } renderRates();
     const el = $(`.row[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-  document.addEventListener('click', (e) => {
-    const a = e.target.closest('.lane[data-show]'); if (!a) return;
-    e.preventDefault(); const id = a.dataset.show;
-    S.f = { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }; S.q = ''; $('#searchInput').value = ''; syncChips(); S.open.add(id); { const rr = ROWS.find((x) => x.id === id); if (rr) S.openProv.add(rr.category + '|' + rr.provider); } renderRates();
-    const el = $(`.row[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
   $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });
@@ -441,45 +435,7 @@ async function loadDefi() {
       });
   } catch (e) { return []; }
 }
-/* ── layout options (preview only: ?look=a|b|c) ── */
-const LOOK = (new URLSearchParams(location.search).get('look') || 'a').toLowerCase();
-function applyLook() {
-  document.body.dataset.look = LOOK;
-  const main = $('main'), finder = $('#finder'), yields = $('#yields');
-  if (LOOK === 'b') {
-    main.insertBefore(yields, finder);
-    finder.classList.add('collapsible');
-    const h = $('.sec-head', finder);
-    const btn = document.createElement('button'); btn.className = 'btn gold help-btn'; btn.textContent = 'Help me choose';
-    btn.setAttribute('aria-expanded', 'false');
-    btn.onclick = () => { const o = finder.classList.toggle('expanded'); btn.setAttribute('aria-expanded', String(o)); btn.textContent = o ? 'Hide the finder' : 'Help me choose'; };
-    h.appendChild(btn);
-  }
-  if (LOOK === 'c') {
-    const lb = document.createElement('section'); lb.className = 'section'; lb.id = 'leaders';
-    lb.innerHTML = '<div class="container"><div class="sec-head"><span class="eyebrow">Leaderboard</span><h2>The best in each <span class="gold">lane</span></h2><p class="subtitle">One winner per lane, judged on what ₱100,000 earns over the next 12 months. Tap a card for the fine print.</p></div><div class="lanes" id="lanes"></div></div>';
-    main.insertBefore(lb, finder);
-  }
-}
-const LANES = [
-  ['Steady digital bank', (r) => r.category === 'digital' && r.kind === 'standard' && !locked(r) && !r.strings],
-  ['Best promo right now', (r) => r.kind === 'promo' && isPeso(r)],
-  ['Traditional bank', (r) => r.category === 'traditional' && !locked(r)],
-  ['Lock it for longer', (r) => isPeso(r) && locked(r) && r.category !== 'government'],
-  ['Government (tax-free)', (r) => r.category === 'government'],
-  ['Crypto: stablecoin', (r) => r.category === 'cex' && r.stablecoin],
-];
-function renderLanes() {
-  const el = $('#lanes'); if (!el) return;
-  el.innerHTML = LANES.map(([name, fn]) => {
-    const best = ROWS.filter((r) => rankable(r) && fn(r) && !(r.maxDeposit && r.maxDeposit < 100000) && !(r.minDeposit && r.minDeposit > 100000)).map((r) => ({ r, n: net(yearRate(r, 100000), r) })).sort((a, b) => b.n - a.n)[0];
-    if (!best) return '';
-    const r = best.r;
-    return `<a class="lane" href="#yields" data-show="${esc(r.id)}"><span class="pick-rank">${name}</span><div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div><div class="pick-rate">${pct2(net(r.rate, r))} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}</small></div><div>${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''}</div></a>`;
-  }).join('');
-}
 async function init() {
-  applyLook();
   wire();
   document.body.dataset.view = S.view; $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
