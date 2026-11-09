@@ -31,7 +31,9 @@ try { const v = localStorage.getItem('trYieldView'); if (v === 'advanced') S.vie
 const TAX = () => (DATA && DATA.rules && DATA.rules.tax && DATA.rules.tax.ratePeso) || 20;
 const INFL = () => (DATA && DATA.rules && DATA.rules.inflation && DATA.rules.inflation.value);
 const isPeso = (r) => PH_CATS.includes(r.category) && r.currency === 'PHP';
-const taxable = (r) => isPeso(r) && !r.taxExempt;
+const taxable = (r) => PH_CATS.includes(r.category) && !r.taxExempt; // PH final tax applies to peso AND dollar deposits (RA 12214)
+const isUsdBank = (r) => PH_CATS.includes(r.category) && r.currency === 'USD';
+const sym = (r) => (r.currency === 'USD' ? '$' : isPeso(r) ? '₱' : '');
 function net(rate, r) {
   if (rate == null) return null;
   let n = S.tax && taxable(r) ? rate * (1 - TAX() / 100) : rate;
@@ -40,7 +42,7 @@ function net(rate, r) {
 }
 // Amounts are in pesos; crypto caps are in coins, so convert with the BSP rate (stablecoins ≈ US$1).
 const FX = () => (DATA && DATA.rules && DATA.rules.fx && DATA.rules.fx.usdphp) || null;
-function units(r, pesos) { return isPeso(r) ? pesos : (r.stablecoin && FX() ? pesos / FX() : null); }
+function units(r, pesos) { return isPeso(r) ? pesos : ((r.stablecoin || r.currency === 'USD') && FX() ? pesos / FX() : null); }
 // "Have you beaten inflation?" (Advanced view, peso savers in the Philippines)
 const afterTax = (r) => (r.rate == null ? null : taxable(r) ? r.rate * (1 - TAX() / 100) : r.rate);
 const realYield = (r) => (isPeso(r) && INFL() != null && r.rate != null ? afterTax(r) - INFL() : null);
@@ -139,7 +141,7 @@ const stale = (r) => age(r) > staleLimit(r);
 const locked = (r) => r.lockup && !/^flexible/i.test(r.lockup);
 const capped = (r) => r.cap != null || (!!r.capText && r.category !== 'dex'); // DeFi capText is pool size, not a cap
 const usable = (r) => r.rate != null && r.verified !== false && !ended(r);
-const rankable = (r) => usable(r) && !r.teaser && !r.vipOnly;
+const rankable = (r) => usable(r) && !r.teaser && !r.vipOnly && !r.pastReturn;
 const pct = (n, d = 2) => (n == null ? '—' : n.toFixed(d).replace(/\.?0+$/, (m) => (m.startsWith('.') ? '' : m)) + '%');
 const pct2 = (n) => (n == null ? '—' : n.toFixed(2) + '%');
 const money = (n, ccy = '₱') => ccy + Math.round(n).toLocaleString('en-PH');
@@ -222,7 +224,7 @@ function rowHTML(r) {
   const p = partner(r);
   const rateCell = r.rate == null
     ? '<div class="rate na">Not published<small>check in the app</small></div>'
-    : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.tax && taxable(r) ? '<small>after tax</small>' : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
+    : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.tax && taxable(r) ? `<small>after tax${isPeso(r) ? '' : ' · ' + esc(r.currency)}</small>` : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
   const ins = r.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r.category === 'cex' || r.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   const st = stale(r) ? '<span class="badge stale">Needs re-check</span>' : '';
   const facts = [
@@ -234,7 +236,8 @@ function rowHTML(r) {
     r.kind === 'promo' && r.rateAfterPromo != null ? ['After the promo', pct2(r.rateAfterPromo)] : null,
     ['Cap', capText(r).replace(/<small>/, ' · ').replace('</small>', '')],
     ['Access', esc(r.lockup || '—')],
-    r.minDeposit ? ['Minimum', (isPeso(r) ? '₱' : '') + Number(r.minDeposit).toLocaleString('en-PH')] : null,
+    r.minDeposit ? ['Minimum', sym(r) + Number(r.minDeposit).toLocaleString('en-PH') + (sym(r) ? '' : ' ' + r.currency)] : null,
+    r.pastReturn ? ['Note', 'Past return, not a promised rate. A fund can go down.'] : null,
     r.interestCredited ? ['Interest paid', esc(r.interestCredited)] : null,
     r.eligibility ? ['Who can get it', esc(r.eligibility)] : null,
     ['Insurance', r.pdic ? 'PDIC member bank: up to ₱1,000,000 per depositor, per bank, counting all your accounts at that bank together' : r.category === 'government' ? 'Not PDIC; backed by the agency' : 'None. Not a bank deposit'],
@@ -260,6 +263,7 @@ function rowHTML(r) {
         <h4>The fine print</h4><p>${esc(r.finePrint || 'No extra conditions listed on the official page.')}</p>
         ${r.cons ? `<h4>Cons to know</h4><p>${esc(r.cons)}</p>` : ''}
         <div class="more-actions">
+          ${cmpBtn(r)}
           ${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}
           ${p ? fnLink(p) : ''}
         </div>
@@ -320,12 +324,13 @@ function renderRates() {
 const TREE = [
   { key: 'ccy', label: 'Currency', sub: 'What you save in', nodes: [
     ['php', '₱', 'Pesos (PHP)', 'Banks, digital banks, MP2'],
-    ['usd', '$', 'US dollars (USD)', 'Stablecoins: USDT, USDC, USDG'],
+    ['usd', '$', 'US dollars (USD)', 'Bank USD accounts, stablecoins'],
   ] },
   { key: 'where', label: 'Where', sub: 'Pick your world', nodes: () => S.tree.ccy === 'usd' ? [
-    ['crypto', '🪙', 'Crypto exchange', 'OKX, Bybit, Gate and more'],
-    ['defi', '🧩', 'DeFi on Solana', 'Kamino, Jupiter · advanced'],
-    ['both', '⚖️', 'Show me both', 'Compare side by side'],
+    ['bank', '🏦', 'Bank (USD)', 'PDIC-insured up to ₱1M'],
+    ['crypto', '🪙', 'Crypto exchange', 'Stablecoins · not insured'],
+    ['defi', '🧩', 'DeFi on Solana', 'Not insured · advanced'],
+    ['both', '⚖️', 'Show me all', 'Compare side by side'],
   ] : [
     ['bank', '🏦', 'Bank or government', 'Pesos, PDIC-insured banks'],
     ['both', '⚖️', 'Banks + crypto', 'Crypto pays in dollars'],
@@ -345,6 +350,82 @@ const TREE = [
     ['no', '🧘', 'No strings', 'Just park it'],
   ] },
 ];
+/* ── Comparator + best match (George, 10 Nov) ── */
+const CMP = { ids: [], ccy: 'php', amount: 100000, promo: true, tasks: true, insured: false, flex: false, open: false };
+const CMP_MAX = 3;
+const cmpBtn = (r) => (!usable(r) || r.pastReturn ? '' : `<button type="button" class="cmp-btn" data-cmp="${esc(r.id)}" aria-pressed="${CMP.ids.includes(r.id)}">${CMP.ids.includes(r.id) ? '✓ Comparing' : '+ Compare'}</button>`);
+const riskOf = (r) => r.pdic ? ['Low', 'PDIC-insured up to ₱1M per depositor, per bank'] : r.category === 'government' ? ['Low', 'Backed by the agency, not PDIC'] : r.category === 'cex' ? ['Higher', 'Exchange risk; not insured'] : r.category === 'dex' ? ['Highest', 'Smart-contract risk; not insured'] : ['Medium', 'Not a bank deposit'];
+function cmpEarn(r, pesos) { const y = yearRate(r, pesos); const n = r.rate == null ? null : (taxable(r) ? y * (1 - TAX() / 100) : y); return n == null ? null : { n, earn: pesos * n / 100 }; }
+function syncCmp() {
+  document.querySelectorAll('[data-cmp]').forEach((b) => { const on = CMP.ids.includes(b.dataset.cmp); b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '✓ Comparing' : '+ Compare'; });
+  const tray = $('#cmpTray'); if (!tray) return;
+  tray.hidden = !CMP.ids.length;
+  $('#cmpCount').textContent = CMP.ids.length + ' of ' + CMP_MAX;
+  $('#cmpNames').textContent = CMP.ids.map((id) => (ROWS.find((r) => r.id === id) || {}).provider).filter(Boolean).join(' · ');
+  $('#cmpOpen').disabled = CMP.ids.length < 2;
+  $('#cmpOpen').textContent = CMP.ids.length < 2 ? 'Pick one more to compare' : 'Compare side by side';
+  if (CMP.open) renderCmp();
+}
+function renderCmp() {
+  const box = $('#cmpPanel'); if (!box) return;
+  box.hidden = !CMP.open; if (!CMP.open) return;
+  const usd = CMP.ccy === 'usd', fx = FX() || 1, pesos = (Number(CMP.amount) || 0) * (usd ? fx : 1);
+  const show = (p) => (usd ? '$' + (p / fx).toLocaleString('en-US', { maximumFractionDigits: 0 }) : money(p));
+  const rows = CMP.ids.map((id) => ROWS.find((r) => r.id === id)).filter(Boolean);
+  const res = rows.map((r) => {
+    const e = cmpEarn(r, pesos), why = [];
+    if (ended(r)) why.push('promo ended');
+    if (!CMP.promo && r.kind === 'promo') why.push('a promo');
+    if (!CMP.tasks && r.strings) why.push('needs tasks');
+    if (CMP.insured && !r.pdic) why.push('not insured');
+    if (CMP.flex && locked(r)) why.push('locked for ' + r.lockup);
+    const u = units(r, pesos);
+    if (r.minDeposit && u != null && u < r.minDeposit) why.push('below the ' + sym(r) + Number(r.minDeposit).toLocaleString('en-PH') + ' minimum');
+    if (r.maxDeposit && u != null && u > r.maxDeposit) why.push('above this band');
+    return { r, e, out: why };
+  });
+  const ok = res.filter((x) => !x.out.length && x.e).sort((a, b) => b.e.earn - a.e.earn);
+  const best = ok[0], second = ok[1];
+  const tie = best && second && Math.abs(best.e.earn - second.e.earn) <= Math.max(1, best.e.earn * 0.02);
+  const what = rows.every(taxable) ? 'after-tax earnings' : rows.some(taxable) ? 'earnings after the PH tax on bank interest' : 'earnings';
+  const scope = [CMP.insured ? 'insured options' : 'the options you picked', !CMP.promo ? 'without promos' : '', !CMP.tasks ? 'with no tasks' : '', CMP.flex ? 'that you can withdraw anytime' : ''].filter(Boolean).join(' ');
+  const caveat = (x) => [x.r.kind === 'promo' ? (x.r.promoEnds ? 'promo ends ' + fmtDate(x.r.promoEnds) : 'promo can end anytime') : '', !x.r.pdic && x.r.category !== 'government' ? 'not insured' : '', locked(x.r) ? 'locked for ' + x.r.lockup : '', x.r.upTo ? '"up to" rate: you may get less' : '', x.r.newUsersOnly ? 'new users only' : '', x.r.strings && !x.r.newUsersOnly ? 'needs tasks' : ''].filter(Boolean).join(' · ');
+  const verdict = !best ? '<p class="cmp-verdict none">No best match: none of these fits your choices. Try allowing promos or tasks, or turn off "insured only" or "withdraw anytime".</p>'
+    : tie ? `<p class="cmp-verdict"><b>Tie:</b> ${esc(best.r.provider)} and ${esc(second.r.provider)} earn about the same (${show(best.e.earn)} vs ${show(second.e.earn)}) on ${show(pesos)} over 12 months among ${scope}. Pick on access and risk.</p>`
+    : `<p class="cmp-verdict"><b>Best match: ${esc(best.r.provider)} · ${esc(best.r.product)}</b>: highest ${what} on ${show(pesos)} over 12 months among ${scope} (${show(best.e.earn)}).${caveat(best) ? ' <span class="cmp-cav">Keep in mind: ' + esc(caveat(best)) + '.</span>' : ''}</p>`;
+  const td = (x, f) => '<td' + (best && !tie && x === best ? ' class="win"' : '') + '>' + f(x) + '</td>';
+  const line = (label, f) => '<tr><th scope="row">' + label + '</th>' + res.map((x) => td(x, f)).join('') + '</tr>';
+  $('#cmpBody').innerHTML = verdict + '<div class="cmp-scroll"><table class="cmp-table"><thead><tr><th scope="col"><span class="sr">Feature</span></th>' + res.map((x) => '<th scope="col"' + (best && !tie && x === best ? ' class="win"' : '') + '>' + (best && !tie && x === best ? '<span class="badge std">Best match</span>' : '') + '<div class="cmp-h"><div class="logo">' + logo(x.r) + '</div><div><b>' + esc(x.r.provider) + '</b><small>' + esc(x.r.product) + '</small></div></div><button type="button" class="cmp-x" data-cmp="' + esc(x.r.id) + '" aria-label="Remove ' + esc(x.r.provider) + '">Remove</button></th>').join('') + '</tr></thead><tbody>' +
+    line('Currency', (x) => esc(x.r.currency)) +
+    line('Rate', (x) => (x.r.upTo ? 'up to ' : '') + pct2(x.r.rate) + ' ' + (isPeso(x.r) || isUsdBank(x.r) ? 'p.a.' : esc(x.r.rateBasis || 'APR'))) +
+    line('After tax', (x) => taxable(x.r) ? pct2(x.r.rate * (1 - TAX() / 100)) : x.r.taxExempt ? 'tax-free' : pct2(x.r.rate) + ' <small>no PH tax applied</small>') +
+    line('Earns in 12 months', (x) => x.e ? '<b>' + show(x.e.earn) + '</b>' + (x.r.kind === 'promo' && (x.r.promoEnds || x.r.promoDays) ? '<small>promo counted only until it ends</small>' : '') : '—') +
+    line('Cap', (x) => capText(x.r)) +
+    line('Minimum', (x) => x.r.minDeposit ? sym(x.r) + Number(x.r.minDeposit).toLocaleString('en-PH') + (sym(x.r) ? '' : ' ' + x.r.currency) : '—') +
+    line('Access', (x) => esc(locked(x.r) ? x.r.lockup : 'Withdraw anytime')) +
+    line('Insurance', (x) => esc(riskOf(x.r)[1])) +
+    line('Risk level', (x) => '<span class="risk risk-' + riskOf(x.r)[0].toLowerCase() + '">' + riskOf(x.r)[0] + '</span>') +
+    line('Type', (x) => kindBadge(x.r)) +
+    line('Fine print', (x) => [x.r.strings ? 'needs tasks' : '', x.r.vipOnly ? 'VIP only' : '', x.r.newUsersOnly ? 'new users only' : '', x.r.upTo ? '"up to" rate' : ''].filter(Boolean).join(' · ') || '—') +
+    line('Fits your choices', (x) => x.out.length ? '<span class="cmp-out">No: ' + esc(x.out.join(', ')) + '</span>' : '<span class="cmp-in">Yes</span>') +
+    line('Checked', (x) => fmtDate(x.r.checkedOn)) +
+    '</tbody></table></div>' +
+    '<p class="cmp-note">' + (rows.some((r) => !isPeso(r)) || usd ? 'Dollar and peso amounts are converted at the BSP rate of ₱' + fx + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + '). ' : '') + 'Best match is based only on your inputs and the rates we checked, after the 20% PH tax on bank interest (crypto is not adjusted for tax). Partners get no boost. This is a comparison, not advice; rates can change any time.</p>';
+}
+function wireCmp() {
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cmp]');
+    if (b) { e.preventDefault(); e.stopPropagation(); const id = b.dataset.cmp, i = CMP.ids.indexOf(id);
+      if (i >= 0) CMP.ids.splice(i, 1); else if (CMP.ids.length < CMP_MAX) CMP.ids.push(id); else { $('#cmpNames').textContent = 'You can compare up to 3. Remove one first.'; return; }
+      if (CMP.ids.length < 2) CMP.open = false; syncCmp(); return; }
+    if (e.target.closest('#cmpOpen')) { CMP.open = true; const r0 = ROWS.find((r) => r.id === CMP.ids[0]); if (r0 && !isPeso(r0)) { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = 1000; } syncCmpForm(); syncCmp(); $('#cmpPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (e.target.closest('#cmpClear')) { CMP.ids = []; CMP.open = false; syncCmp(); return; }
+    if (e.target.closest('#cmpClose')) { CMP.open = false; syncCmp(); return; }
+    const c = e.target.closest('[data-ccy]'); if (c) { CMP.ccy = c.dataset.ccy; CMP.amount = CMP.ccy === 'usd' ? 1000 : 100000; $('#cmpAmt').value = CMP.amount; syncCmpForm(); renderCmp(); }
+  }, true);
+  ['cmpAmt', 'cmpPromo', 'cmpTasks', 'cmpIns', 'cmpFlex'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', () => { CMP.amount = Number($('#cmpAmt').value) || 0; CMP.promo = $('#cmpPromo').checked; CMP.tasks = $('#cmpTasks').checked; CMP.insured = $('#cmpIns').checked; CMP.flex = $('#cmpFlex').checked; renderCmp(); }); });
+}
+function syncCmpForm() { document.querySelectorAll('[data-ccy]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ccy === CMP.ccy))); $('#cmpSym').textContent = CMP.ccy === 'usd' ? '$' : '₱'; }
 function renderTree() {
   let html = '', reached = true;
   TREE.forEach((t, i) => {
@@ -372,7 +453,9 @@ function renderPicks() {
   const pool = ROWS.filter((r) => {
     if (!rankable(r)) return false;
     if ((r.category === 'cex' || r.category === 'dex') && !r.stablecoin) return false;
-    if (usd && !((r.category === 'cex' || r.category === 'dex') && r.stablecoin)) return false;
+    if (usd && !(((r.category === 'cex' || r.category === 'dex') && r.stablecoin) || isUsdBank(r))) return false;
+    if (!usd && isUsdBank(r)) return false;
+    if (r.pastReturn) return false; // funds show past returns, not rates: never ranked
     if (T.where === 'bank' && !PH_CATS.includes(r.category)) return false;
     if (T.where === 'crypto' && r.category !== 'cex') return false;
     if (T.where === 'defi' && r.category !== 'dex') return false;
@@ -381,7 +464,7 @@ function renderPicks() {
     if (T.access === 'lock' && !locked(r)) return false;
     if (T.promo === 'no' && r.kind === 'promo') return false;
     if (T.strings === 'no' && r.strings) return false;
-    if (r.minDeposit && amt && amt < r.minDeposit && isPeso(r)) return false;
+    if (r.minDeposit && amt && (units(r, amt) ?? amt) < r.minDeposit && (isPeso(r) || isUsdBank(r))) return false;
     if (r.maxDeposit && amt && amt > r.maxDeposit && isPeso(r)) return false;
     return true;
   }).map((r) => ({ r, b: blended(r, amt), y: yearRate(r, amt) })).map((x) => ({ ...x, n: net(x.b, x.r), ny: net(x.y, x.r) }))
@@ -398,10 +481,10 @@ function renderPicks() {
       <div class="pick-rank">${ranks[i]}</div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
-      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
+      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${isUsdBank(r) ? `<div class="why">Paid in US dollars into a PH bank. 20% final tax already taken off.</div>` : ''}${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
-      <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
+      <div class="actions">${cmpBtn(r)}<a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
   $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.</p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
@@ -518,7 +601,7 @@ function syncFilterUi() {
   cnt.hidden = !act.length; cnt.textContent = act.length;
   $('#fActive').innerHTML = act.length ? act.map((k) => `<button class="f-pill" data-clear="${k}" aria-label="Clear ${FLABEL[k]} filter">${FLABEL[k]}: ${optLabel(k, S.f[k])} <span aria-hidden="true">×</span></button>`).join('') + (act.length > 1 ? '<button class="f-pill f-clear" data-clear="*">Clear all</button>' : '') : '';
 }
-function renderAll() { renderStats(); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
+function renderAll() { renderStats(); renderRates(); syncCmp(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
 function wire() {
   $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
   $('#taxToggle').addEventListener('change', (e) => { S.tax = e.target.checked; renderAll(); });
@@ -590,6 +673,7 @@ async function loadDefi() {
   } catch (e) { return []; }
 }
 async function init() {
+  wireCmp();
   setupFilters();
   wire();
   document.body.dataset.view = S.view; $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
@@ -602,6 +686,7 @@ async function init() {
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('cmp')) { CMP.ids = Q.get('cmp').split(',').filter((id) => ROWS.some((r) => r.id === id)).slice(0, 3); if (Q.get('cmpccy') === 'usd') { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = 1000; } CMP.open = CMP.ids.length > 1; syncCmpForm(); syncCmp(); }
   if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }

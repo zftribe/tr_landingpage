@@ -115,6 +115,19 @@
       </div>
     </div>
 
+    <section class="cmp-panel" id="cmpPanel" hidden aria-label="Comparison">
+      <div class="cmp-top"><h3>Compare side by side</h3><button type="button" class="btn" id="cmpClose">Close</button></div>
+      <div class="cmp-form">
+        <div class="seg" role="group" aria-label="Currency"><button type="button" data-ccy="php" aria-pressed="true">₱ Pesos</button><button type="button" data-ccy="usd" aria-pressed="false">$ Dollars</button></div>
+        <label class="cmp-amt"><span id="cmpSym">₱</span><input id="cmpAmt" type="number" inputmode="numeric" min="0" value="100000" aria-label="Amount"></label>
+        <label class="switch"><input type="checkbox" id="cmpPromo" checked><span class="switch-ui" aria-hidden="true"></span><span>Promos OK</span></label>
+        <label class="switch"><input type="checkbox" id="cmpTasks" checked><span class="switch-ui" aria-hidden="true"></span><span>Tasks OK</span></label>
+        <label class="switch"><input type="checkbox" id="cmpIns"><span class="switch-ui" aria-hidden="true"></span><span>Insured only</span></label>
+        <label class="switch"><input type="checkbox" id="cmpFlex"><span class="switch-ui" aria-hidden="true"></span><span>Must withdraw anytime</span></label>
+      </div>
+      <div id="cmpBody"></div>
+    </section>
+
     <div class="rates" id="rates"><div class="loading-spinner"></div></div>
     <p class="rates-foot" id="ratesFoot"></p>
   </div>
@@ -227,6 +240,10 @@
   </div>
 </footer>
 
+<div class="cmp-tray" id="cmpTray" hidden role="region" aria-label="Compare tray">
+  <div class="cmp-tray-in"><b>Compare <span id="cmpCount">0 of 3</span></b><span id="cmpNames" class="cmp-names"></span>
+  <button type="button" class="btn gold" id="cmpOpen">Compare side by side</button><button type="button" class="btn" id="cmpClear">Clear</button></div>
+</div>
 <script src="tracker.js"></script>
 </body>
 </html>

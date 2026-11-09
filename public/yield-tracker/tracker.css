@@ -404,3 +404,43 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .fn-toggle { font: 600 .8rem/1 var(--font-body); padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--white); cursor: pointer; min-height: 36px; }
 .fn-toggle:hover, .fn-toggle[aria-expanded="true"] { border-color: var(--gold); }
 .fn-cols[hidden] { display: none; }
+
+/* Comparator (round 4) */
+.cmp-btn { font: 600 .78rem/1 var(--font-body); padding: 8px 12px; border-radius: 100px; border: 1px dashed var(--border-2); background: transparent; color: var(--white); cursor: pointer; min-height: 36px; }
+.cmp-btn:hover { border-color: var(--gold); }
+.cmp-btn[aria-pressed="true"] { border-style: solid; border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+.cmp-tray { position: fixed; left: 0; right: 0; bottom: 0; z-index: 90; background: rgba(12,12,14,.97); border-top: 1px solid rgba(249,168,37,.45); padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.cmp-tray-in { max-width: 1320px; margin: 0 auto; display: flex; align-items: center; gap: 10px 14px; flex-wrap: wrap; font-size: .86rem; }
+.cmp-tray-in b { color: var(--gold); }
+.cmp-names { color: var(--text-dim); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cmp-tray .btn[disabled] { opacity: .5; cursor: default; }
+body:has(.cmp-tray:not([hidden])) { padding-bottom: 64px; }
+.cmp-panel { background: var(--bg-card); border: 1px solid rgba(249,168,37,.45); border-radius: var(--radius); padding: 18px; margin: 0 auto 22px; display: grid; gap: 14px; }
+.cmp-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.cmp-top h3 { font-size: 1.05rem; }
+.cmp-form { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.cmp-amt { display: inline-flex; align-items: center; gap: 6px; background: var(--bg); border: 1px solid var(--border-2); border-radius: 100px; padding: 4px 6px 4px 14px; }
+.cmp-amt span { color: var(--gold); font-weight: 700; }
+.cmp-amt input { width: 120px; background: transparent; border: 0; color: var(--white); font-weight: 600; font-size: .95rem; padding: 6px 4px; outline: none; }
+.cmp-verdict { margin: 0; padding: 12px 14px; border-radius: 12px; background: var(--green-bg); border: 1px solid rgba(34,197,94,.4); font-size: .92rem; line-height: 1.55; }
+.cmp-verdict.none { background: var(--bg-card-2); border-color: var(--border-2); }
+.cmp-verdict b { color: var(--white); }
+.cmp-cav { color: var(--text-dim); }
+.cmp-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; }
+.cmp-table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .84rem; }
+.cmp-table th, .cmp-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.cmp-table thead th { background: var(--bg-card-2); }
+.cmp-table tbody th { color: var(--text-dim); font-weight: 600; font-size: .74rem; letter-spacing: .6px; text-transform: uppercase; white-space: nowrap; width: 150px; }
+.cmp-table td small { display: block; color: var(--text-dim); font-size: .72rem; }
+.cmp-table .win { background: rgba(34,197,94,.07); }
+.cmp-h { display: flex; gap: 10px; align-items: center; margin: 6px 0; }
+.cmp-h b { display: block; color: var(--white); }
+.cmp-h small { color: var(--text-dim); font-size: .74rem; }
+.cmp-x { font-size: .72rem; background: none; border: 0; color: var(--text-dim); text-decoration: underline; cursor: pointer; padding: 0; }
+.risk { font-weight: 700; } .risk-low { color: var(--green); } .risk-medium { color: #fbbf24; } .risk-higher { color: #fb923c; } .risk-highest { color: var(--red); }
+.cmp-out { color: var(--red); } .cmp-in { color: var(--green); }
+.cmp-note { font-size: .74rem; color: var(--text-dim); margin: 0; line-height: 1.6; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 720px) { .cmp-names { flex-basis: 100%; order: 3; } .cmp-tray .btn { flex: 1; } .cmp-amt input { width: 100px; } }
+.cmp-panel { scroll-margin-top: 140px; }
+.cmp-panel { min-width: 0; max-width: 100%; } .cmp-panel > * { min-width: 0; }

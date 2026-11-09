@@ -8,7 +8,7 @@ const D = (f) => path.join(ROOT, 'data', 'yields', f)
 const read = (f) => (fs.existsSync(D(f)) ? JSON.parse(fs.readFileSync(D(f), 'utf8')) : null)
 const checkOnly = process.argv.includes('--check')
 
-const sources = ['digital.json', 'traditional.json', 'cex.json'].map((f) => ({ f, rows: read(f) || [] }))
+const sources = ['digital.json', 'traditional.json', 'usd.json', 'cex.json'].map((f) => ({ f, rows: read(f) || [] }))
 const rules = read('rules.json') || {}
 rules.fx = read('fx.json') || null
 const overrides = read('overrides.json') || {}
@@ -39,6 +39,7 @@ for (const { f, rows: list } of sources) {
     ids.add(id)
     r.id = id
     Object.assign(r, overrides[id] || {})
+    if (r.category === 'fund') { r.pastReturn = true; r.pdic = false; r.category = 'traditional' } // UITFs/funds: past return only, never ranked as a deposit rate
     if (!['traditional', 'digital', 'ewallet', 'government', 'cex'].includes(r.category)) r.category = 'traditional' // e.g. 'savings', 'high-yield savings'
     if (r.drop) continue
     if (!r.source) errors.push(`${f}: ${id} has no source`)
