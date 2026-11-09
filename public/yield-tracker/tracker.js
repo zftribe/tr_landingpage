@@ -35,12 +35,43 @@ const taxable = (r) => isPeso(r) && !r.taxExempt;
 function net(rate, r) {
   if (rate == null) return null;
   let n = S.tax && taxable(r) ? rate * (1 - TAX() / 100) : rate;
-  if (S.real && isPeso(r) && INFL() != null) n = ((1 + n / 100) / (1 + INFL() / 100) - 1) * 100;
+  if (S.real && isPeso(r) && INFL() != null) n = n - INFL(); // real yield = rate after tax − inflation
   return n;
 }
 // Amounts are in pesos; crypto caps are in coins, so convert with the BSP rate (stablecoins ≈ US$1).
 const FX = () => (DATA && DATA.rules && DATA.rules.fx && DATA.rules.fx.usdphp) || null;
 function units(r, pesos) { return isPeso(r) ? pesos : (r.stablecoin && FX() ? pesos / FX() : null); }
+// "Have you beaten inflation?" (Advanced view, peso savers in the Philippines)
+const afterTax = (r) => (r.rate == null ? null : taxable(r) ? r.rate * (1 - TAX() / 100) : r.rate);
+const realYield = (r) => (isPeso(r) && INFL() != null && r.rate != null ? afterTax(r) - INFL() : null);
+function inflBadge(r) {
+  const ry = realYield(r); if (ry == null || ended(r)) return '';
+  return ry >= 0 ? `<span class="badge std adv-only" title="Rate after tax minus ${INFL()}% inflation">Beats inflation ✓</span>` : `<span class="badge stale adv-only" title="Rate after tax minus ${INFL()}% inflation">Below inflation</span>`;
+}
+function inflSpark(h, w = 280, ht = 64) {
+  if (!h || h.length < 2) return '';
+  const vs = h.map((p) => p.v), mx = Math.max(...vs), mn = Math.min(0, ...vs), sp = mx - mn || 1;
+  const X = (i) => 4 + (i / (h.length - 1)) * (w - 8), Y = (v) => ht - 14 - ((v - mn) / sp) * (ht - 24);
+  const pts = h.map((p, i) => `${X(i).toFixed(1)},${Y(p.v).toFixed(1)}`).join(' ');
+  const last = h[h.length - 1];
+  return `<svg class="infl-spark" viewBox="0 0 ${w} ${ht}" width="100%" height="${ht}" role="img" aria-label="PH inflation ${h[0].m} to ${last.m}: from ${h[0].v}% to ${last.v}%">
+    <polyline fill="none" stroke="#ef4444" stroke-width="2" stroke-linejoin="round" points="${pts}"/>
+    <circle cx="${X(h.length - 1)}" cy="${Y(last.v)}" r="3.5" fill="#ef4444"/>
+    <text x="4" y="${ht - 2}" font-size="10" fill="#9a9a9a">${h[0].m}</text><text x="${w - 4}" y="${ht - 2}" font-size="10" fill="#9a9a9a" text-anchor="end">${last.m}</text>
+  </svg>`;
+}
+function renderInfl() {
+  const el = $('#inflPanel'), i = (DATA.rules || {}).inflation; if (!el || !i || i.value == null) return;
+  const peso = ROWS.filter((r) => rankable(r) && isPeso(r) && !ended(r));
+  const beat = peso.filter((r) => realYield(r) >= 0);
+  const beatSteady = beat.filter((r) => r.kind !== 'promo' && !r.strings && !locked(r));
+  const h = (i.history || []).slice(-24);
+  el.innerHTML = `<div class="infl-head"><div><span class="eyebrow">For savers in the Philippines</span><h3>Have you beaten inflation?</h3>
+      <p>Prices rose <b>${i.value}%</b> in the year to ${esc(i.label || i.month)}. To keep your buying power, your rate <b>after tax</b> has to be at least that.
+      <b>${beat.length} of ${peso.length}</b> peso rate${peso.length === 1 ? "" : "s"} ${beat.length === 1 ? "does" : "do"} it today${beatSteady.length ? `, and only ${beatSteady.length} without a promo, task or lock-up` : ', and none without a promo, task or lock-up'}.</p></div>
+    <div class="infl-chart"><div class="infl-now"><b>${i.value}%</b><small>PH inflation, ${esc(i.label || i.month)}</small></div>${inflSpark(h)}<small class="infl-src">Last 24 months · Source: <a href="${esc(i.source)}" target="_blank" rel="noopener">BSP</a> (CPI ${esc(i.base || '')}) · checked ${fmtDate(i.checkedOn)}</small></div></div>
+    <p class="infl-foot">Real yield = rate after tax − inflation. Each peso rate below shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span>. Crypto is paid in dollars, so it isn't compared. This is a comparison, not advice; past inflation doesn't predict future inflation.</p>`;
+}
 function blended(r, pesos) {
   if (r.rate == null) return null;
   const amount = units(r, pesos);
@@ -140,6 +171,7 @@ function rowHTML(r) {
   const facts = [
     ['Rate', r.rate == null ? 'Not published' : `${r.upTo ? 'Up to ' : ''}${pct2(r.rate)} ${isPeso(r) ? 'p.a. before tax' : (r.rateBasis || 'APR')}`],
     S.tax && taxable(r) && r.rate != null ? ['After 20% tax', pct2(r.rate * (1 - TAX() / 100))] : null,
+    S.view === 'advanced' && realYield(r) != null ? ['Real yield', `${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} (after tax − ${INFL()}% inflation${r.kind === 'promo' ? '; only while the promo lasts' : ''})`] : null,
     r.taxExempt ? ['Tax', esc(r.taxNote || 'Tax-exempt')] : null,
     ['Type', r.kind === 'promo' ? `Promo${r.promoStarts ? ' from ' + fmtDate(r.promoStarts) : ''}${r.promoEnds ? ' until ' + fmtDate(r.promoEnds) : ''}` : 'Standard (ongoing, can change)'],
     r.kind === 'promo' && r.rateAfterPromo != null ? ['After the promo', pct2(r.rateAfterPromo)] : null,
@@ -156,12 +188,12 @@ function rowHTML(r) {
     <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}</span></div></div>
     ${rateCell}
     <div class="adv-only c-adv cell-s">${r.rate == null ? '' : `${pct2(r.rate)}<small>${isPeso(r) ? 'before tax' : 'as shown'}</small>`}</div>
-    <div class="c-kind">${kindBadge(r)} ${st}</div>
+    <div class="c-kind">${kindBadge(r)} ${st} ${inflBadge(r)}</div>
     <div class="c-cap cell-s">${capText(r)}</div>
     <div class="adv-only c-adv cell-s">${esc(locked(r) ? r.lockup : 'Anytime')}<small>${ins.replace(/<[^>]+>/g, '')}</small></div>
     <div class="adv-only c-adv cell-s">${fmtDate(r.checkedOn)}<small>${stale(r) ? '<span style="color:var(--red)">re-check due</span>' : 'on schedule'}</small></div>
     <div class="adv-only c-adv">${spark(r.history)}</div>
-    <div class="c-badges">${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''} ${ins} ${st}</div>
+    <div class="c-badges">${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''} ${ins} ${st} ${inflBadge(r)}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
   <div class="row-more" id="m-${id}">
@@ -299,7 +331,7 @@ function renderPicks() {
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
       <div class="pick-earn">On ${money(amt)}: about <b>${money(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar). Not insured.</div>` : ''}
       <div class="why">${esc(why)}</div>
-      <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''}</div>
+      <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
       <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? `<a class="btn gold" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Open ${esc(p.name)} ↗</a>` : ''}</div>
       ${p ? '<span class="tag">Partner link: we may earn a commission.</span>' : ''}
     </article>`;
@@ -365,7 +397,7 @@ function renderRules() {
     <h4>Philippine tax on interest</h4><p>${esc(t.summary || '')}</p>
     ${(t.sources || []).slice(0, 2).map((s) => `<a href="${esc(s.url || s)}" target="_blank" rel="noopener">${esc(s.name || 'Source')} ↗</a> `).join('')}
     <h4 style="margin-top:14px">Deposit insurance</h4><p>${esc(p.summary || '')}</p>${p.source ? `<a href="${esc(p.source)}" target="_blank" rel="noopener">PDIC ↗</a>` : ''}
-    ${i.value != null ? `<h4 style="margin-top:14px">Inflation</h4><p>PH headline inflation was ${i.value}% in ${esc(i.label || i.month)}. A rate below that loses buying power. Turn on “After inflation” in Advanced view.</p><a href="${esc(i.source)}" target="_blank" rel="noopener">BSP ↗</a>` : ''}
+    ${i.value != null ? `<h4 style="margin-top:14px">Inflation</h4><p>PH headline inflation was ${i.value}% in ${esc(i.label || i.month)}. A rate below that loses buying power. See “Have you beaten inflation?” in Advanced view.</p><a href="${esc(i.source)}" target="_blank" rel="noopener">BSP ↗</a>` : ''}
     <p style="margin:14px 0 0;font-size:.76rem;color:var(--text-dim)">Crypto: we do not adjust for tax. Rules differ by country; check yours.</p>
   </div>`;
 }
@@ -441,7 +473,7 @@ async function init() {
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); fillCalc(); renderTree(); renderAll();
+  renderRules(); renderInfl(); fillCalc(); renderTree(); renderAll();
   const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.

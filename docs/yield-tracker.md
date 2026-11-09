@@ -41,7 +41,10 @@ The build adds: `id`, `strings` (must do something to earn it), `vipOnly`, `newU
 2. For each row in the files for this refresh (PH or crypto), open its `source` and re-read the rate, cap, promo dates and conditions. Look for new promos on the providers' official promo or announcement pages.
 3. Before changing a rate, append the old `{ d: checkedOn, r: rate }` to `history.json` under the row's id.
 4. Update the row and set `checkedOn` to today. Drop promos that have ended (keep them in history).
-5. PH refresh only: update `rules.json` (latest PSA inflation, BSP policy rate; re-check BIR/PDIC wording) and `fx.json` (BSP daily rate; BSP blocks scripts, so use the in-app browser).
+5. PH refresh only: update `rules.json` and `fx.json`:
+   - **Inflation tracker:** set `inflation.value`, `month`, `label` and `checkedOn` from the BSP home page "Inflation Rate" key-rates chart. Append new months to `inflation.history` as `{ "m": "YYYY-MM", "v": 7.8 }`. The Advanced view's "Have you beaten inflation?" panel and the Beats / Below inflation badges read these fields. Real yield = rate after tax − inflation.
+   - BSP policy rate (Target RRP) from the same page; re-check BIR/PDIC wording.
+   - `fx.json`: BSP daily peso per US dollar rate. BSP blocks scripts, so use the in-app browser.
 6. Run `node scripts/yields/build.js`, then fix every ERROR. Read the notes.
 7. Commit (`Yield Tracker refresh (PH|crypto) YYYY-MM-DD: N rates changed`), push the branch, and open a PR with a short table of what changed (old → new, with source links).
 8. Deploy the preview (`sh D:/Temp/yield-tracker/deploy.sh` with W pointed at the refresh worktree), then send the Command Center keeper a one-line card: what changed and the PR link.
