@@ -156,7 +156,10 @@ function partner(r) {
 }
 // Partner/referral links live in the footer footnotes; rows and picks only link down to them.
 const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-');
-const fnLink = (p) => `<a class="fn-link" href="#${fnId(p)}" data-fn="${fnId(p)}">${p.kind === 'bank' ? 'Referral' : 'Partner'} link<sup>↓</sup></a>`;
+// Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
+const fnLink = (p) => p.code
+  ? `<span class="ref-code"><span class="ref-lbl">Referral code</span><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="ref-how">${esc(p.codeHow || 'Enter this referral code when you sign up.')}</span>`
+  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a>${p.kind === 'bank' ? '' : '<span class="ref-how">Adults (18+) only</span>'}`;
 function renderFootnotes() {
   const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
@@ -591,6 +594,7 @@ async function init() {
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
   if (Q.get('scrollto')) { const el = document.getElementById(Q.get('scrollto')); if (el) { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 130); } }
