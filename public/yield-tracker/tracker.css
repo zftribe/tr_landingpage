@@ -389,3 +389,18 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .rank-note { text-align: center; font-size: .84rem; color: var(--text); margin: -6px auto 16px; max-width: 640px; }
 
 .fn-dom { color: var(--text-dim); opacity: .7; margin-left: 4px; }
+
+/* Direct referral/partner buttons in rows and picks (link opens in a new tab) */
+.ref-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 100px; font-size: .8rem; font-weight: 600; border: 1px solid rgba(249,168,37,.6); background: var(--gold-glow); color: var(--gold); min-height: 36px; }
+.ref-btn:hover { background: var(--gold); color: #141006; text-decoration: none; }
+.ref-code { display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.ref-lbl { font-size: .74rem; color: var(--text-dim); }
+.ref-code code { font: 600 .82rem ui-monospace, Consolas, monospace; color: var(--gold); background: var(--bg-card-2); border: 1px solid var(--border-2); padding: 3px 8px; border-radius: 6px; letter-spacing: .5px; }
+.ref-how { font-size: .72rem; color: var(--text-dim); align-self: center; }
+
+/* Footer partner list: collapsed by default */
+.fn-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.fn-head .fn-title { margin: 0; }
+.fn-toggle { font: 600 .8rem/1 var(--font-body); padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--white); cursor: pointer; min-height: 36px; }
+.fn-toggle:hover, .fn-toggle[aria-expanded="true"] { border-color: var(--gold); }
+.fn-cols[hidden] { display: none; }

@@ -156,7 +156,10 @@ function partner(r) {
 }
 // Partner/referral links live in the footer footnotes; rows and picks only link down to them.
 const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-');
-const fnLink = (p) => `<a class="fn-link" href="#${fnId(p)}" data-fn="${fnId(p)}">${p.kind === 'bank' ? 'Referral' : 'Partner'} link<sup>↓</sup></a>`;
+// Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
+const fnLink = (p) => p.code
+  ? `<span class="ref-code"><span class="ref-lbl">Referral code</span><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="ref-how">${esc(p.codeHow || 'Enter this referral code when you sign up.')}</span>`
+  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a>${p.kind === 'bank' ? '' : '<span class="ref-how">Adults (18+) only</span>'}`;
 function renderFootnotes() {
   const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
@@ -164,9 +167,11 @@ function renderFootnotes() {
       ? `<span class="fn-code"><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="fn-how">${esc(p.codeHow || '')} <a href="${esc(p.url)}" target="_blank" rel="noopener">Official site ↗</a></span>`
       : `<a class="fn-url" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a> <small class="fn-dom">${esc(new URL(p.url).hostname.replace(/^www\./, ''))}</small>`}</li>`;
   const banks = list.filter((p) => p.kind === 'bank'), ex = list.filter((p) => p.kind !== 'bank');
-  el.innerHTML = `<h3 class="fn-title">Partner &amp; referral links</h3>
+  // Collapsed by default (George, 9 Nov); the heading and disclosure line always stay visible.
+  el.innerHTML = `<div class="fn-head"><h3 class="fn-title">Partner &amp; referral links</h3>
+    <button type="button" class="fn-toggle" id="fnToggle" aria-expanded="false" aria-controls="fnBody">Show all ${list.length} links <span aria-hidden="true">▾</span></button></div>
     <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
-    <div class="fn-cols">
+    <div class="fn-cols" id="fnBody" hidden>
       <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
       <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
     </div>`;
@@ -553,6 +558,12 @@ function wire() {
   });
   ['simAmt', 'simYears', 'simRate', 'simInfl', 'simTax'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', sim); });
   const sp = $('#simPick'); if (sp) sp.addEventListener('change', () => { const r = ROWS.find((x) => x.id === sp.value); if (r) $('#simRate').value = r.rate; sim(); });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('#fnToggle'); if (!t) return;
+    const body = document.getElementById('fnBody'), open = body.hidden;
+    body.hidden = !open; t.setAttribute('aria-expanded', String(open));
+    t.innerHTML = (open ? 'Hide links' : 'Show all ' + body.querySelectorAll('li').length + ' links') + ' <span aria-hidden="true">' + (open ? '▴' : '▾') + '</span>';
+  });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
   $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });
@@ -591,6 +602,7 @@ async function init() {
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
   if (Q.get('scrollto')) { const el = document.getElementById(Q.get('scrollto')); if (el) { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 130); } }
