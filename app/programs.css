@@ -210,3 +210,20 @@
   .as-box h3 { font-size: 28px; }
   .as-facts { grid-template-columns: 1fr 1fr; }
 }
+
+/* Style mix meter (round 2) */
+.as-mix { margin-top: 20px; }
+.as-mix-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; }
+.as-mix-head .as-small { margin: 0; }
+.as-mix-list { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 12px; }
+.as-mix-list li { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 52px; gap: 14px; align-items: center; }
+.as-mix-name { color: var(--white); font-weight: 600; font-size: 14.5px; display: grid; }
+.as-mix-name small { color: var(--dim); font-weight: 500; font-size: 12px; }
+.as-mix-bar { height: 12px; border-radius: 99px; background: rgba(255,255,255,.06); overflow: hidden; }
+.as-mix-bar i { display: block; height: 100%; border-radius: 99px; background: rgba(249,168,37,.45); }
+.as-mix-lead .as-mix-bar i { background: var(--gold); }
+.as-mix-lead .as-mix-name { color: var(--gold); }
+.as-mix-pct { color: var(--white); font-size: 15px; text-align: right; font-variant-numeric: tabular-nums; }
+.as-mix-rest .as-mix-name { color: var(--muted); font-weight: 500; }
+.as-mix-rest .as-mix-bar i { background: rgba(255,255,255,.18); }
+@media (max-width: 760px) { .as-mix-list li { grid-template-columns: 1fr 48px; gap: 6px 10px; } .as-mix-bar { grid-column: 1 / -1; grid-row: 2; } }

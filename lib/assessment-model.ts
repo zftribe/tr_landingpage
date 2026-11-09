@@ -204,7 +204,7 @@ export function trial(state: TrialState) {
     const lead = v.r[0].c;
     const reasons = answers.filter(x => favourite(x) === lead).map(x => card(x.id).opts[x.o].why).filter(Boolean).slice(0, 4);
     const flags = [...new Set(answers.map(x => card(x.id).opts[x.o].flag).filter((f): f is string => !!f))];
-    return { ...v, n, contradicted, fs, facetsDone, factsDone, minNow, done, capped, finished: (done || capped) && !(state.deeper && nextCard()), reasons, flags, forkVotes: forkVotes(), branch: branch() };
+    return { ...v, scores: totals().s, n, contradicted, fs, facetsDone, factsDone, minNow, done, capped, finished: (done || capped) && !(state.deeper && nextCard()), reasons, flags, forkVotes: forkVotes(), branch: branch() };
   }
   const deeperLeft = () => BANK.some(c => c.stage === 'deeper' && !answered(c.id));
   return { answers, nextCard, verdict, deeperLeft };

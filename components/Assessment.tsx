@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
-import { trial, trialClass, FACETS, type Answer, type Card } from '@/lib/assessment-model'
+import { trial, trialClass, TRIAL_CLASSES, FACETS, BANK, type Answer, type Card } from '@/lib/assessment-model'
+import { VARIANTS } from '@/lib/assessment-variants'
 
 type Item = Product & { checkout: string }
 
@@ -67,16 +68,44 @@ function Chart({ kind }: { kind: string }) {
   )
 }
 
+/** Each question has up to three versions (sets A, B, C). A run picks one per question at random, preferring versions this
+ *  browser hasn't seen yet, so a retake or refresh shows fresh wording. The scoring is the same for every version. */
+const SEEN_KEY = 'tr-assessment-seen'
+type Wording = { q: string; sub?: string; opts: string[] }
+const wordings = (c: Card): Wording[] => [{ q: c.q, sub: c.sub, opts: c.opts.map((o) => o.l) }, ...(VARIANTS[c.id] ?? [])]
+function pickSets(): Record<string, number> {
+  let seen: Record<string, number[]> = {}
+  try { seen = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}') } catch {}
+  const out: Record<string, number> = {}
+  for (const c of BANK) {
+    const n = wordings(c).length, used = seen[c.id] ?? []
+    const fresh = Array.from({ length: n }, (_, i) => i).filter((i) => !used.includes(i))
+    const pool = fresh.length ? fresh : Array.from({ length: n }, (_, i) => i)
+    out[c.id] = pool[Math.floor(Math.random() * pool.length)]
+  }
+  return out
+}
+function markSeen(id: string, i: number) {
+  try {
+    const seen: Record<string, number[]> = JSON.parse(localStorage.getItem(SEEN_KEY) || '{}')
+    const n = wordings(BANK.find((c) => c.id === id)!).length
+    const list = (seen[id] ?? []).filter((x) => x !== i).concat(i)
+    seen[id] = list.length >= n ? [i] : list // once every version is seen, start the cycle again
+    localStorage.setItem(SEEN_KEY, JSON.stringify(seen))
+  } catch {}
+}
+
 export function Assessment({ products }: { products: Item[] }) {
   const [open, setOpen] = useState(false)
   const [answers, setAnswers] = useState<Answer[]>([])
+  const [sets, setSets] = useState<Record<string, number>>({})
   const dlg = useRef<HTMLDialogElement>(null)
 
   const t = useMemo(() => trial({ answers, deeper: false }), [answers])
   const v = t.verdict()
   const next = v.finished ? null : t.nextCard()
 
-  const start = useCallback(() => { setAnswers([]); setOpen(true) }, [])
+  const start = useCallback(() => { setSets(pickSets()); setAnswers([]); setOpen(true) }, [])
   useEffect(() => {
     const fromHash = () => { if (location.hash === '#assessment') { history.replaceState(null, '', '#start'); document.getElementById('start')?.scrollIntoView({ block: 'center' }); start() } }
     fromHash()
@@ -86,7 +115,7 @@ export function Assessment({ products }: { products: Item[] }) {
   useEffect(() => { const d = dlg.current; if (!d) return; if (open && !d.open) d.showModal(); if (!open && d.open) d.close() }, [open])
   useEffect(() => { dlg.current?.querySelector<HTMLElement>('.as-body')?.scrollTo(0, 0); dlg.current?.querySelector<HTMLElement>('.as-q, .as-res h3')?.focus() }, [answers.length, open])
 
-  const pick = (c: Card, o: number) => setAnswers((a) => [...a, { id: c.id, o }])
+  const pick = (c: Card, o: number) => { markSeen(c.id, sets[c.id] ?? 0); setAnswers((a) => [...a, { id: c.id, o }]) }
   const back = () => setAnswers((a) => a.slice(0, -1))
 
   const showCard = (id: string) => {
@@ -132,7 +161,7 @@ export function Assessment({ products }: { products: Item[] }) {
               <button type="button" className="btn btn-outline as-exit" onClick={() => setOpen(false)}>Exit</button>
             </div>
             <div className="as-body">
-              {next ? <Question c={next} n={answers.length} onPick={pick} onBack={back} /> : <Result v={v} answers={answers} products={products} onRetake={start} onShow={showCard} />}
+              {next ? <Question c={next} w={wordings(next)[sets[next.id] ?? 0] ?? wordings(next)[0]} n={answers.length} onPick={pick} onBack={back} /> : <Result v={v} answers={answers} products={products} onRetake={start} onShow={showCard} />}
             </div>
           </>
         )}
@@ -141,18 +170,18 @@ export function Assessment({ products }: { products: Item[] }) {
   )
 }
 
-function Question({ c, n, onPick, onBack }: { c: Card; n: number; onPick: (c: Card, o: number) => void; onBack: () => void }) {
+function Question({ c, w, n, onPick, onBack }: { c: Card; w: Wording; n: number; onPick: (c: Card, o: number) => void; onBack: () => void }) {
   return (
     <div className="as-qwrap">
       <p className="as-topic">{TOPIC[c.stage]}</p>
-      <h3 className="as-q" tabIndex={-1}>{c.q}</h3>
-      {c.sub && <p className="as-sub">{c.sub}</p>}
+      <h3 className="as-q" tabIndex={-1}>{w.q}</h3>
+      {w.sub && <p className="as-sub">{w.sub}</p>}
       {c.scene.startsWith('replay:') && <Chart kind={c.scene} />}
       <div className="as-opts" role="group" aria-label="Answers">
         {c.opts.map((o, i) => (
           <button key={i} type="button" className="as-opt" onClick={() => onPick(c, i)}>
             <span className="as-ic"><Icon name={o.i} /></span>
-            <span className="as-ol">{o.l}</span>
+            <span className="as-ol">{w.opts[i] ?? o.l}</span>
           </button>
         ))}
       </div>
@@ -172,6 +201,12 @@ function Result({ v, answers, products, onRetake, onShow }: { v: V; answers: Ans
   // The split comes from the trader-or-investor questions, smoothed so one-sided answers read 80/20, not 100/0.
   const fv = v.forkVotes, traderPct = Math.min(95, Math.max(5, Math.round(((fv.t + 1) / (fv.t + fv.i + 2)) * 100)))
   const notYet = has('L3', 0) || has('L4', 2)
+  // Style mix: a gentler spread of the same scores, so a second and third style show (George, 10 Nov).
+  const top = Math.max(...Object.values(v.scores))
+  const raw = TRIAL_CLASSES.map((c) => ({ c, e: Math.exp((v.scores[c.id] - top) * 0.18) }))
+  const z = raw.reduce((a, b) => a + b.e, 0)
+  const mix = raw.map((x) => ({ c: x.c, pct: Math.round((x.e / z) * 100) })).sort((a, b) => b.pct - a.pct)
+  const shown = mix.slice(0, 5), rest = Math.max(0, 100 - shown.reduce((a, b) => a + b.pct, 0))
   const facet = (k: 'decide' | 'risk') => { const f = v.fs[k]; return f.top ? FACETS[k].values[f.top] : '—' }
   const newcomer = v.fs.stage.top === 'newcomer'
   const watch = [...v.flags, ...(newcomer && !notYet ? ['You are just starting: practise on paper before you use real money.'] : [])].slice(0, 2)
@@ -259,6 +294,19 @@ function Result({ v, answers, products, onRetake, onShow }: { v: V; answers: Ans
           <p className="as-demand-h">What it asks of you</p>
           <ul className="as-demand">{lead.demand.map((d) => <li key={d}>{d}</li>)}</ul>
         </div>
+      </div>
+      <div className="as-box as-mix">
+        <div className="as-mix-head"><p className="qz-eyebrow">Your style mix</p><span className="as-small">How strongly your answers match each style</span></div>
+        <ul className="as-mix-list">
+          {shown.map(({ c, pct }, i) => (
+            <li key={c.id} className={i === 0 ? 'as-mix-lead' : ''}>
+              <span className="as-mix-name">{c.name}<small>{c.side === 'trader' ? 'Trader' : 'Investor'} · {c.book}</small></span>
+              <span className="as-mix-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, pct)}%` }} /></span>
+              <b className="as-mix-pct">{pct}%</b>
+            </li>
+          ))}
+          {rest > 0 && <li className="as-mix-rest"><span className="as-mix-name">Other styles</span><span className="as-mix-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, rest)}%` }} /></span><b className="as-mix-pct">{rest}%</b></li>}
+        </ul>
       </div>
       <h4 className="as-recs-h">{notYet ? 'What to do now' : 'Where to start'}</h4>
       <div className="as-recs">{recs}</div>
