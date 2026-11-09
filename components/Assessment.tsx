@@ -295,19 +295,27 @@ function Result({ v, answers, products, onRetake, onShow }: { v: V; answers: Ans
           <ul className="as-demand">{lead.demand.map((d) => <li key={d}>{d}</li>)}</ul>
         </div>
       </div>
-      <div className="as-box as-mix">
-        <div className="as-mix-head"><p className="qz-eyebrow">Your style mix</p><span className="as-small">How strongly your answers match each style</span></div>
+      {/* Collapsed by default: a one-line summary, then the full meter (George, 10 Nov). Bars fill along a three-colour scale. */}
+      <details className="as-box as-mix">
+        <summary>
+          <span className="as-mix-sum">
+            <span className="qz-eyebrow">Your style mix</span>
+            <span className="as-mix-top">{shown.slice(0, 3).map(({ c, pct }) => `${c.name} ${pct}%`).join(' · ')}</span>
+          </span>
+          <span className="as-mix-toggle" aria-hidden="true"><span className="as-when-closed">Show all</span><span className="as-when-open">Hide</span> ▾</span>
+        </summary>
+        <p className="as-small as-mix-note">How strongly your answers match each style</p>
         <ul className="as-mix-list">
           {shown.map(({ c, pct }, i) => (
             <li key={c.id} className={i === 0 ? 'as-mix-lead' : ''}>
               <span className="as-mix-name">{c.name}<small>{c.side === 'trader' ? 'Trader' : 'Investor'} · {c.book}</small></span>
-              <span className="as-mix-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, pct)}%` }} /></span>
+              <span className="as-mix-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, pct)}%`, backgroundSize: `${(shown[0].pct / Math.max(2, pct)) * 100}% 100%` }} /></span>
               <b className="as-mix-pct">{pct}%</b>
             </li>
           ))}
           {rest > 0 && <li className="as-mix-rest"><span className="as-mix-name">Other styles</span><span className="as-mix-bar" aria-hidden="true"><i style={{ width: `${Math.max(2, rest)}%` }} /></span><b className="as-mix-pct">{rest}%</b></li>}
         </ul>
-      </div>
+      </details>
       <h4 className="as-recs-h">{notYet ? 'What to do now' : 'Where to start'}</h4>
       <div className="as-recs">{recs}</div>
       <p className="as-disc">This assessment is for education only and is not financial advice. It describes a learning style from your own answers; it does not judge whether any investment suits you. Trading and investing carry risk, including the loss of your money. Adults (18+) only.</p>
