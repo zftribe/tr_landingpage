@@ -64,6 +64,9 @@ Only **USDT, USDC and USDG** (George, 9 Nov 2026). The build drops every other c
 8. Deploy the preview (`sh D:/Temp/yield-tracker/deploy.sh` with W pointed at the refresh worktree), then send the Command Center keeper a one-line card: what changed and the PR link.
 9. **Going live needs George's typed go** (merge the PR). Do not merge unless George has said auto-publish is OK for refreshes.
 
+## Partner and referral links
+All partner (OKX, MEXC, Bitget, Bybit, Gate) and referral (Maya, MariBank, GoTyme code GTXGFA27Z70) links live in ONE place: the footer footnotes "Partner & referral links" (George, 9 Nov 2026). Rows and Finder picks show only a small "Referral link ↓" / "Partner link ↓" that jumps to the footnote. Links are set in `PARTNERS` in scripts/yields/build.js.
+
 ## Legal lines on the page
 - Not financial advice (footer and finder note).
 - Partner links (OKX, MEXC, Bitget, Bybit, Gate), Legal docket 26 / LD-023: "Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice." Links use `rel="sponsored"`.

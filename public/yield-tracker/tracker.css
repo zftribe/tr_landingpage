@@ -222,6 +222,25 @@ body[data-view=advanced] .row-main { grid-template-columns: minmax(200px, 2fr) .
 .infl-src { color: var(--text-dim); font-size: .72rem; }
 .infl-foot { margin-top: 14px; font-size: .78rem !important; color: var(--text-dim) !important; line-height: 1.7; }
 
+/* partner & referral footnotes */
+.fn-link { display: inline-flex; align-items: center; gap: 2px; font-size: .76rem; color: var(--text-dim); text-decoration: underline dotted; text-underline-offset: 3px; align-self: center; }
+.fn-link:hover { color: var(--gold); }
+.fn-link sup { font-size: .7em; }
+.footnotes { max-width: 860px; margin: 22px auto 0; text-align: left; border-top: 1px solid var(--border); padding-top: 18px; }
+.fn-title { font-size: .82rem; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); margin: 0 0 6px; }
+.fn-lead { font-size: .78rem; color: var(--text-dim); line-height: 1.6; margin: 0 0 12px; }
+.fn-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 28px; }
+.fn-cols h4 { font-size: .72rem; letter-spacing: 1px; text-transform: uppercase; color: var(--text-dim); margin: 0 0 6px; }
+.fn-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: .8rem; color: var(--text-dim); }
+.fn-list li { padding: 3px 6px; border-radius: 8px; transition: background .4s; }
+.fn-list li.fn-hit { background: var(--gold-dim); }
+.fn-name { color: var(--white); font-weight: 600; margin-right: 8px; }
+.fn-url { word-break: break-all; }
+.fn-code { display: inline-flex; gap: 8px; align-items: center; }
+.fn-code code { font: 600 .82rem ui-monospace, Consolas, monospace; color: var(--gold); background: var(--bg-card-2); border: 1px solid var(--border-2); padding: 2px 8px; border-radius: 6px; letter-spacing: .5px; }
+.fn-copy { font-size: .72rem; padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--white); cursor: pointer; }
+.fn-how { display: block; font-size: .74rem; margin-top: 2px; }
+.fn-note { font-size: .72rem; color: var(--text-dim); line-height: 1.6; margin: 8px 0 0; opacity: .85; }
 /* calculator */
 .calc-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; }
 .calc-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }
@@ -321,6 +340,7 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
   .row-more { padding: 4px 12px 14px; }
   .prov-prod { white-space: normal; }
   .more-grid { grid-template-columns: 1fr; }
+  .fn-cols { grid-template-columns: 1fr; }
   .infl { padding: 18px 16px; }
   .infl-head { grid-template-columns: 1fr; gap: 14px; }
   .result-cards { grid-template-columns: 1fr; }
@@ -334,3 +354,5 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 @media (max-width: 720px) { .prov-body .row-main .c-badges { padding-left: 0; } }
 
 .rank-note { text-align: center; font-size: .84rem; color: var(--text); margin: -6px auto 16px; max-width: 640px; }
+
+.fn-dom { color: var(--text-dim); opacity: .7; margin-left: 4px; }

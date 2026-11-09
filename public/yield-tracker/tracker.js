@@ -119,6 +119,23 @@ function partner(r) {
   for (const k in DATA.partners) if ((r.provider || '').toLowerCase().startsWith(k.toLowerCase())) return { name: k, ...DATA.partners[k] };
   return null;
 }
+// Partner/referral links live in the footer footnotes; rows and picks only link down to them.
+const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const fnLink = (p) => `<a class="fn-link" href="#${fnId(p)}" data-fn="${fnId(p)}">${p.kind === 'bank' ? 'Referral' : 'Partner'} link<sup>↓</sup></a>`;
+function renderFootnotes() {
+  const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
+  const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
+  const item = (p) => `<li id="${fnId(p)}"><span class="fn-name">${esc(p.label || p.name)}</span>${p.code
+      ? `<span class="fn-code"><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="fn-how">${esc(p.codeHow || '')} <a href="${esc(p.url)}" target="_blank" rel="noopener">Official site ↗</a></span>`
+      : `<a class="fn-url" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a> <small class="fn-dom">${esc(new URL(p.url).hostname.replace(/^www\./, ''))}</small>`}</li>`;
+  const banks = list.filter((p) => p.kind === 'bank'), ex = list.filter((p) => p.kind !== 'bank');
+  el.innerHTML = `<h3 class="fn-title">Partner &amp; referral links</h3>
+    <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
+    <div class="fn-cols">
+      <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
+      <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
+    </div>`;
+}
 function spark(h) {
   if (!h || h.length < 2) return '';
   const w = 64, ht = 22, vs = h.map((p) => p.r), mn = Math.min(...vs), mx = Math.max(...vs), sp = mx - mn || 1;
@@ -204,7 +221,7 @@ function rowHTML(r) {
         ${r.cons ? `<h4>Cons to know</h4><p>${esc(r.cons)}</p>` : ''}
         <div class="more-actions">
           ${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}
-          ${p ? `<a class="btn gold" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Open ${esc(p.name)} ↗</a><span class="tag">Partner link: we may earn a commission.${p.perk ? ' ' + esc(p.perk) : ''}</span>` : ''}
+          ${p ? fnLink(p) : ''}
         </div>
       </div>
       <dl class="facts">${facts}</dl>
@@ -344,8 +361,7 @@ function renderPicks() {
       <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
-      <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? `<a class="btn gold" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Open ${esc(p.name)} ↗</a>` : ''}</div>
-      ${p ? '<span class="tag">Partner link: we may earn a commission.</span>' : ''}
+      <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
   $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.</p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
@@ -506,6 +522,12 @@ function wire() {
     S.f = { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }; S.q = ''; $('#searchInput').value = ''; syncChips(); S.open.add(id); { const rr = ROWS.find((x) => x.id === id); if (rr) S.openProv.add(rr.category + '|' + rr.provider); } renderRates();
     const el = $(`.row[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('.fn-link');
+    if (a) { e.preventDefault(); const t = document.getElementById(a.dataset.fn); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.classList.remove('fn-hit'); void t.offsetWidth; t.classList.add('fn-hit'); } return; }
+    const c = e.target.closest('.fn-copy');
+    if (c) { const done = () => { c.textContent = 'Copied ✓'; setTimeout(() => (c.textContent = 'Copy code'), 1800); }; try { navigator.clipboard.writeText(c.dataset.copy).then(done, done); } catch (err) { done(); } }
+  });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
   $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });
@@ -538,7 +560,7 @@ async function init() {
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
+  renderRules(); renderInfl(); renderFootnotes(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
   const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
