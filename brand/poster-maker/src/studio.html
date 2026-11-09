@@ -1,7 +1,7 @@
 <title>TR Poster Maker</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bricolage+Grotesque:wght@800&family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@500;700&family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@700&family=Manrope:wght@500;700;800&family=Montserrat:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Playfair+Display:wght@900&family=Plus+Jakarta+Sans:wght@500;700;800&family=Poppins:wght@800&family=Russo+One&family=Space+Grotesk:wght@700&family=Unbounded:wght@800&family=Work+Sans:wght@500;700&display=swap">
 <style>
 /* Layout: a stage-by-stage builder. Left: the stage you're on, with the stage bar (Back · 1–6 · Next) under it. Right: the live poster, pinned.
    Phone: a small pinned preview on top, the stage in the middle, the stage bar fixed at the bottom. Single dark look matched to the TR site. */
@@ -98,6 +98,29 @@ input[type=range]{accent-color:var(--gold);width:100%}
 .focusbox img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
 .focusdot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 3px rgba(0,0,0,.5);background:rgba(255,180,0,.25);pointer-events:none}
 .focusbox:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.picker{display:grid;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;max-width:340px}
+.picker[hidden]{display:none}
+.sv{position:relative;height:160px;border-radius:10px;touch-action:none;cursor:crosshair;background-image:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent)}
+.sv i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}
+.hue{-webkit-appearance:none;appearance:none;height:14px;border-radius:99px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.hue::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #111}
+.hue::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #111}
+.hexrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center}
+.hexrow .swatch{width:38px;height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.2)}
+.hexrow input{font:700 14px "JetBrains Mono",monospace;text-transform:uppercase}
+.contrast{font-size:12px;margin:0} .contrast .ok{color:var(--ok)} .contrast .bad{color:#ffcf6b}
+.fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:280px;overflow:auto;padding:2px 4px 2px 2px}
+.fontbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel-2);display:grid;gap:2px;min-width:0}
+.fontbtn span{font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fontbtn small{font:600 11px var(--body);color:var(--muted)}
+.fontbtn[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.fontbtn:focus-visible,.sv:focus-visible,.crop:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.addfont{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.crop{position:relative;border-radius:12px;overflow:hidden;touch-action:none;cursor:grab;background:#000;border:2px solid var(--gold);max-width:100%}
+.crop:active{cursor:grabbing}
+.crop canvas{width:100%;height:100%;display:block}
+.crop .grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}
+.zoomrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;max-width:340px}
 .check{display:grid;gap:4px;font-size:13px}
 .check .ok{color:var(--ok)} .check .bad{color:#ffcf6b}
 .draft{border:1px solid rgba(255,180,0,.5);border-radius:12px;padding:12px;background:var(--gold-soft);display:grid;gap:10px}
@@ -196,10 +219,22 @@ a{color:var(--gold)}
     <div class="stage-body" data-stage="1" hidden>
       <div class="sec"><div class="label">Series looks</div><div class="styles" id="styles"></div></div>
       <div class="sec"><div class="label">Bold blocks</div><div class="styles" id="styles2"></div></div>
-      <div class="sec"><div class="label">Colour theme</div><div class="sws" id="themes"></div></div>
-      <div class="sec"><div class="label">Headline font</div><div class="row" role="group" aria-label="Headline font">
-        <button class="chipbtn" type="button" data-font="signature">ZFT Slant<small>one bold face for every show</small></button>
-        <button class="chipbtn" type="button" data-font="show">Show's own font<small>each series keeps its type</small></button></div></div>
+      <div class="sec"><div class="label">Colour theme</div><div class="sws" id="themes"></div>
+        <div class="picker" id="picker" hidden aria-label="Custom colour">
+          <div class="sv" id="sv" tabindex="0" role="slider" aria-label="Saturation and brightness. Arrow keys adjust."><i id="svDot"></i></div>
+          <input type="range" class="hue" id="hue" min="0" max="360" value="205" aria-label="Hue">
+          <div class="hexrow"><div class="swatch" id="swatch"></div><input type="text" id="hex" maxlength="7" aria-label="HEX colour" spellcheck="false" autocomplete="off"><button class="btn" type="button" id="copyHex">Copy</button></div>
+          <p class="contrast" id="contrast" aria-live="polite"></p>
+          <div class="row"><button class="btn gold" type="button" id="saveSw">Save as my swatch</button><button class="x" type="button" id="delSw" hidden>Remove this swatch</button></div>
+        </div></div>
+      <div class="sec"><div class="label">Fonts</div>
+        <div class="row" role="group" aria-label="Font for"><button class="chipbtn" type="button" data-ff="title" aria-pressed="true">Headline</button><button class="chipbtn" type="button" data-ff="body" aria-pressed="false">Body text</button></div>
+        <div class="fonts" id="fonts" role="group" aria-label="Fonts"></div>
+        <div class="addfont">
+          <div class="row"><input type="text" id="gfName" maxlength="40" placeholder="Add any Google Font by name, e.g. Righteous" style="flex:1;min-width:180px" aria-label="Google Font name"><button class="btn" type="button" id="gfAdd">Add</button></div>
+          <div class="row"><button class="btn" type="button" id="upBtn">Upload a font (.ttf .otf .woff2)</button><input type="file" id="upFile" accept=".ttf,.otf,.woff,.woff2" hidden></div>
+          <p class="note" id="fontNote" aria-live="polite">Only free Google Fonts or fonts you own. Fonts you add stay in this browser.</p>
+        </div></div>
     </div>
 
     <!-- 3 · Details -->
@@ -238,9 +273,10 @@ a{color:var(--gold)}
         <div class="row" role="group" aria-label="Photo colour"><button class="chipbtn" type="button" data-grade="zft">Dark theme<small>moody, tinted to the colour theme</small></button><button class="chipbtn" type="button" data-grade="natural">Original theme<small>the photo's own colours</small></button></div>
         <input type="file" id="bgFile" accept="image/*" hidden>
       </div>
-      <div class="sec" id="focusSec" hidden><div class="label">Focus · drag the gold dot onto what must stay in view</div>
-        <div class="focusbox" id="focusBox" tabindex="0" role="slider" aria-label="Photo focus point. Arrow keys move it." aria-valuetext=""><img id="focusImg" alt=""><i class="focusdot" id="focusDot"></i></div>
-        <button class="x" type="button" id="focusReset" style="justify-self:start">Centre the focus</button>
+      <div class="sec" id="focusSec" hidden><div class="label">Frame the photo · drag to move, scroll or pinch to zoom</div>
+        <div class="crop" id="crop" tabindex="0" role="slider" data-nozoom aria-label="Photo frame. Drag to move, scroll or pinch to zoom. Arrow keys move, plus and minus zoom." aria-valuetext=""><canvas id="cropC" width="600" height="600"></canvas><div class="grid"></div></div>
+        <div class="zoomrow"><span aria-hidden="true">−</span><input type="range" id="cropZoom" min="100" max="300" step="1" value="100" aria-label="Photo zoom"><span aria-hidden="true">+</span></div>
+        <div class="row"><button class="btn" type="button" id="focusReset">Reset</button><span class="note" id="cropNote"></span></div>
       </div>
       <div class="sec"><div class="label">Hosts and speakers · <span id="spkCount">up to 3</span></div>
         <div id="spkList" style="display:grid;gap:8px"></div>
@@ -253,7 +289,7 @@ a{color:var(--gold)}
     <!-- 5 · Fine-tune -->
     <div class="stage-body" data-stage="4" hidden>
       <div class="f"><label for="titleScale">Title size <span id="titleScaleV"></span></label><input type="range" id="titleScale" min="70" max="130" step="5" value="100"></div>
-      <div class="f"><label for="photoZoom">Photo zoom <span id="photoZoomV"></span></label><input type="range" id="photoZoom" min="100" max="160" step="5" value="100"></div>
+      <div class="f"><label for="photoZoom">Photo zoom <span id="photoZoomV"></span></label><input type="range" id="photoZoom" min="100" max="300" step="5" value="100"></div>
       <p class="note">Everything stays inside the safe edges: a bigger title stops growing when it runs out of room.</p>
       <div class="sec"><div class="label">Motion (GIF and video)</div><div class="styles" id="motions"></div></div>
       <label class="toggle"><input type="checkbox" id="play"> Play the animation in the preview</label>
@@ -332,7 +368,7 @@ const PHOTOS = Object.keys(ASSETS).filter(k=>k.startsWith("ph_")).map(k=>k.slice
 const STAGES = ["Pick a template","Choose the look","Fill in the details","Photo & speakers","Fine-tune","Generate & share"];
 const SHORT = ["Template","Look","Details","Photo","Fine-tune","Share"];
 
-const state = { tpl:"hunt", style:"signature", theme:"show", font:"signature", motion:"classic", size:"square", f:null, bgPhoto:null, photoKey:"", grade:"zft", stage:0, designId:null };
+const state = { tpl:"hunt", style:"signature", theme:"show", font:"signature", titleFont:"", titleWeight:800, bodyFont:"", custom:"#7DC4FA", motion:"classic", size:"square", f:null, bgPhoto:null, photoKey:"", grade:"zft", stage:0, designId:null };
 const visited = new Set([0]);
 function store(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); }catch(e){} }
 function load(k){ try{ return JSON.parse(localStorage.getItem("trpm:"+k)); }catch(e){ return null; } }
@@ -348,7 +384,7 @@ function currentFields(){
   f.speakers = (state.f.speakers||[]).map(s=>Object.assign({}, s, {photo: s._img||null}));
   return f;
 }
-function cfg(){ return {style:state.style, theme:state.theme, font:state.font, motion:state.motion}; }
+function cfg(){ applyCustom(); return {style:state.style, theme:state.theme, font:state.font, motion:state.motion, titleFont:state.titleFont||undefined, titleWeight:state.titleWeight, bodyFont:state.bodyFont||undefined}; }
 function cloneF(f){ return Object.assign({}, f, {speakers:(f.speakers||[]).map(s=>Object.assign({}, s))}); }
 
 /* ---------- PH-time dates + weekly presets ---------- */
@@ -386,8 +422,9 @@ function buildPresets(){
 
 /* ---------- undo / redo ---------- */
 const undoStack=[], redoStack=[];
-function snap(){ return {tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.photoKey, bgPhoto:state.bgPhoto, designId:state.designId, f:cloneF(state.f)}; }
-function restore(s){ Object.assign(state, {tpl:s.tpl, style:s.style, theme:s.theme, font:s.font, motion:s.motion, grade:s.grade, photoKey:s.photoKey, bgPhoto:s.bgPhoto, designId:s.designId}); state.f=cloneF(s.f); afterLoad(); }
+const LOOKKEYS=["font","titleFont","titleWeight","bodyFont","custom"];
+function snap(){ return {...Object.fromEntries(LOOKKEYS.map(k=>[k,state[k]])), tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.photoKey, bgPhoto:state.bgPhoto, designId:state.designId, f:cloneF(state.f)}; }
+function restore(s){ for (const k of LOOKKEYS) state[k]=s[k]; Object.assign(state, {tpl:s.tpl, style:s.style, theme:s.theme, font:s.font, motion:s.motion, grade:s.grade, photoKey:s.photoKey, bgPhoto:s.bgPhoto, designId:s.designId}); state.f=cloneF(s.f); afterLoad(); }
 let typing=null;
 function pushHistory(coalesce){
   if (coalesce){ if (typing) return; typing=setTimeout(()=>{ typing=null; }, 900); }
@@ -401,7 +438,7 @@ document.addEventListener("keydown",(e)=>{ if(!(e.ctrlKey||e.metaKey) || e.key.t
 /* refresh every control after a state jump (template switch, preset, undo, open a design) */
 function afterLoad(){
   document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
-  layoutTemplates(); markLook(); markGrade(); fillForm(); renderSpeakers(); buildPhotoLib(); fillTune(); drawThumbs(); draw(); saveDraft(); store("last", state.tpl);
+  layoutTemplates(); markLook(); markGrade(); $("picker").hidden = state.theme!=="custom"; if(state.theme==="custom"){ hsv=rgb2hsv(...(fromHex(state.custom)||[125,196,250])); paintPicker(); } fillForm(); renderSpeakers(); buildPhotoLib(); fillTune(); drawThumbs(); draw(); saveDraft(); store("last", state.tpl);
 }
 
 /* ---------- stages ---------- */
@@ -515,11 +552,11 @@ function layoutTemplates(){
 }
 /* thumbnails: small (324 px), drawn a few per frame so clicks stay instant; only while stage 1 is open */
 let thumbGen = 0;
-function thumbKey(){ return [state.style,state.theme,state.grade,state.font].join("|"); }
+function thumbKey(){ return [state.style,state.theme,state.grade,state.font,state.titleFont,state.bodyFont,state.custom].join("|"); }
 function drawThumb(b){
   const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
   const dp = defaultPhoto(t.id); if (dp) { f.bgPhoto = TP.IMG["ph_"+dp]; f.grade = state.grade; }
-  TP.render(b.querySelector("canvas"), t, f, {style:state.style, theme:state.theme, font:state.font}, "square", {scale: 0.3});
+  const c=cfg(); delete c.motion; TP.render(b.querySelector("canvas"), t, f, c, "square", {scale: 0.3});
   b.dataset.key = thumbKey();
 }
 function drawThumbs(){
@@ -548,13 +585,14 @@ function buildLook(){
     (s.look==="bold" ? $("styles2") : $("styles")).append(b);
   }
   for (const [k,t] of Object.entries(TP.THEMES)){
+    if (k==="custom") continue;
     const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.theme=k;
     const i=document.createElement("i"); i.style.background = k==="show" ? "conic-gradient(#e9d3a6 0 20%,#5dff9e 0 40%,#FFB400 0 60%,#ff9a2e 0 80%,#cfd0d4 0)" : `linear-gradient(135deg, ${t.bg} 0 50%, ${t.accent} 50% 100%)`;
     b.append(i, document.createTextNode(t.name));
-    b.addEventListener("click",()=>{ if(state.theme===k) return; pushHistory(); state.theme=k; store("theme",k); markLook(); draw(); });
+    b.addEventListener("click",()=>{ if(state.theme===k) return; pushHistory(); state.theme=k; store("theme",k); $("picker").hidden=true; markLook(); draw(); });
     $("themes").append(b);
   }
-  document.querySelectorAll("[data-font]").forEach(b=>b.addEventListener("click",()=>{ if(state.font===b.dataset.font) return; pushHistory(); state.font=b.dataset.font; store("font",state.font); markLook(); draw(); }));
+  buildSwatches(); buildFonts();
   for (const [k,m] of Object.entries(TP.MOTIONS)){
     const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.motion=k; b.innerHTML=`${esc(m.name)}<small>${esc(m.note)}</small>`;
     b.addEventListener("click",()=>{ if(state.motion===k) return; pushHistory(); state.motion=k; store("motion",k); markLook(); if(!$("play").checked){ $("play").checked=true; startPlay(); } else playStart=performance.now(); });
@@ -564,8 +602,111 @@ function buildLook(){
 function markLook(){
   document.querySelectorAll("[data-style]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.style===state.style)));
   document.querySelectorAll("[data-theme]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.theme===state.theme)));
-  document.querySelectorAll("[data-font]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.font===state.font)));
+  document.querySelectorAll("[data-sw]").forEach(b=>b.setAttribute("aria-pressed", String(state.theme==="custom" && (b.dataset.sw===state.custom || (b.dataset.sw==="new" && !mySw.includes(state.custom))))));
+  markFonts();
   document.querySelectorAll("[data-motion]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.motion===state.motion)));
+}
+
+/* ---------- custom colour (George 10 Nov, pick A: the colour is the accent and block; background stays dark in its hue) ---------- */
+function hsv2rgb(h,s,v){ const f=(n)=>{ const k=(n+h/60)%6; return v - v*s*Math.max(0,Math.min(k,4-k,1)); }; return [f(5),f(3),f(1)].map(x=>Math.round(x*255)); }
+function rgb2hsv(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn; let h=0; if(d){ h = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; if(h<0) h+=360; } return [h, mx?d/mx:0, mx]; }
+const toHex=(r,g,b)=>"#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+const fromHex=(h)=>{ const m=/^#?([0-9a-f]{6}|[0-9a-f]{3})$/i.exec(String(h||"").trim()); if(!m) return null; let x=m[1]; if(x.length===3) x=x.split("").map(c=>c+c).join(""); const n=parseInt(x,16); return [n>>16&255,n>>8&255,n&255]; };
+function relLumC(r,g,b){ const f=c=>{ c/=255; return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4); }; return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b); }
+const cRatio=(a,b)=>(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+function hslHex(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1)); return toHex(...[f(0),f(8),f(4)].map(x=>Math.round(x*255))); }
+function themeFrom(hex){ const c=fromHex(hex)||[125,196,250]; const [h,s]=rgb2hsv(...c); const sat=Math.round(Math.min(60,s*100)); const L=relLumC(...c);
+  return { name:"My colour", bg:hslHex(h,sat,6), bg2:hslHex(h,sat,15), ink:"#ffffff", sub:hslHex(h,Math.min(sat,30),86), accent:toHex(...c), block:toHex(...c), blockInk: cRatio(L,1)>=cRatio(L,0) ? "#ffffff" : "#111111" }; }
+let customFor="";
+function applyCustom(){ if (customFor!==state.custom){ TP.THEMES.custom = themeFrom(state.custom); customFor=state.custom; } }
+let mySw = (load("swatches")||[]).filter(x=>fromHex(x)).slice(0,8);
+let hsv=[205,0.5,0.98];
+function buildSwatches(){
+  document.querySelectorAll("[data-sw]").forEach(b=>b.remove());
+  const mk=(key,label,bg)=>{ const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.sw=key; const i=document.createElement("i"); i.style.background=bg; b.append(i, document.createTextNode(label));
+    b.addEventListener("click",()=>{ pushHistory(); if(key!=="new"){ state.custom=key; } state.theme="custom"; store("theme","custom"); store("custom",state.custom); hsv=rgb2hsv(...fromHex(state.custom)); $("picker").hidden=false; paintPicker(); markLook(); draw(); drawThumbs(); }); $("themes").append(b); };
+  for (const h of mySw) mk(h, h, h);
+  mk("new", "＋ Custom colour", "conic-gradient(red,yellow,lime,cyan,blue,magenta,red)");
+}
+function paintPicker(pushHex){
+  const c=fromHex(state.custom); $("swatch").style.background=state.custom; if(pushHex!==false) $("hex").value=state.custom;
+  $("sv").style.backgroundColor=toHex(...hsv2rgb(hsv[0],1,1)); $("svDot").style.left=(hsv[1]*100)+"%"; $("svDot").style.top=((1-hsv[2])*100)+"%"; $("hue").value=Math.round(hsv[0]);
+  $("sv").setAttribute("aria-valuetext", `${state.custom}, saturation ${Math.round(hsv[1]*100)}%, brightness ${Math.round(hsv[2]*100)}%`);
+  const t=themeFrom(state.custom), L=relLumC(...c), onBg=cRatio(L, relLumC(...fromHex(t.bg))), onBlock=cRatio(L, t.blockInk==="#ffffff"?1:0);
+  $("contrast").innerHTML = `<span class="${onBg>=3?"ok":"bad"}">${onBg>=3?"✓":"⚠"} Colour on the dark background ${onBg.toFixed(1)} : 1</span> · <span class="ok">✓ ${t.blockInk==="#ffffff"?"White":"Black"} text on blocks ${onBlock.toFixed(1)} : 1</span>` + (onBg<3 ? `<br><span class="bad">Too dark to stand out as an accent: pick a lighter colour.</span>` : "");
+  $("delSw").hidden = !mySw.includes(state.custom);
+}
+function setCustomFromHsv(push){ state.custom=toHex(...hsv2rgb(...hsv)); state.theme="custom"; store("custom",state.custom); store("theme","custom"); paintPicker(push); markLook(); queueDraw(); }
+(function picker(){ const el=$("sv"); let down=false;
+  const set=(e)=>{ const r=el.getBoundingClientRect(); hsv[1]=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); hsv[2]=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); setCustomFromHsv(); };
+  el.addEventListener("pointerdown",e=>{ pushHistory(); down=true; el.setPointerCapture(e.pointerId); set(e); }); el.addEventListener("pointermove",e=>{ if(down) set(e); }); el.addEventListener("pointerup",()=>{ down=false; drawThumbs(); });
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[-.03,0],ArrowRight:[.03,0],ArrowUp:[0,.03],ArrowDown:[0,-.03]}[e.key]; if(!k) return; e.preventDefault(); pushHistory(true); hsv[1]=Math.min(1,Math.max(0,hsv[1]+k[0])); hsv[2]=Math.min(1,Math.max(0,hsv[2]+k[1])); setCustomFromHsv(); });
+  $("hue").addEventListener("input",()=>{ pushHistory(true); hsv[0]=+$("hue").value; setCustomFromHsv(); });
+  $("hue").addEventListener("change",drawThumbs);
+  $("hex").addEventListener("input",()=>{ const c=fromHex($("hex").value); if(!c) return; pushHistory(true); hsv=rgb2hsv(...c); state.custom=toHex(...c); state.theme="custom"; store("custom",state.custom); paintPicker(false); markLook(); queueDraw(); });
+  $("hex").addEventListener("change",()=>{ $("hex").value=state.custom; drawThumbs(); });
+  $("copyHex").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(state.custom); $("copyHex").textContent="Copied ✓"; }catch(e){ $("hex").select(); $("copyHex").textContent="Ctrl+C"; } setTimeout(()=>$("copyHex").textContent="Copy",1800); });
+  $("saveSw").addEventListener("click",()=>{ if(!mySw.includes(state.custom)) mySw.unshift(state.custom); mySw=mySw.slice(0,8); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
+  $("delSw").addEventListener("click",()=>{ mySw=mySw.filter(x=>x!==state.custom); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
+})();
+
+/* ---------- fonts (pick A: added and uploaded fonts stay in this browser) ---------- */
+const FONTS = [
+  ["ZFT Slant","",800,"title","One slanted face for every show"],["Show's own font","",800,"title","Each series keeps its type"],
+  ["Anton","Anton",400,"title","Tall and loud"],["Bebas Neue","Bebas Neue",400,"title","Clean caps"],["Archivo Black","Archivo Black",400,"title","Heavy, wide"],
+  ["Montserrat","Montserrat",900,"title","Geometric black"],["Poppins","Poppins",800,"both","Round and friendly"],["Oswald","Oswald",700,"title","Condensed"],["Russo One","Russo One",400,"title","Sporty, techy"],
+  ["Unbounded","Unbounded",800,"title","Wide and modern"],["Bricolage Grotesque","Bricolage Grotesque",800,"title","Editorial character"],["Space Grotesk","Space Grotesk",700,"both","Tech and data"],["Playfair Display","Playfair Display",900,"title","Classy serif"],
+  ["DM Sans","",700,"body","The usual body text"],["Inter","Inter",700,"body","Very readable"],["Manrope","Manrope",700,"body","Soft, modern"],["Plus Jakarta Sans","Plus Jakarta Sans",800,"both","The tool's own"],["Work Sans","Work Sans",700,"body","Plain and clear"],["IBM Plex Sans","IBM Plex Sans",700,"body","Serious, technical"],
+];
+const CURATED = new Set(FONTS.map(f=>f[1]).filter(Boolean));
+let extraFonts = [];          // [label, family, weight, "both", note]
+let ffFor = "title";
+const safeFont = (n)=>String(n||"").replace(/[^A-Za-z0-9 _-]/g,"").trim().slice(0,40);
+function googleLink(name){ const id="gf-"+name.replace(/ /g,"_"); if(document.getElementById(id)) return Promise.resolve(true);
+  const l=document.createElement("link"); l.id=id; l.rel="stylesheet"; l.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,"+")}:wght@400;700;800&display=swap`;
+  return new Promise(r=>{ l.onload=()=>r(true); l.onerror=()=>{ l.remove(); r(false); }; document.head.append(l); setTimeout(()=>r(false),8000); }); }
+async function ensureFont(name, w){ name=safeFont(name); if(!name) return true;
+  if (!CURATED.has(name) && !name.startsWith("Mine ")) await googleLink(name);
+  try{ const f=await document.fonts.load(`${w||700} 40px "${name}"`); return f.length>0; }catch(e){ return false; } }
+function buildFonts(){ const box=$("fonts"); box.textContent="";
+  for (const [label,fam,w,use,note] of FONTS.concat(extraFonts)) {
+    if (ffFor==="title" && use==="body") continue; if (ffFor==="body" && (use==="title")) continue;
+    const b=document.createElement("button"); b.type="button"; b.className="fontbtn"; b.dataset.fam=fam; b.dataset.label=label;
+    const sp=document.createElement("span"); sp.textContent = ffFor==="title" ? "THE HUNT" : "Learn the setup";
+    sp.style.fontFamily = fam ? `"${fam}", sans-serif` : (label==="ZFT Slant" ? '"Archivo Black", sans-serif' : label==="DM Sans" ? '"DM Sans", sans-serif' : 'Anton, sans-serif'); sp.style.fontWeight=w; if(label==="ZFT Slant") sp.style.fontStyle="italic";
+    const sm=document.createElement("small"); sm.textContent=`${label} · ${note}`; b.append(sp,sm); b.setAttribute("aria-label", `${label}: ${note}`);
+    b.addEventListener("click", async ()=>{ pushHistory(); if (fam) await ensureFont(fam, w);
+      if (ffFor==="title"){ state.titleFont=fam; state.titleWeight=w; if(label==="ZFT Slant") state.font="signature"; if(label==="Show's own font") state.font="show"; store("titleFont",state.titleFont); store("titleWeight",w); store("font",state.font); }
+      else { state.bodyFont=fam; store("bodyFont",fam); }
+      markLook(); draw(); drawThumbs(); });
+    box.append(b); }
+  markFonts(); }
+function markFonts(){ document.querySelectorAll(".fontbtn").forEach(b=>{ const fam=b.dataset.fam, label=b.dataset.label; let on;
+  if (ffFor==="body") on = (state.bodyFont||"")===fam; else on = fam ? state.titleFont===fam : (!state.titleFont && ((label==="ZFT Slant"&&state.font==="signature")||(label==="Show's own font"&&state.font==="show")));
+  b.setAttribute("aria-pressed", String(on)); }); }
+document.querySelectorAll("[data-ff]").forEach(b=>b.addEventListener("click",()=>{ ffFor=b.dataset.ff; document.querySelectorAll("[data-ff]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); buildFonts(); }));
+$("gfAdd").addEventListener("click", async ()=>{ const name=safeFont($("gfName").value); const note=$("fontNote"); if(!name){ note.textContent="Type a font name from fonts.google.com."; return; }
+  note.textContent=`Loading ${name}…`; const ok = await googleLink(name); let loaded=false; if(ok){ try{ loaded=(await document.fonts.load(`700 40px "${name}"`)).length>0; }catch(e){} }
+  if(!loaded){ note.textContent=`Couldn't find “${name}” on Google Fonts. Check the spelling on fonts.google.com.`; return; }
+  if (!extraFonts.some(f=>f[1]===name)) extraFonts.unshift([name,name,700,"both","Added from Google Fonts"]);
+  const list=(load("gfonts")||[]).filter(x=>x!==name); list.unshift(name); store("gfonts", list.slice(0,12));
+  note.textContent=`Added ${name}. It's at the top of the list.`; $("gfName").value=""; buildFonts(); });
+$("upBtn").addEventListener("click",()=>$("upFile").click());
+/* uploaded fonts live in this browser's IndexedDB */
+function fontDB(){ return new Promise((res)=>{ try{ const r=indexedDB.open("trpm-fonts",1); r.onupgradeneeded=()=>r.result.createObjectStore("f"); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }catch(e){ res(null); } }); }
+async function fontPut(name, buf){ const db=await fontDB(); if(!db) return; await new Promise(r=>{ const t=db.transaction("f","readwrite"); t.objectStore("f").put(buf,name); t.oncomplete=r; t.onerror=r; }); }
+async function fontAll(){ const db=await fontDB(); if(!db) return []; return new Promise(r=>{ const out=[]; const t=db.transaction("f"); const c=t.objectStore("f").openCursor(); c.onsuccess=()=>{ const k=c.result; if(k){ out.push([k.key,k.value]); k.continue(); } else r(out); }; c.onerror=()=>r(out); }); }
+async function addFontFace(name, buf){ try{ const ff=new FontFace(name, buf); await ff.load(); document.fonts.add(ff); if(!extraFonts.some(f=>f[1]===name)) extraFonts.unshift([name.replace(/^Mine /,""),name,400,"both","Uploaded (this browser)"]); return true; }catch(e){ return false; } }
+$("upFile").addEventListener("change", async (e)=>{ const file=e.target.files[0]; e.target.value=""; if(!file) return; const note=$("fontNote");
+  if (file.size>5*1048576){ note.textContent="That font file is over 5 MB."; return; }
+  const name=safeFont("Mine "+file.name.replace(/\.[^.]+$/,"")); const buf=await file.arrayBuffer();
+  if (await addFontFace(name, buf)){ await fontPut(name, buf); note.textContent=`Added ${file.name}. Only use fonts you own or that are free.`; buildFonts(); }
+  else note.textContent="That file isn't a font this browser can read. Try .ttf, .otf or .woff2."; });
+async function restoreFonts(){
+  for (const n of (load("gfonts")||[]).map(safeFont).filter(Boolean)) if (!extraFonts.some(f=>f[1]===n)) extraFonts.push([n,n,700,"both","Added from Google Fonts"]);
+  for (const [n,buf] of await fontAll()) await addFontFace(n, buf);
+  await Promise.all(extraFonts.filter(f=>!f[1].startsWith("Mine ")).map(f=>googleLink(f[1])));
+  await ensureFont(state.titleFont, state.titleWeight); await ensureFont(state.bodyFont, 700);
 }
 
 /* ---------- details ---------- */
@@ -611,17 +752,30 @@ function buildPhotoLib(){
   if (all.length > list.length || showAllPhotos){ const m=document.createElement("button"); m.type="button"; m.className="btn"; m.style.gridColumn="1/-1"; m.textContent = showAllPhotos ? "Show fewer photos ▴" : `All photos (${all.length}) ▾`; m.addEventListener("click",()=>{ showAllPhotos=!showAllPhotos; buildPhotoLib(); }); lib.append(m); }
   $("bgClear").hidden = !(state.bgPhoto || state.photoKey);
   const src = state.bgPhoto ? state.bgPhoto.src : (state.photoKey ? ASSETS["ph_"+state.photoKey] : "");
-  $("focusSec").hidden = !src; if (src && $("focusImg").src !== src) $("focusImg").src = src; placeDot();
+  $("focusSec").hidden = !src; drawCrop();
 }
-function placeDot(){ const fx = state.f.focusX ?? 0.5, fy = state.f.focusY ?? 0.45; const d=$("focusDot"); d.style.left=(fx*100)+"%"; d.style.top=(fy*100)+"%"; $("focusBox").setAttribute("aria-valuetext", `${Math.round(fx*100)}% across, ${Math.round(fy*100)}% down`); }
-(function focusDrag(){
-  const box=$("focusBox"); let down=false;
-  const set=(e)=>{ const r=box.getBoundingClientRect(); state.f.focusX=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); state.f.focusY=Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); placeDot(); queueDraw(); };
-  box.addEventListener("pointerdown",(e)=>{ pushHistory(); down=true; box.setPointerCapture(e.pointerId); set(e); });
-  box.addEventListener("pointermove",(e)=>{ if(down) set(e); });
-  box.addEventListener("pointerup",()=>{ down=false; });
-  box.addEventListener("keydown",(e)=>{ const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!k) return; e.preventDefault(); pushHistory(true); state.f.focusX=Math.min(1,Math.max(0,(state.f.focusX??0.5)+k[0]*0.05)); state.f.focusY=Math.min(1,Math.max(0,(state.f.focusY??0.45)+k[1]*0.05)); placeDot(); queueDraw(); });
-  $("focusReset").addEventListener("click",()=>{ pushHistory(); delete state.f.focusX; delete state.f.focusY; placeDot(); draw(); });
+/* profile-picture framing: the frame is the poster's shape; drag pans (focusX/Y), wheel/pinch/slider zoom (photoZoom 1–3×) */
+function cropPhoto(){ return state.bgPhoto || (state.photoKey ? TP.IMG["ph_"+state.photoKey] : null); }
+function drawCrop(){ const img=cropPhoto(), cc=$("cropC"); if(!img || $("focusSec").hidden) return;
+  const S=TP.SIZES[state.size], k=Math.min(Math.min(340, $("focusSec").clientWidth||340)/S.w, 360/S.h); const cw=Math.round(S.w*k), ch=Math.round(S.h*k);
+  const box=$("crop"); box.style.width=cw+"px"; box.style.height=ch+"px"; const W=Math.round(cw*2), H=Math.round(ch*2); if(cc.width!==W||cc.height!==H){ cc.width=W; cc.height=H; }
+  const x=cc.getContext("2d"), z=1.02*(state.f.photoZoom||1), sc=Math.max(W/img.width, H/img.height)*z, iw=img.width*sc, ih=img.height*sc;
+  x.clearRect(0,0,W,H); x.drawImage(img, (W-iw)*(state.f.focusX??0.5), (H-ih)*(state.f.focusY??0.45), iw, ih);
+  const zp=Math.round((state.f.photoZoom||1)*100); $("cropZoom").value=zp; $("cropNote").textContent=`Zoom ${zp}%`; box.setAttribute("aria-valuetext", `Zoom ${zp}%`); }
+function cropPan(dx,dy){ const img=cropPhoto(); if(!img) return; const cc=$("cropC"), W=cc.width, H=cc.height, z=1.02*(state.f.photoZoom||1), sc=Math.max(W/img.width,H/img.height)*z, iw=img.width*sc, ih=img.height*sc, k=W/cc.clientWidth;
+  if(iw>W+0.5) state.f.focusX=Math.min(1,Math.max(0,(state.f.focusX??0.5) - dx*k/(iw-W))); if(ih>H+0.5) state.f.focusY=Math.min(1,Math.max(0,(state.f.focusY??0.45) - dy*k/(ih-H))); drawCrop(); queueDraw(); }
+function cropZoom(z){ state.f.photoZoom=Math.min(3,Math.max(1,Math.round(z*100)/100)); if(state.f.photoZoom===1) delete state.f.photoZoom; drawCrop(); fillTune(); queueDraw(); }
+(function cropFrame(){ const el=$("crop"), pts=new Map(); let pinch=0, pz=1;
+  el.addEventListener("pointerdown",e=>{ pushHistory(); el.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(pts.size===2){ const [a,b]=[...pts.values()]; pinch=Math.hypot(a.x-b.x,a.y-b.y); pz=state.f.photoZoom||1; } });
+  el.addEventListener("pointermove",e=>{ const p=pts.get(e.pointerId); if(!p) return; const n={x:e.clientX,y:e.clientY};
+    if(pts.size===2){ pts.set(e.pointerId,n); const [a,b]=[...pts.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch) cropZoom(pz*d/pinch); }
+    else { cropPan(n.x-p.x, n.y-p.y); pts.set(e.pointerId,n); } });
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=0; }; el.addEventListener("pointerup",up); el.addEventListener("pointercancel",up);
+  el.addEventListener("wheel",e=>{ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)*Math.exp(-e.deltaY*0.0015)); },{passive:false});
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[12,0],ArrowRight:[-12,0],ArrowUp:[0,12],ArrowDown:[0,-12]}[e.key];
+    if(k){ e.preventDefault(); pushHistory(true); cropPan(...k); } else if(e.key==="+"||e.key==="="){ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)*1.1); } else if(e.key==="-"){ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)/1.1); } });
+  $("cropZoom").addEventListener("input",()=>{ pushHistory(true); cropZoom(+$("cropZoom").value/100); });
+  $("focusReset").addEventListener("click",()=>{ pushHistory(); delete state.f.focusX; delete state.f.focusY; delete state.f.photoZoom; drawCrop(); fillTune(); draw(); });
 })();
 function markGrade(){ document.querySelectorAll("[data-grade]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.grade===state.grade))); }
 document.querySelectorAll("[data-grade]").forEach(b=>b.addEventListener("click",()=>{ if(state.grade===b.dataset.grade) return; pushHistory(); state.grade=b.dataset.grade; store("grade",state.grade); markGrade(); draw(); }));
@@ -665,14 +819,14 @@ function fillTune(){
   $("photoZoom").disabled = !(state.bgPhoto || state.photoKey);
 }
 $("titleScale").addEventListener("input",()=>{ pushHistory(true); state.f.titleScale=+$("titleScale").value/100; $("titleScaleV").textContent=$("titleScale").value+"%"; queueDraw(); });
-$("photoZoom").addEventListener("input",()=>{ pushHistory(true); state.f.photoZoom=+$("photoZoom").value/100; $("photoZoomV").textContent=$("photoZoom").value+"%"; queueDraw(); });
+$("photoZoom").addEventListener("input",()=>{ pushHistory(true); state.f.photoZoom=+$("photoZoom").value/100; $("photoZoomV").textContent=$("photoZoom").value+"%"; drawCrop(); queueDraw(); });
 $("tuneReset").addEventListener("click",()=>{ pushHistory(); delete state.f.titleScale; delete state.f.photoZoom; state.motion="classic"; markLook(); fillTune(); draw(); });
 
 /* ---------- sizes + preview ---------- */
 function buildSizes(){
   for (const [k,s] of Object.entries(TP.SIZES)){
     const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.size=k; b.innerHTML=`${esc(s.label)}<small>${esc(s.sub)}</small>`;
-    b.addEventListener("click",()=>{ state.size=k; store("size",k); markSize(); draw(); });
+    b.addEventListener("click",()=>{ state.size=k; store("size",k); markSize(); draw(); drawCrop(); });
     $("sizes").append(b);
   }
 }
@@ -848,7 +1002,7 @@ $("mkVid").addEventListener("click", async ()=>{
 /* ---------- saved designs + team history ---------- */
 const LOCAL_KEY="designs";
 function defaultName(){ const t=byId[state.tpl]; return t.name.replace(/^The /,"") + (state.f.date ? " – "+shortDate(state.f.date) : ""); }
-function designData(){ return {tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.bgPhoto?"":state.photoKey, size:state.size, f: JSON.parse(JSON.stringify(state.f,(k,v)=>k==="_img"?undefined:v))}; }
+function designData(){ return {custom:state.custom, titleFont:state.titleFont, titleWeight:state.titleWeight, bodyFont:state.bodyFont, tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.bgPhoto?"":state.photoKey, size:state.size, f: JSON.parse(JSON.stringify(state.f,(k,v)=>k==="_img"?undefined:v))}; }
 function cleanDesign(d){
   if (!d || typeof d!=="object" || !byId[d.tpl]) return null;
   const s=(v,n)=>typeof v==="string"?v.slice(0,n):"", n=(v,lo,hi)=>typeof v==="number"&&isFinite(v)?Math.min(hi,Math.max(lo,v)):undefined;
@@ -856,14 +1010,16 @@ function cleanDesign(d){
   for (const [k,m] of Object.entries({title:80,kicker:60,topic:220,where:60,channel:60,cta:80,link:200,partner:40,photoKey:40})) if (k in f0) f[k]=s(f0[k],m);
   for (const k of ["date","time","endTime"]) f[k]= /^[\d:-]{5,10}$/.test(f0[k]||"") ? f0[k] : "";
   f.live=!!f0.live;
-  for (const [k,lo,hi] of [["titleScale",0.7,1.3],["photoZoom",1,1.6],["focusX",0,1],["focusY",0,1]]){ const v=n(f0[k],lo,hi); if(v!==undefined) f[k]=v; }
+  for (const [k,lo,hi] of [["titleScale",0.7,1.3],["photoZoom",1,3],["focusX",0,1],["focusY",0,1]]){ const v=n(f0[k],lo,hi); if(v!==undefined) f[k]=v; }
   f.speakers = Array.isArray(f0.speakers) ? f0.speakers.slice(0,3).filter(x=>x&&typeof x==="object").map(x=>{ const o={name:s(x.name,40), role:s(x.role,40)}; const z=n(x.zoom,1,2); if(z!==undefined) o.zoom=z; return o; }) : [];
   if (f.partner && !PARTNERS.includes(f.partner)) f.partner="";
-  return {tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
+  const fname=(v)=>typeof v==="string" && /^[A-Za-z0-9 _-]{0,40}$/.test(v) ? v : "";
+  return {custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
 }
 function openDesign(d0){
   const d=cleanDesign(d0); if (!d){ $("status").textContent="That design couldn't be opened."; return; } pushHistory();
-  Object.assign(state, {tpl:d.tpl, style:TP.STYLES[d.style]?d.style:"signature", theme:TP.THEMES[d.theme]?d.theme:"show", font:d.font||"signature", motion:TP.MOTIONS[d.motion]?d.motion:"classic", grade:d.grade||"zft", photoKey:d.photoKey||"", bgPhoto:null});
+  if (d.custom) state.custom=d.custom; state.titleFont=d.titleFont; state.titleWeight=d.titleWeight; state.bodyFont=d.bodyFont; ensureFont(d.titleFont, d.titleWeight).then(()=>ensureFont(d.bodyFont, 700)).then(()=>{ draw(); drawThumbs(); });
+  Object.assign(state, {tpl:d.tpl, style:TP.STYLES[d.style]?d.style:"signature", theme:(TP.THEMES[d.theme]||d.theme==="custom")?d.theme:"show", font:d.font||"signature", motion:TP.MOTIONS[d.motion]?d.motion:"classic", grade:d.grade||"zft", photoKey:d.photoKey||"", bgPhoto:null});
   if (TP.SIZES[d.size]) { state.size=d.size; markSize(); }
   state.f = Object.assign(freshFields(d.tpl), d.f);
   afterLoad(); capEdited=false; $("caption").value="";
@@ -1074,7 +1230,7 @@ function endTour(markDone){
 }
 function maybeAutoTour(){ const done = (ZT && ZT.tourDone) || !!load("tourDone2"); if (!done) setTimeout(startTour, 600); }
 $("tourBtn").addEventListener("click", startTour);
-let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(()=>{ draw(); fitScrollPadding(); }, 150); });
+let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(()=>{ draw(); fitScrollPadding(); drawCrop(); }, 150); });
 
 /* ---------- boot ---------- */
 (async()=>{
@@ -1082,6 +1238,9 @@ let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeou
   state.style = load("style") || "signature"; if(!TP.STYLES[state.style]) state.style="signature";
   state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
   state.font = load("font") || "signature"; if(!["signature","show"].includes(state.font)) state.font="signature";
+  state.custom = fromHex(load("custom")) ? toHex(...fromHex(load("custom"))) : "#7DC4FA";
+  state.titleFont = safeFont(load("titleFont")); state.titleWeight = [400,700,800,900].includes(load("titleWeight")) ? load("titleWeight") : 800; state.bodyFont = safeFont(load("bodyFont"));
+  state.theme = load("theme")==="custom" ? "custom" : state.theme;
   state.motion = load("motion") || "classic"; if(!TP.MOTIONS[state.motion]) state.motion="classic";
   state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
   state.grade = load("grade") || "zft"; markSize(); markCap();
@@ -1089,7 +1248,7 @@ let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeou
   state.tpl = (byId[last] && !hidden.has(last)) ? last : visibleTemplates()[0].id; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
   state.photoKey = state.f.photoKey !== undefined ? state.f.photoKey : defaultPhoto(state.tpl);
   buildPresets(); goStage(0, false);
-  await TP.loadFonts(); await TP.loadAssets(ASSETS);
+  await TP.loadFonts(); await TP.loadAssets(ASSETS); await restoreFonts(); buildFonts();
   afterLoad(); markUndo(); markAttach();
   if (/[?&]fb=connected/.test(location.search)){ history.replaceState(null, "", location.pathname); visited.add(1).add(2).add(3).add(4); goStage(5); $("status").textContent="Facebook connected. Press “Post to the TR Facebook Page…” again."; }
   else maybeAutoTour();
