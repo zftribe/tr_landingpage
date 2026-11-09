@@ -256,7 +256,7 @@ function renderRates() {
   }
   $('#rates').innerHTML = html || '<p class="no-picks">No rates match these filters.</p>';
   const hidden = ROWS.filter((r) => r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin)).length;
-  $('#ratesFoot').innerHTML = S.view === 'basic' && hidden ? `Basic view hides ${hidden} rows: VIP-only offers, tiny-cap teasers, BTC/ETH earn, and products that only show a rate inside their app. <a href="#" data-goadv>Switch to Advanced</a> to see them.` : '';
+  $('#ratesFoot').innerHTML = S.view === 'basic' && hidden ? `Basic view hides ${hidden} rows: VIP-only offers, tiny-cap teasers, and products that only show a rate inside their app. <a href="#" data-goadv>Switch to Advanced</a> to see them.` : '';
 }
 
 /* ── finder (tech tree) ───────────────────── */

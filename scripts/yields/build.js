@@ -48,7 +48,7 @@ for (const { f, rows: list } of sources) {
     if (/\bvip\b/i.test(elig)) r.vipOnly = true
     if (/new[- ]user|first[- ]time/i.test(elig + ' ' + (r.product || ''))) r.newUsersOnly = true
     if (r.rate != null && r.rate > 30) r.teaser = true // tiny-cap headline offers: listed, never ranked
-    if (r.category === 'cex' && /^(usde|fdusd|dai|pyusd|usds|tusd|usdd)$/i.test(r.currency || '')) continue // George 9 Nov: stablecoins = USDT, USDC, USDG only
+    if (r.category === 'cex' && !/^(usdt|usdc|usdg)$/i.test(r.currency || '')) continue // George 9 Nov: crypto = USDT, USDC, USDG only (no other stablecoins, no BTC/ETH)
     if (r.category === 'cex') r.stablecoin = /^(usdt|usdc|usdg)$/i.test(r.currency || '')
     if (r.vipOnly || r.newUsersOnly) r.strings = r.strings ?? true
     if (r.strings == null) r.strings = STRINGS.test(`${r.conditions || ''}`) && !/^none|no (special )?conditions/i.test(r.conditions || '')
