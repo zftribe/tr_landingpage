@@ -1,0 +1,59 @@
+{
+ "tax": {
+  "ratePeso": 20,
+  "rateFcdu": 20,
+  "summary": "Interest on bank deposits is taxed at a flat 20%, taken by the bank before you are paid (Section 24(B)(1) of the Tax Code, as amended by RA 12214, effective 1 July 2025). The law says 'any currency bank deposit', so peso and dollar deposits are both covered, and licensed digital banks are covered the same way. Long-term (5+ year) deposits are no longer tax-free for new deposits; only deposits placed before 1 July 2025 keep their old rate until they mature.",
+  "longTermExemption": "Before 1 July 2025, interest on deposits kept 5 years or more was tax-free, and 3 to 5 year deposits paid a lower tax (5% to 12%). Under CMEPA (RA 12214) interest on any bank deposit for individuals is taxed a flat 20%, whatever the term. Deposits placed before 1 July 2025 keep their old rate until they mature (Section 28, transitory provision). New deposits and renewals get no long-term exemption.",
+  "exemptions": [
+   {
+    "what": "Pag-IBIG MP2 dividends",
+    "why": "DOF says savings in Pag-IBIG, SSS and GSIS programs such as MP2 remain tax-free; they are not bank deposits.",
+    "source": "https://www.dof.gov.ph/dof-calls-out-fake-news-cmepa-does-not-impose-a-new-tax-instead-corrects-an-unfair-system-that-favors-the-wealthy/"
+   },
+   {
+    "what": "Deposits placed before 1 July 2025 (grandfathered until maturity)",
+    "why": "RA 12214 Section 28: exemptions and lower rates on instruments issued before 1 July 2025 stay until the agreement matures.",
+    "source": "https://lawphil.net/statutes/repacts/ra2025/ra_12214_2025.html"
+   },
+   {
+    "what": "Project-specific government bonds (interest)",
+    "why": "RA 12214 adds Sec 32(B)(7)(g): interest on government bonds funding priority national programs, as set by the Finance Secretary, is excluded from income. Not a bank deposit.",
+    "source": "https://lawphil.net/statutes/repacts/ra2025/ra_12214_2025.html"
+   }
+  ],
+  "sources": [
+   {
+    "name": "RA 12214 (CMEPA) text",
+    "url": "https://lawphil.net/statutes/repacts/ra2025/ra_12214_2025.html"
+   },
+   {
+    "name": "BIR RR 21-2025 digest",
+    "url": "https://bir-cdn.bir.gov.ph/BIR/pdf/RR%20No.%2021-2025%20Digest.pdf"
+   },
+   {
+    "name": "DOF on CMEPA",
+    "url": "https://www.dof.gov.ph/dof-calls-out-fake-news-cmepa-does-not-impose-a-new-tax-instead-corrects-an-unfair-system-that-favors-the-wealthy/"
+   }
+  ]
+ },
+ "pdic": {
+  "maxCover": 1000000,
+  "since": "2025-03-15",
+  "source": "https://www.pdic.gov.ph/mdic",
+  "summary": "PDIC insures deposits in member banks up to ₱1,000,000 per depositor, per bank (since 15 March 2025). Crypto, e-wallet balances held outside a bank, and Pag-IBIG MP2 are not bank deposits, so PDIC does not cover them."
+ },
+ "inflation": {
+  "value": 7.8,
+  "month": "2026-10",
+  "label": "October 2026",
+  "source": "https://www.bsp.gov.ph/SitePages/Default.aspx",
+  "checkedOn": "2026-11-09",
+  "note": "Read on the BSP home page (Key Rates). PSA site blocks automated access."
+ },
+ "policyRate": {
+  "value": 5.5,
+  "asOf": "2026-11-06",
+  "source": "https://www.bsp.gov.ph/SitePages/Default.aspx",
+  "note": "BSP Target RRP Rate, raised 50 bp at the latest Monetary Board meeting."
+ }
+}
