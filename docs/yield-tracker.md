@@ -40,6 +40,9 @@ conditions, finePrint, pdic, taxExempt, taxNote, source (official URL), checkedO
 
 The build adds: `id`, `strings` (must do something to earn it), `vipOnly`, `newUsersOnly`, `teaser` (rate over 30%: listed, never ranked), `stablecoin`, `cons` (crypto), `history`.
 
+## Stablecoins
+Only **USDT, USDC and USDG** (George, 9 Nov 2026). The build drops other stablecoins (USDe, FDUSD, DAI, PYUSD…). BTC/ETH earn stays in Advanced view. DeFi (Kamino, Jupiter) lists the same three.
+
 ## Rules for every rate
 1. **Official sources only:** the bank's or exchange's own page, its public API, or its official announcement. Rules come from BIR, PDIC, BSP and PSA. Never a blog or comparison site. Search results can lead you to the official page; they are not the source.
 2. **Nothing invented.** If a rate is only in the app or the page can't be read, keep the row with `rate: null, verified: false` and say why in `note`.

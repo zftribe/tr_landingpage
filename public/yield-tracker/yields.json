@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-09T00:25:36.594Z",
+ "generated": "2026-11-09T06:11:17.326Z",
  "checked": {
   "ph": "2026-11-09",
   "crypto": "2026-11-09"
@@ -4634,42 +4634,6 @@
     {
      "d": "2026-11-09",
      "r": 1.83
-    }
-   ]
-  },
-  {
-   "provider": "Gate",
-   "product": "Simple Earn - USDE flexible",
-   "category": "cex",
-   "currency": "USDE",
-   "rate": 5.25,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Flexible lending rate, redeem any time.",
-   "finePrint": "Rates change hourly. est_rate is Gate's estimated annual rate. Interest paid in the same coin.",
-   "source": "https://api.gateio.ws/api/v4/earn/uni/rate",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "est_rate \"0.0525\" for USDE",
-   "note": "est_rate is a decimal, see USDT row.",
-   "id": "gate-simple-earn-usde-flexible",
-   "stablecoin": true,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Not among the 10 platforms named in the Aug 2025 advisory (article read; Gate not mentioned). A later SEC list reported 25 Aug 2025 added Blofin, CoinW, DigiFinex, LBank and Pionex; I did not read it in full, so a later naming cannot be ruled out. Gate's own promo terms also say the UK and some other regions are restricted.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 5.25
     }
    ]
   },

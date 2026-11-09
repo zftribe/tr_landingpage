@@ -11,13 +11,13 @@ const PH_CATS = ['traditional', 'digital', 'ewallet', 'government'];
 const CAT_LABEL = { traditional: 'Banks', digital: 'Digital banks', ewallet: 'E-wallets', government: 'Government', cex: 'Crypto exchanges', dex: 'DeFi · Kamino + Jupiter (live)' };
 const CAT_NOTE = {
   cex: 'Paid in the coin you deposit. Not a bank deposit and not PDIC-insured. Rates change often, sometimes daily. Rules differ by country: check with your local regulator (in the Philippines, the SEC) that an exchange is allowed where you live. Adults (18+) only.',
-  dex: 'Kamino (its lending markets and curated vaults) and Jupiter Lend on Solana. USDC and USDT only, pools over $2M. Live from DefiLlama, so rates move every hour. Curated vaults are run by outside managers, not Kamino or us. Smart-contract risk: you could lose some or all of your money. No insurance and no support desk. Adults (18+) only.',
+  dex: 'Kamino (its lending markets and curated vaults) and Jupiter Lend on Solana. USDT, USDC and USDG only, pools over $2M. Live from DefiLlama, so rates move every hour. Curated vaults are run by outside managers, not Kamino or us. Smart-contract risk: you could lose some or all of your money. No insurance and no support desk. Adults (18+) only.',
   government: 'Not a bank deposit and not PDIC-insured. The rate is last year’s dividend (7.12% for 2025), not a promise. Money is locked for 5 years. Tax-free.',
 };
 const ORDER = ['digital', 'ewallet', 'traditional', 'government', 'cex', 'dex'];
 const LOGOS = { gcash: 'gcash', maribank: 'maribank', gotyme: 'gotyme', maya: 'maya', cimb: 'cimb', ownbank: 'ownbank', uniondigital: 'uniondigital', 'uno ': 'uno', tonik: 'tonik', ofbank: 'ofbank', 'overseas filipino': 'ofbank', netbank: 'netbank', komo: 'komo', diskartech: 'diskartech', bpi: 'bpi', metrobank: 'metrobank', rcbc: 'rcbc', 'security bank': 'securitybank', landbank: 'landbank', dbp: 'dbp', 'development bank': 'dbp', pnb: 'pnb', 'philippine national': 'pnb', psbank: 'psbank', bdo: 'bdo', eastwest: 'eastwest', unionbank: 'unionbank', aub: 'aub', 'asia united': 'aub', 'china bank': 'chinabank', 'pag-ibig': 'pagibig', okx: 'okx', bybit: 'bybit', bitget: 'bitget', mexc: 'mexc', gate: 'gate', kamino: 'kamino', jupiter: 'jupiter' };
 // DeFi: Kamino (its lend markets and curated vaults) and Jupiter Lend on Solana, stablecoins only (George, 9 Nov).
-const DEFI = { projects: { 'kamino-lend': ['Kamino', 'https://app.kamino.finance/'], 'jupiter-lend': ['Jupiter', 'https://jup.ag/lend'] }, symbols: ['USDC', 'USDT'], minTvl: 2e6 };
+const DEFI = { projects: { 'kamino-lend': ['Kamino', 'https://app.kamino.finance/'], 'jupiter-lend': ['Jupiter', 'https://jup.ag/lend'] }, symbols: ['USDT', 'USDC', 'USDG'], minTvl: 2e6 };
 
 let DATA = null, ROWS = [];
 const S = {
@@ -102,7 +102,7 @@ const staleLimit = (r) => (r.category === 'cex' ? 16 : r.category === 'dex' ? 2 
 const age = (r) => (r.checkedOn ? daysBetween(new Date(r.checkedOn), TODAY) : 999);
 const stale = (r) => age(r) > staleLimit(r);
 const locked = (r) => r.lockup && !/^flexible/i.test(r.lockup);
-const capped = (r) => r.cap != null || !!r.capText;
+const capped = (r) => r.cap != null || (!!r.capText && r.category !== 'dex'); // DeFi capText is pool size, not a cap
 const usable = (r) => r.rate != null && r.verified !== false && !ended(r);
 const rankable = (r) => usable(r) && !r.teaser && !r.vipOnly;
 const pct = (n, d = 2) => (n == null ? '—' : n.toFixed(d).replace(/\.?0+$/, (m) => (m.startsWith('.') ? '' : m)) + '%');
@@ -261,17 +261,24 @@ function renderRates() {
 
 /* ── finder (tech tree) ───────────────────── */
 const TREE = [
-  { key: 'where', label: 'Where', sub: 'Pick your world', nodes: [
-    ['bank', '🏦', 'Bank or government', 'Pesos, PDIC-insured banks'],
-    ['crypto', '🪙', 'Crypto exchange', 'Stablecoins like USDT'],
+  { key: 'ccy', label: 'Currency', sub: 'What you save in', nodes: [
+    ['php', '₱', 'Pesos (PHP)', 'Banks, digital banks, MP2'],
+    ['usd', '$', 'US dollars (USD)', 'Stablecoins: USDT, USDC, USDG'],
+  ] },
+  { key: 'where', label: 'Where', sub: 'Pick your world', nodes: () => S.tree.ccy === 'usd' ? [
+    ['crypto', '🪙', 'Crypto exchange', 'OKX, Bybit, Gate and more'],
+    ['defi', '🧩', 'DeFi on Solana', 'Kamino, Jupiter · advanced'],
     ['both', '⚖️', 'Show me both', 'Compare side by side'],
+  ] : [
+    ['bank', '🏦', 'Bank or government', 'Pesos, PDIC-insured banks'],
+    ['both', '⚖️', 'Banks + crypto', 'Crypto pays in dollars'],
   ] },
   { key: 'access', label: 'Access', sub: 'When you need it back', nodes: [
     ['flex', '🔓', 'Anytime', 'Withdraw whenever'],
     ['lock', '🔒', 'I can lock it', 'Months or longer'],
     ['any', '↔️', 'Either is fine', ''],
   ] },
-  { key: 'amount', label: 'Amount', sub: 'How much to park', amount: [10000, 100000, 500000, 1000000] },
+  { key: 'amount', label: 'Amount', sub: 'How much to park', amount: () => (S.tree.ccy === 'usd' ? [100, 1000, 5000, 10000] : [10000, 100000, 500000, 1000000]) },
   { key: 'promo', label: 'Promos', sub: 'Short boosts or steady', nodes: [
     ['ok', '⚡', 'Promos are fine', 'I will move my money'],
     ['no', '🌳', 'Steady rates only', 'No end dates'],
@@ -288,9 +295,11 @@ function renderTree() {
     const val = S.tree[t.key];
     html += `<div class="tier${val != null ? ' dim' : ''}" data-tier="${t.key}"><div class="tier-label">${i + 1}. ${t.label}<small>${t.sub}</small></div>`;
     if (t.amount) {
-      html += `<div class="amount-row">${t.amount.map((a) => `<button class="node" data-k="amount" data-v="${a}" aria-pressed="${val === a}"><span class="ic">₱</span><b>${a >= 1e6 ? '₱1M+' : '₱' + a / 1000 + 'k'}</b></button>`).join('')}<input type="number" inputmode="numeric" min="1000" step="1000" placeholder="Other amount" aria-label="Other amount in pesos" id="treeAmt" value="${val && !t.amount.includes(val) ? val : ''}"></div>`;
+      const usd = S.tree.ccy === 'usd', sym = usd ? '$' : '₱', amts = t.amount();
+      const chip = (a) => (usd ? (a >= 10000 ? '$10k+' : a >= 1000 ? '$' + a / 1000 + 'k' : '$' + a) : (a >= 1e6 ? '₱1M+' : '₱' + a / 1000 + 'k'));
+      html += `<div class="amount-row">${amts.map((a) => `<button class="node" data-k="amount" data-v="${a}" aria-pressed="${val === a}"><span class="ic">${sym}</span><b>${chip(a)}</b></button>`).join('')}<input type="number" inputmode="numeric" min="${usd ? 10 : 1000}" step="${usd ? 10 : 1000}" placeholder="Other amount" aria-label="Other amount in ${usd ? 'US dollars' : 'pesos'}" id="treeAmt" value="${val && !amts.includes(val) ? val : ''}"></div>`;
     } else {
-      html += `<div class="nodes">${t.nodes.map(([v, ic, b, s]) => `<button class="node" data-k="${t.key}" data-v="${v}" aria-pressed="${val === v}"><span class="ic" aria-hidden="true">${ic}</span><span><b>${b}</b>${s ? `<span class="sub">${s}</span>` : ''}</span></button>`).join('')}</div>`;
+      html += `<div class="nodes">${(typeof t.nodes === 'function' ? t.nodes() : t.nodes).map(([v, ic, b, s]) => `<button class="node" data-k="${t.key}" data-v="${v}" aria-pressed="${val === v}"><span class="ic" aria-hidden="true">${ic}</span><span><b>${b}</b>${s ? `<span class="sub">${s}</span>` : ''}</span></button>`).join('')}</div>`;
     }
     html += '</div>';
     reached = val != null;
@@ -301,13 +310,16 @@ function renderTree() {
   if (done) renderPicks();
 }
 function renderPicks() {
-  const T = S.tree, amt = Number(T.amount) || 0;
+  const T = S.tree, usd = T.ccy === 'usd', amt = (Number(T.amount) || 0) * (usd ? (FX() || 1) : 1); // amt is always pesos inside
+  const show = (p) => (usd ? '$' + Math.round(p / (FX() || 1)).toLocaleString('en-US') : money(p));
   const pool = ROWS.filter((r) => {
     if (!rankable(r)) return false;
-    if (r.category === 'cex' && !r.stablecoin) return false;
+    if ((r.category === 'cex' || r.category === 'dex') && !r.stablecoin) return false;
+    if (usd && !((r.category === 'cex' || r.category === 'dex') && r.stablecoin)) return false;
     if (T.where === 'bank' && !PH_CATS.includes(r.category)) return false;
     if (T.where === 'crypto' && r.category !== 'cex') return false;
-    if (T.where === 'both' && !(PH_CATS.includes(r.category) || r.category === 'cex')) return false;
+    if (T.where === 'defi' && r.category !== 'dex') return false;
+    if (T.where === 'both' && !usd && !(PH_CATS.includes(r.category) || r.category === 'cex')) return false;
     if (T.access === 'flex' && locked(r)) return false;
     if (T.access === 'lock' && !locked(r)) return false;
     if (T.promo === 'no' && r.kind === 'promo') return false;
@@ -319,7 +331,7 @@ function renderPicks() {
     .sort((a, b) => b.ny - a.ny);
   const seen = new Set(), top = [];
   for (const x of pool) { const k = x.r.provider; if (seen.has(k)) continue; seen.add(k); top.push(x); if (top.length === 3) break; }
-  const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); if (t.amount) return '₱' + Number(v).toLocaleString('en-PH'); const n = t.nodes.find((x) => x[0] === v); return n ? n[2] : v; };
+  const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); if (t.amount) return (usd ? '$' : '₱') + Number(v).toLocaleString('en-PH'); const n = (typeof t.nodes === 'function' ? t.nodes() : t.nodes).find((x) => x[0] === v); return n ? n[2] : v; };
   const path = TREE.map((t) => `<span class="step">${lbl(t.key, S.tree[t.key])}</span>`).join('<span aria-hidden="true">→</span>');
   const ranks = ['Best fit', 'Runner-up', 'Also good'];
   const cards = top.map((x, i) => {
@@ -329,7 +341,7 @@ function renderPicks() {
       <div class="pick-rank">${ranks[i]}</div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
-      <div class="pick-earn">On ${money(amt)}: about <b>${money(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar). Not insured.</div>` : ''}
+      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
       <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? `<a class="btn gold" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Open ${esc(p.name)} ↗</a>` : ''}</div>
@@ -481,6 +493,7 @@ function wire() {
     const b = e.target.closest('.node'); if (!b) return;
     const k = b.dataset.k, v = k === 'amount' ? Number(b.dataset.v) : b.dataset.v;
     const idx = TREE.findIndex((t) => t.key === k);
+    if (k === 'ccy' && S.tree.ccy !== v) { delete S.tree.where; delete S.tree.amount; }
     S.tree[k] = v;
     renderTree();
     const next = $(`.tier[data-tier="${(TREE[idx + 1] || {}).key}"]`) || $('#treeResult');
@@ -530,11 +543,11 @@ async function init() {
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
-  if (Q.get('demo')) { S.tree = { where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
   if (Q.get('scrollto')) { const el = document.getElementById(Q.get('scrollto')); if (el) { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 130); } }
-  const dex = await loadDefi(); if (dex.length) { ROWS = ROWS.concat(dex); renderRates(); }
+  const dex = await loadDefi(); if (dex.length) { ROWS = ROWS.concat(dex); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); }
 }
 init();
 })();
