@@ -386,7 +386,13 @@ function renderStats() {
   const stat = (v, l) => `<div class="stat-item"><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`;
   $('#statsRow').innerHTML = stat(providers, 'Providers') + stat(std.length ? pct2(Math.max(...std)) : '—', `Best steady savings${S.tax ? ', after tax' : ''}`) + stat(promoTop.length ? pct2(Math.max(...promoTop)) : '—', `Top promo rate${S.tax ? ' after tax' : ''} (short-term, conditions apply)`) + stat(promos, 'Live promos');
   const ph = DATA.checked && DATA.checked.ph, cx = DATA.checked && DATA.checked.crypto;
-  $('#heroBadge').textContent = `Peso rates checked ${fmtDate(ph)} · Crypto ${fmtDate(cx)}`;
+  // Verified seal: last check per group and the next scheduled check (PH: 28th = end of month; crypto: 1st and 15th).
+  const nextPh = (() => { const d = new Date(TODAY); if (d.getDate() >= 28) d.setMonth(d.getMonth() + 1, 28); else d.setDate(28); return d; })();
+  const nextCx = (() => { const d = new Date(TODAY); if (d.getDate() < 15) d.setDate(15); else d.setMonth(d.getMonth() + 1, 1); return d; })();
+  const dm = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const late = (iso, days) => iso && daysBetween(new Date(iso), TODAY) > days;
+  $('#verifyChecked').innerHTML = `<span class="vc">Peso rates checked <b>${fmtDate(ph)}</b></span><span class="vsep"> · </span><span class="vc">Crypto checked <b>${fmtDate(cx)}</b></span>`;
+  $('#verifyNext').innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Next update: <span class="vc">peso rates <b>${dm(nextPh)}</b> (end of every month)</span><span class="vsep"> · </span><span class="vc">crypto <b>${dm(nextCx)}</b> (every 2 weeks)</span>${late(ph, 35) || late(cx, 16) ? ' · <span class="verify-late">a re-check is overdue</span>' : ''}`;
 }
 function renderRules() {
   const R = DATA.rules || {};

@@ -25,7 +25,14 @@
 
 <header class="hero">
   <div class="container">
-    <div class="hero-badge" id="heroBadge">Checked against official pages</div>
+    <div class="verify" id="verify" role="note" aria-label="Rates verified against official sources">
+      <svg class="seal" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><path d="M24 2l5.2 3.8 6.4-.2 2 6.1 5.2 3.7-2 6.1 2 6.1-5.2 3.7-2 6.1-6.4-.2L24 46l-5.2-3.8-6.4.2-2-6.1-5.2-3.7 2-6.1-2-6.1 5.2-3.7 2-6.1 6.4.2z" fill="#22c55e"/><path d="M15.5 24.5l5.5 5.5 11.5-12" fill="none" stroke="#0a0a0a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="verify-txt">
+        <b>Verified against official sources</b>
+        <span id="verifyChecked">Checked on the providers' own pages</span>
+        <span class="verify-next" id="verifyNext"></span>
+      </div>
+    </div>
     <h1>Where should your money <span class="gold">earn</span>?</h1>
     <p class="subtitle">Savings and earn rates from Philippine banks, digital banks, e-wallets and our partner crypto exchanges. Every rate shows its cap, its catches, whether it is a promo, and the day we checked it.</p>
     <div class="stats-row" id="statsRow"></div>
