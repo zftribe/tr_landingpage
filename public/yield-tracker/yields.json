@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-09T18:57:45.261Z",
+ "generated": "2026-11-09T19:02:01.306Z",
  "checked": {
   "ph": "2026-11-10",
   "crypto": "2026-11-09"
@@ -254,13 +254,224 @@
    "note": "BSP Target RRP Rate, raised 50 bp at the latest Monetary Board meeting."
   },
   "fx": {
-   "usdphp": 63.143,
-   "asOf": "2026-11-06",
+   "usdphp": 63.06,
+   "asOf": "2026-11-09",
    "name": "BSP daily peso per US dollar rate",
-   "source": "https://www.bsp.gov.ph/statistics/external/day99_data.aspx",
-   "checkedOn": "2026-11-09"
+   "source": "https://www.bsp.gov.ph/SitePages/Statistics/ExchangeRate.aspx",
+   "checkedOn": "2026-11-10"
   },
-  "fxBoard": null
+  "fxBoard": {
+   "checkedOn": "2026-11-10",
+   "bspReference": {
+    "usdphp": 63.06,
+    "asOf": "2026-11-09",
+    "source": "https://www.bsp.gov.ph/SitePages/Statistics/ExchangeRate.aspx",
+    "note": "BSP Reference Exchange Rate Bulletin dated November 09, 2026: USD = 63.0600 PHP. Page is JS-rendered; read in a real browser."
+   },
+   "banks": [
+    {
+     "provider": "BDO Unibank",
+     "category": "bank",
+     "buy": 63,
+     "sell": 63.5,
+     "basis": "cash notes",
+     "asOf": "Nov 09, 2026, 10:03 am",
+     "source": "https://www.bdo.com.ph/forex",
+     "note": "Branch board (notes; BDO may reject counterfeit/demonetized notes). Indicative only. Spread 0.50. Table is JS-rendered; read in a real browser."
+    },
+    {
+     "provider": "BPI",
+     "category": "bank",
+     "buy": 63,
+     "sell": 63.5,
+     "basis": "unknown",
+     "asOf": "As of 4:20 PM, November 9, 2026",
+     "source": "https://www.bpi.com.ph/personal/bank/forex/rates",
+     "note": "Bank's Buying/Selling Rate in PHP; page says indicative only. Does not say cash vs account. Spread 0.50."
+    },
+    {
+     "provider": "Metrobank",
+     "category": "bank",
+     "buy": 63.05,
+     "sell": 63.55,
+     "basis": "cash notes",
+     "asOf": "November 09, 2026 12:41 PM",
+     "source": "https://metrobank.com.ph/forex",
+     "note": "From the page's CSV (web-assets.metrobank.com.ph/1794204187-forex-11-09-26.csv): Buying Notes 63.05, Draft 63.05, TT/EB 63.05; Selling DD/TT/IB 63.55 (no separate notes-selling column). Indicative. Spread 0.50."
+    },
+    {
+     "provider": "Landbank",
+     "category": "bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.landbank.com/",
+     "note": "Not published. No forex rates page found on landbank.com (old /forex-rates URL returns 404; site search and homepage show no board)."
+    },
+    {
+     "provider": "PNB",
+     "category": "bank",
+     "buy": 62.7,
+     "sell": 63.4,
+     "basis": "cash notes",
+     "asOf": "Nov 09, 2026, 09:27 AM",
+     "source": "https://www.pnb.com.ph/foreign-exchange-rate-135/",
+     "note": "Indicative; currencies need prior reservation with a PNB branch (cash notes). Spread 0.70. Bot-blocked to plain fetch; read in a real browser."
+    },
+    {
+     "provider": "Security Bank",
+     "category": "bank",
+     "buy": null,
+     "sell": null,
+     "basis": "account conversion",
+     "asOf": "November 9, 2026 | 10:36 AM",
+     "source": "https://www.securitybank.com/personal/accounts/foreign-currency/third-currency-forex/",
+     "note": "USD not published. The page shows only third-currency rates (EUR, HKD, SGD, AUD, CAD, CNY, JPY, KRW vs PHP). Old forex page /forex-foreign-exchange/ returns 404."
+    },
+    {
+     "provider": "RCBC",
+     "category": "bank",
+     "buy": 63.04,
+     "sell": 63.54,
+     "basis": "account conversion",
+     "asOf": "As of 11/09/2026 10:40 AM",
+     "source": "https://www.rcbc.com/online-fx",
+     "note": "Online FX page (RCBC Pulz FCY account conversion; also buy notes online for branch pickup). Spread 0.50."
+    },
+    {
+     "provider": "UnionBank",
+     "category": "bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.unionbankph.com/",
+     "note": "Could not read. Site returns 403 Access Denied to fetch and to the browser after the first page; no forex rates link found on the homepage."
+    },
+    {
+     "provider": "China Bank",
+     "category": "bank",
+     "buy": 62.7,
+     "sell": 63.6,
+     "basis": "unknown",
+     "asOf": "As of 09:30 am, 11/09/2026",
+     "source": "https://www.chinabank.ph/forex-and-navpu",
+     "note": "Indicative, for reference; transactions need an FX slip / application to purchase. Spread 0.90 (widest)."
+    },
+    {
+     "provider": "EastWest",
+     "category": "bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.eastwestbanker.com/rates",
+     "note": "Could not read. The /rates page shows deposit and bond rates only; the forex board link (/forexrates/store-digitalscreens) returns 403 Forbidden."
+    },
+    {
+     "provider": "PSBank",
+     "category": "bank",
+     "buy": 63,
+     "sell": 63.55,
+     "basis": "cash notes",
+     "asOf": "As of 09-Nov-2026",
+     "source": "https://www.psbank.com.ph/rates/",
+     "note": "Forex tab (loaded by the page's own AJAX call): Notes buying 63.00, Notes selling 63.55, FCDU savings/time 63.00, inward remittance 63.00, guiding rate 63.055. Spread 0.55."
+    },
+    {
+     "provider": "Maybank PH",
+     "category": "bank",
+     "buy": 62.71,
+     "sell": 63.41,
+     "basis": "unknown",
+     "asOf": "Forex Rates as of 11/09/2026",
+     "source": "https://www.maybank.com.ph/en/personal/investment/Forex.page",
+     "note": "Indicative rates only; no time shown. Spread 0.70."
+    },
+    {
+     "provider": "CIMB PH",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.cimbbank.com.ph/en/home.html",
+     "note": "Not published. No forex or USD rate page on the site."
+    },
+    {
+     "provider": "GoTyme",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.gotyme.com.ph/help/remittances/send-money-abroad/what-are-the-fees-limits-and-exchange-rates",
+     "note": "Not published. Help page gives no figure; rate is shown in the app before you confirm a transfer."
+    },
+    {
+     "provider": "Maya",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.maya.ph/deals/enjoy-low-forex-fees-when-you-travel-with-maya-2025",
+     "note": "Not published. No board rate; card spending abroad uses the network rate plus a conversion fee."
+    },
+    {
+     "provider": "MariBank",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.maribank.ph/",
+     "note": "Not published. PHP-only accounts; no forex page on the site."
+    },
+    {
+     "provider": "Seabank",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.maribank.ph/",
+     "note": "Not published. SeaBank PH is now MariBank (same entry)."
+    },
+    {
+     "provider": "Tonik",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://tonikbank.com/",
+     "note": "Not published. PHP-only accounts; no forex page on the site."
+    },
+    {
+     "provider": "UNO Digital Bank",
+     "category": "digital bank",
+     "buy": null,
+     "sell": null,
+     "basis": "unknown",
+     "asOf": null,
+     "source": "https://www.uno.bank/",
+     "note": "Not published / could not read. Site returns 403 to fetch; search shows peso products only."
+    },
+    {
+     "provider": "Wise",
+     "category": "remittance",
+     "buy": null,
+     "sell": null,
+     "mid": 63.13,
+     "basis": "account conversion",
+     "asOf": "2026-11-10 (time of check)",
+     "source": "https://wise.com/gb/currency-converter/usd-to-php-rate",
+     "note": "Wise converts at the mid-market rate ($1 USD = 63.13 PHP at check) and charges a separate fee, so there is no buy/sell board."
+    }
+   ]
+  }
  },
  "partners": {
   "Maya": {
@@ -3602,7 +3813,12 @@
      "d": "2026-11-10",
      "r": 0.05
     }
-   ]
+   ],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "As of 4:20 PM, November 9, 2026",
+   "fxSource": "https://www.bpi.com.ph/personal/bank/forex/rates",
+   "fxBasis": "unknown"
   },
   {
    "provider": "BPI",
@@ -3639,7 +3855,12 @@
      "d": "2026-11-10",
      "r": 0.1
     }
-   ]
+   ],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "As of 4:20 PM, November 9, 2026",
+   "fxSource": "https://www.bpi.com.ph/personal/bank/forex/rates",
+   "fxBasis": "unknown"
   },
   {
    "provider": "BPI",
@@ -3670,7 +3891,12 @@
    "note": "BPI rates page has no foreign-currency time deposit table in the fetched text; the time-deposit rates URL returned 404.",
    "id": "bpi-usd-time-deposit",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "As of 4:20 PM, November 9, 2026",
+   "fxSource": "https://www.bpi.com.ph/personal/bank/forex/rates",
+   "fxBasis": "unknown"
   },
   {
    "provider": "BDO",
@@ -3701,7 +3927,12 @@
    "note": "BDO site timed out or blocks automated fetches (403 / ECONNRESET). No BDO rates page could be fetched today.",
    "id": "bdo-usd-savings",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "Nov 09, 2026, 10:03 am",
+   "fxSource": "https://www.bdo.com.ph/forex",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "BDO",
@@ -3732,7 +3963,12 @@
    "note": "Could not fetch. A search snippet showed 0.05%-0.10% for USD 10,000 to under 50,000, undated and not read on the page, so not recorded.",
    "id": "bdo-usd-time-deposit",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "Nov 09, 2026, 10:03 am",
+   "fxSource": "https://www.bdo.com.ph/forex",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "Metrobank",
@@ -3768,7 +4004,12 @@
      "d": "2026-11-10",
      "r": 0.05
     }
-   ]
+   ],
+   "fxBuy": 63.05,
+   "fxSell": 63.55,
+   "fxAsOf": "November 09, 2026 12:41 PM",
+   "fxSource": "https://metrobank.com.ph/forex",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "Metrobank",
@@ -3799,7 +4040,12 @@
    "note": "Rate table is an image or not in page text. Page says all foreign currency rates are gross of 20% tax, updated 2 Oct 2024.",
    "id": "metrobank-usd-time-deposit",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63.05,
+   "fxSell": 63.55,
+   "fxAsOf": "November 09, 2026 12:41 PM",
+   "fxSource": "https://metrobank.com.ph/forex",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "LANDBANK",
@@ -3892,7 +4138,12 @@
    "note": "Page text came back empty. A search snippet said 0.025% with USD 500 to open. Not verified.",
    "id": "pnb-usd-savings",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 62.7,
+   "fxSell": 63.4,
+   "fxAsOf": "Nov 09, 2026, 09:27 AM",
+   "fxSource": "https://www.pnb.com.ph/foreign-exchange-rate-135/",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "PNB",
@@ -3923,7 +4174,12 @@
    "note": "Rate page came back empty. Search snippets say PNB keeps USD rates behind a click-through link.",
    "id": "pnb-usd-time-deposit-greenmarket-top-dollar",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 62.7,
+   "fxSell": 63.4,
+   "fxAsOf": "Nov 09, 2026, 09:27 AM",
+   "fxSource": "https://www.pnb.com.ph/foreign-exchange-rate-135/",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "Security Bank",
@@ -4031,7 +4287,12 @@
      "d": "2026-11-10",
      "r": 0.1
     }
-   ]
+   ],
+   "fxBuy": 63.04,
+   "fxSell": 63.54,
+   "fxAsOf": "As of 11/09/2026 10:40 AM",
+   "fxSource": "https://www.rcbc.com/online-fx",
+   "fxBasis": "account conversion"
   },
   {
    "provider": "RCBC",
@@ -4068,7 +4329,12 @@
      "d": "2026-11-10",
      "r": 2.5
     }
-   ]
+   ],
+   "fxBuy": 63.04,
+   "fxSell": 63.54,
+   "fxAsOf": "As of 11/09/2026 10:40 AM",
+   "fxSource": "https://www.rcbc.com/online-fx",
+   "fxBasis": "account conversion"
   },
   {
    "provider": "China Bank",
@@ -4104,7 +4370,12 @@
      "d": "2026-11-10",
      "r": 0.05
     }
-   ]
+   ],
+   "fxBuy": 62.7,
+   "fxSell": 63.6,
+   "fxAsOf": "As of 09:30 am, 11/09/2026",
+   "fxSource": "https://www.chinabank.ph/forex-and-navpu",
+   "fxBasis": "unknown"
   },
   {
    "provider": "China Bank",
@@ -4136,7 +4407,12 @@
    "note": "No rate published. USD 500 minimum.",
    "id": "china-bank-foreign-currency-savings-usd",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 62.7,
+   "fxSell": 63.6,
+   "fxAsOf": "As of 09:30 am, 11/09/2026",
+   "fxSource": "https://www.chinabank.ph/forex-and-navpu",
+   "fxBasis": "unknown"
   },
   {
    "provider": "China Bank",
@@ -4167,7 +4443,12 @@
    "note": "No USD time deposit rate published online; the foreign-currency-term page returned 404. USD 1,000 minimum is from a search snippet only.",
    "id": "china-bank-usd-time-deposit",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 62.7,
+   "fxSell": 63.6,
+   "fxAsOf": "As of 09:30 am, 11/09/2026",
+   "fxSource": "https://www.chinabank.ph/forex-and-navpu",
+   "fxBasis": "unknown"
   },
   {
    "provider": "UnionBank",
@@ -4261,7 +4542,12 @@
    "note": "Page lists tenors of 1, 2, 3, 6 and 12 months and a USD 1,000 minimum but no rate. The /rates/ page showed no USD figures.",
    "id": "psbank-usd-time-deposit",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.55,
+   "fxAsOf": "As of 09-Nov-2026",
+   "fxSource": "https://www.psbank.com.ph/rates/",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "AUB",
@@ -5021,7 +5307,12 @@
      "d": "2026-11-10",
      "r": 2.97
     }
-   ]
+   ],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "As of 4:20 PM, November 9, 2026",
+   "fxSource": "https://www.bpi.com.ph/personal/bank/forex/rates",
+   "fxBasis": "unknown"
   },
   {
    "provider": "BDO",
@@ -5052,7 +5343,12 @@
    "note": "PDF fetch timed out. A search summary claimed 1-year 3.26% as of 28 Aug 2026; not read directly, so not recorded.",
    "id": "bdo-bdo-dollar-money-market-fund-uitf",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "Nov 09, 2026, 10:03 am",
+   "fxSource": "https://www.bdo.com.ph/forex",
+   "fxBasis": "cash notes"
   },
   {
    "provider": "BPI",
@@ -5083,7 +5379,12 @@
    "note": "Fetched, but the return table text was jumbled so the 1-year figure is uncertain (looks like 2.30% to 31 Jul 2026). Aggressive bond fund; July 2026 month return -1.77%. Not recorded.",
    "id": "bpi-bpi-philippine-dollar-bond-index-fund-uitf",
    "strings": false,
-   "history": []
+   "history": [],
+   "fxBuy": 63,
+   "fxSell": 63.5,
+   "fxAsOf": "As of 4:20 PM, November 9, 2026",
+   "fxSource": "https://www.bpi.com.ph/personal/bank/forex/rates",
+   "fxBasis": "unknown"
   },
   {
    "provider": "OKX",

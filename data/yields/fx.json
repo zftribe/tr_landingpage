@@ -1,1 +1,7 @@
-{ "usdphp": 63.143, "asOf": "2026-11-06", "name": "BSP daily peso per US dollar rate", "source": "https://www.bsp.gov.ph/statistics/external/day99_data.aspx", "checkedOn": "2026-11-09" }
+{
+  "usdphp": 63.06,
+  "asOf": "2026-11-09",
+  "name": "BSP daily peso per US dollar rate",
+  "source": "https://www.bsp.gov.ph/SitePages/Statistics/ExchangeRate.aspx",
+  "checkedOn": "2026-11-10"
+}

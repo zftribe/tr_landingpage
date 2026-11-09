@@ -372,7 +372,7 @@ function renderFx() {
   const r = ROWS.find((x) => x.id === $('#fxPick').value);
   if (!r) { box.innerHTML = '<p class="fx-verdict none">Pick a bank dollar account above.</p>'; return; }
   const x = roundTrip(r, pesos, months);
-  if (!x) { box.innerHTML = '<p class="fx-verdict none">' + esc(r.provider) + ' does not publish its dollar buying and selling rates, so we can\'t work out the exchange cost. Ask the bank for its rate before you convert.</p>'; return; }
+  if (!x) { box.innerHTML = '<p class="fx-verdict none">' + 'We could not find ' + esc(r.provider) + '\'s dollar buying and selling rates on its official site, so we can\'t work out the exchange cost. Ask the bank for its rate before you convert.</p>'; return; }
   const sign = (n) => (n >= 0 ? '+' : '−') + money(Math.abs(n));
   const tiles = [['Exchange round trip costs', money(x.cost), x.costPct.toFixed(2) + '% of your pesos'], ['Interest after tax, ' + months + ' mo', money(x.intPhp), pct2(x.nr) + ' a year in dollars'], ['Break-even', beText(x.be), 'of interest to cover the spread'], ['Net after ' + months + ' months', sign(x.net), x.net >= 0 ? 'gain' : 'loss']];
   const ladder = [3, 6, 12, 24, 36].map((m) => { const y = roundTrip(r, pesos, m); return '<li class="' + (y.net >= 0 ? 'up' : 'down') + '"><b>' + m + ' mo</b><span>' + sign(y.net) + '</span></li>'; }).join('');
@@ -385,14 +385,14 @@ function renderFx() {
 function fillFx() {
   const sel = $('#fxPick'); if (!sel) return;
   const opts = ROWS.filter((r) => isUsdBank(r) && rankable(r) && !locked(r)).concat(ROWS.filter((r) => isUsdBank(r) && rankable(r) && locked(r)));
-  sel.innerHTML = opts.map((r) => '<option value="' + esc(r.id) + '">' + esc(r.provider) + ' · ' + esc(r.product) + ' — ' + pct2(r.rate) + (hasBoard(r) ? '' : ' (exchange rate not published)') + '</option>').join('') || '<option value="">No bank dollar rates yet</option>';
+  sel.innerHTML = opts.map((r) => '<option value="' + esc(r.id) + '">' + esc(r.provider) + ' · ' + esc(r.product) + ' — ' + pct2(r.rate) + (hasBoard(r) ? '' : ' (exchange rate not found)') + '</option>').join('') || '<option value="">No bank dollar rates yet</option>';
   const best = opts.filter(hasBoard).sort((a, b) => roundTrip(b, 100000, 12).net - roundTrip(a, 100000, 12).net)[0];
   if (best) sel.value = best.id;
   const bd = fxBoardRows(), mid = MID(), tb = $('#fxBoard');
   if (tb) tb.innerHTML = bd.length ? '<table class="cmp-table fx-table"><thead><tr><th>Bank</th><th>Sells $ at</th><th>Buys $ at</th><th>Spread vs BSP</th><th>Round trip on $1,000</th></tr></thead><tbody>' +
     bd.slice().sort((a, b) => (a.sell && b.sell ? (a.sell - a.buy) - (b.sell - b.buy) : a.sell ? -1 : 1)).map((b) => b.buy && b.sell
       ? '<tr><td>' + esc(b.provider) + (b.category === 'remittance' ? ' <small>(not a bank)</small>' : '') + '</td><td>₱' + b.sell.toFixed(2) + '</td><td>₱' + b.buy.toFixed(2) + '</td><td>' + (mid ? '+' + ((b.sell - mid) / mid * 100).toFixed(2) + '% / −' + ((mid - b.buy) / mid * 100).toFixed(2) + '%' : '—') + '</td><td><b>' + money((b.sell - b.buy) * 1000) + '</b></td></tr>'
-      : '<tr><td>' + esc(b.provider) + '</td><td colspan="4" class="dim">Not published</td></tr>').join('') + '</tbody></table><p class="fx-note">Board rates checked ' + fmtDate((DATA.rules.fxBoard || {}).checkedOn) + '. BSP reference rate ₱' + (mid || '—') + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + ') is the midpoint. Banks change these rates during the day; your branch or app may differ.</p>' : '';
+      : '<tr><td>' + esc(b.provider) + '</td><td colspan="4" class="dim">Not found on its official site</td></tr>').join('') + '</tbody></table><p class="fx-note">Board rates checked ' + fmtDate((DATA.rules.fxBoard || {}).checkedOn) + '. BSP reference rate ₱' + (mid || '—') + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + ') is the midpoint. Banks change these rates during the day; your branch or app may differ.</p>' : '';
 }
 
 /* ── Comparator + best match (George, 10 Nov) ── */
@@ -428,7 +428,7 @@ function renderCmp() {
     const u = units(r, pesos);
     if (r.minDeposit && u != null && u < r.minDeposit) why.push('below the ' + sym(r) + Number(r.minDeposit).toLocaleString('en-PH') + ' minimum');
     if (r.maxDeposit && u != null && u > r.maxDeposit) why.push('above this band');
-    if (CMP.ccy === 'php' && isUsdBank(r) && !hasBoard(r)) why.push('bank does not publish its exchange rate, so the conversion cost is unknown');
+    if (CMP.ccy === 'php' && isUsdBank(r) && !hasBoard(r)) why.push('no published exchange rate found, so the conversion cost is unknown');
     return { r, e, out: why };
   });
   const ok = res.filter((x) => !x.out.length && x.e && x.e.earn > 0).sort((a, b) => b.e.earn - a.e.earn);
@@ -533,7 +533,7 @@ function renderPicks() {
       <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${isUsdBank(r) ? `<div class="why">Paid in US dollars into a PH bank. 20% final tax already taken off.</div>` : ''}${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
-      ${isUsdBank(r) && T.ccy === 'usd' ? (() => { const q = roundTrip(r, amt, 12); return q ? `<div class="why fx-why">Starting with pesos? The exchange round trip here costs about ${money(q.cost)} (${q.costPct.toFixed(2)}%). Break-even: ${beText(q.be)}. <a href="#fx-check" data-fx="${esc(r.id)}">Check it</a></div>` : `<div class="why fx-why">This bank does not publish its exchange rate. Ask for it before converting pesos.</div>`; })() : ''}
+      ${isUsdBank(r) && T.ccy === 'usd' ? (() => { const q = roundTrip(r, amt, 12); return q ? `<div class="why fx-why">Starting with pesos? The exchange round trip here costs about ${money(q.cost)} (${q.costPct.toFixed(2)}%). Break-even: ${beText(q.be)}. <a href="#fx-check" data-fx="${esc(r.id)}">Check it</a></div>` : `<div class="why fx-why">We could not find this bank's published exchange rate. Ask for it before converting pesos.</div>`; })() : ''}
       <div class="actions">${cmpBtn(r)}<a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
