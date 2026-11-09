@@ -241,7 +241,7 @@
 #tr-intro { display: none; }
 html.intro-on, html.intro-on body { overflow: hidden; }
 html.intro-on #tr-intro { display: block; position: fixed; inset: 0; z-index: 9999; background: #050506; transition: opacity .3s ease; }
-#tr-intro.done { background: transparent; }
+#tr-intro.done { background: transparent; } /* the script also clears it once the canvas paints, so the ink drain shows the real hero */
 #tr-intro.bye { opacity: 0; }
 #tr-intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; touch-action: manipulation; outline: none; }
 #tr-intro canvas:focus-visible { outline: 3px solid #F9A825; outline-offset: -3px; }

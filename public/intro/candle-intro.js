@@ -348,7 +348,7 @@
     screen.classList.add('bye')
     setTimeout(() => { root.classList.remove('intro-on'); screen.remove() }, reduce ? 300 : 120)
   }
-  const start = () => { const it = new Intro(screen, () => CFG, { phone: coarse, onDone: done }); const cv = screen.querySelector('canvas'); if (cv) cv.focus({ preventScroll: true }) }
+  const start = () => { const it = new Intro(screen, () => CFG, { phone: coarse, onDone: done }); const cv = screen.querySelector('canvas'); screen.style.background = 'transparent'; if (cv) cv.focus({ preventScroll: true }) }
   const fonts = document.fonts && document.fonts.load ? document.fonts.load("40px 'Lilita One'").catch(() => {}) : Promise.resolve()
   Promise.race([fonts, new Promise((r) => setTimeout(r, 1200))]).then(start)
 })()
