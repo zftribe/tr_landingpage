@@ -49,7 +49,9 @@ export type Product = {
  */
 export function toProduct(p: LmsPackage): Product {
   const courses = p.items.filter((i) => i.itemType === 'course').map((i) => i.itemId)
-  const membership = p.items.find((i) => i.itemType === 'discord')
+  // Membership time = the first Discord item with a numeric duration. Course keys (Titans, Digital Walkers,
+  // Market Makers…) are ₱0 Discord items with no duration: they are lifetime keys, not membership (LMS, 9 Nov).
+  const membership = p.items.find((i) => i.itemType === 'discord' && typeof i.durationDays === 'number')
   const hasTI = courses.includes(TI_COURSE)
   const hasWeb3 = courses.includes(WEB3_COURSE)
   const hasLP = courses.includes(LP_COURSE)
@@ -65,10 +67,12 @@ export function toProduct(p: LmsPackage): Product {
   return { id: p.id, name, tag, hasTI, hasWeb3, hasLP, courseIds: courses, months, price: p.price, subtotal: p.subtotal, discount: p.discount }
 }
 
-/** A published package that is just the LP Masterclass course (no membership). */
+/** A published package that is just the LP Masterclass course: its only course is LP, and any Discord
+ *  items are lifetime keys (no duration), e.g. the Market Makers key. */
 const isLpOnly = (p: LmsPackage) => {
-  const items = p.items
-  return items.length === 1 && items[0].itemType === 'course' && items[0].itemId === LP_COURSE
+  const courses = p.items.filter((i) => i.itemType === 'course')
+  const discord = p.items.filter((i) => i.itemType === 'discord')
+  return courses.length === 1 && courses[0].itemId === LP_COURSE && discord.every((i) => i.durationDays == null)
 }
 
 export function lineup(packages: LmsPackage[]): Product[] {
