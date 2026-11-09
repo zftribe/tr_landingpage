@@ -236,3 +236,12 @@
 .as-mix-rest .as-mix-name { color: var(--muted); font-weight: 500; }
 .as-mix-rest .as-mix-bar i { background: rgba(255,255,255,.18); opacity: 1; }
 @media (max-width: 760px) { .as-mix-list li { grid-template-columns: 1fr 48px; gap: 6px 10px; } .as-mix-bar { grid-column: 1 / -1; grid-row: 2; } .as-mix summary { align-items: flex-start; } }
+
+/* Tap-the-candle intro (George, 10 Nov). Hidden unless the gate script adds .intro-on to <html>. */
+#tr-intro { display: none; }
+html.intro-on, html.intro-on body { overflow: hidden; }
+html.intro-on #tr-intro { display: block; position: fixed; inset: 0; z-index: 9999; background: #050506; transition: opacity .3s ease; }
+#tr-intro.done { background: transparent; }
+#tr-intro.bye { opacity: 0; }
+#tr-intro canvas { position: absolute; inset: 0; width: 100%; height: 100%; cursor: pointer; touch-action: manipulation; outline: none; }
+#tr-intro canvas:focus-visible { outline: 3px solid #F9A825; outline-offset: -3px; }
