@@ -410,13 +410,58 @@ function renderRules() {
 
 /* ── wiring ───────────────────────────────── */
 function setView(v) {
-  S.view = v; document.body.dataset.view = v;
+  S.view = v; document.body.dataset.view = v; if (v === 'basic' && S.f.lock !== 'all') S.f.lock = 'all';
   $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
   try { localStorage.setItem('trYieldView', v); } catch (e) {}
   if (v === 'basic') { if (S.f.cat === 'dex') S.f.cat = 'all'; S.real = false; $('#realToggle').checked = false; syncChips(); }
   renderAll();
 }
-function syncChips() { $$('.chips').forEach((c) => $$('button', c).forEach((b) => b.setAttribute('aria-pressed', String(S.f[c.dataset.key] === b.dataset.v)))); }
+function syncChips() { $$('.chips').forEach((c) => $$('button', c).forEach((b) => b.setAttribute('aria-pressed', String(S.f[c.dataset.key] === b.dataset.v)))); syncFilterUi(); }
+
+/* ── collapsible filters (preview looks: ?filters=a|b|c, default a) ── */
+const FLOOK = (new URLSearchParams(location.search).get('filters') || 'a').toLowerCase();
+const FLABEL = { cat: 'Where', kind: 'Promo', cap: 'Cap', lock: 'Access' };
+const optLabel = (k, v) => { const b = $(`.chips[data-key="${k}"] button[data-v="${v}"]`); return b ? b.textContent : v; };
+function activeKeys(keys) { return keys.filter((k) => S.f[k] !== 'all' && !(k === 'lock' && S.view !== 'advanced')); }
+function setupFilters() {
+  const box = $('#filters'); if (!box) return;
+  box.dataset.flook = FLOOK;
+  const groups = { cat: $('.chips[data-key="cat"]', box), kind: $('.chips[data-key="kind"]', box), cap: $('.chips[data-key="cap"]', box), lock: $('.chips[data-key="lock"]', box) };
+  const search = $('.search-bar', box);
+  const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
+  const icon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>';
+  if (FLOOK === 'c') {
+    const row = mk('div', 'f-row');
+    for (const k of ['cat', 'kind', 'cap', 'lock']) {
+      const g = groups[k]; g.hidden = true;
+      const wrap = mk('label', 'f-select' + (g.classList.contains('adv-only') ? ' adv-only' : ''));
+      wrap.innerHTML = `<span>${FLABEL[k]}</span><select data-key="${k}">${$$('button', g).map((b) => `<option value="${b.dataset.v}"${b.classList.contains('adv-only') ? ' data-adv="1"' : ''}>${b.textContent}</option>`).join('')}</select>`;
+      wrap.querySelector('select').addEventListener('change', (e) => { S.f[k] = e.target.value; syncChips(); renderRates(); });
+      row.appendChild(wrap);
+    }
+    row.appendChild(search); box.prepend(row); return;
+  }
+  const more = FLOOK === 'b' ? ['cat', 'kind', 'cap', 'lock'] : ['kind', 'cap', 'lock'];
+  const panel = mk('div', 'f-panel'); panel.id = 'fPanel'; panel.hidden = true;
+  for (const k of more) { const g = groups[k]; const row = mk('div', 'f-group' + (g.classList.contains('adv-only') ? ' adv-only' : ''), `<span class="f-label">${FLABEL[k]}</span>`); row.appendChild(g); panel.appendChild(row); }
+  const btn = mk('button', 'f-toggle', `${icon}<span class="f-tl">${FLOOK === 'b' ? 'Filters' : 'More filters'}</span><span class="f-count" hidden></span><svg class="f-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`);
+  btn.type = 'button'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'fPanel');
+  btn.addEventListener('click', () => { panel.hidden = !panel.hidden; btn.setAttribute('aria-expanded', String(!panel.hidden)); });
+  const top = mk('div', 'f-row');
+  if (FLOOK === 'a') top.appendChild(groups.cat);
+  const tools = mk('div', 'f-tools'); tools.appendChild(btn); tools.appendChild(search); top.appendChild(tools);
+  const pills = mk('div', 'f-active'); pills.id = 'fActive';
+  pills.addEventListener('click', (e) => { const x = e.target.closest('[data-clear]'); if (!x) return; const k = x.dataset.clear; if (k === '*') more.forEach((m) => (S.f[m] = 'all')); else S.f[k] = 'all'; syncChips(); renderRates(); });
+  box.prepend(pills); box.prepend(panel); box.prepend(top);
+}
+function syncFilterUi() {
+  const box = $('#filters'); if (!box || !box.dataset.flook) return;
+  if (FLOOK === 'c') { $$('select[data-key]', box).forEach((sel) => { sel.value = S.f[sel.dataset.key]; $$('option[data-adv]', sel).forEach((o) => (o.hidden = S.view !== 'advanced')); }); return; }
+  const more = FLOOK === 'b' ? ['cat', 'kind', 'cap', 'lock'] : ['kind', 'cap', 'lock'];
+  const act = activeKeys(more), cnt = $('.f-count', box);
+  cnt.hidden = !act.length; cnt.textContent = act.length;
+  $('#fActive').innerHTML = act.length ? act.map((k) => `<button class="f-pill" data-clear="${k}" aria-label="Clear ${FLABEL[k]} filter">${FLABEL[k]}: ${optLabel(k, S.f[k])} <span aria-hidden="true">×</span></button>`).join('') + (act.length > 1 ? '<button class="f-pill f-clear" data-clear="*">Clear all</button>' : '') : '';
+}
 function renderAll() { renderStats(); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
 function wire() {
   $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
@@ -474,18 +519,21 @@ async function loadDefi() {
   } catch (e) { return []; }
 }
 async function init() {
+  setupFilters();
   wire();
   document.body.dataset.view = S.view; $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); fillCalc(); renderTree(); renderAll();
+  renderRules(); renderInfl(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
   const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { S.tree = { where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
   if (Q.get('view') === 'advanced') setView('advanced');
+  if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
+  if (Q.get('scrollto')) { const el = document.getElementById(Q.get('scrollto')); if (el) { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 130); } }
   const dex = await loadDefi(); if (dex.length) { ROWS = ROWS.concat(dex); renderRates(); }
 }
 init();
