@@ -213,7 +213,9 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .footer > .container > p { font-size: .8rem; color: var(--text-dim); }
 .legal { max-width: 760px; margin: 18px auto 0; text-align: left; display: grid; gap: 8px; font-size: .76rem; color: var(--text-dim); line-height: 1.65; }
 .legal b { color: var(--text); }
-.credit { margin-top: 16px; font-size: .74rem; color: var(--text-dim); }
+.credit { margin-top: 12px; font-size: .72rem; color: var(--text-dim); }
+.credit a { color: var(--gold); text-decoration: none; font-weight: 500; }
+.credit a:hover { text-decoration: underline; }
 .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin: 40px auto; }
 @keyframes spin { to { transform: rotate(360deg); } }
 

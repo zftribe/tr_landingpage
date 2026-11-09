@@ -54,4 +54,4 @@ The build adds: `id`, `strings` (must do something to earn it), `vipOnly`, `newU
 - Global warning: "Rules differ by country. Check with your local regulator (in the Philippines, the SEC) that this exchange is allowed where you live before you sign up." Exchange accounts 18+.
 - Crypto rows carry cons: not insured, rates and withdrawals can change, regulator facts from `cex-regions.json`.
 
-Original tracker by jayowtrades (credit kept in the footer).
+Footer credit: "By Zeefreaks and jayowtrades" (Jake/jayowtrades is on the team; George confirmed the OK, 9 Nov 2026).
