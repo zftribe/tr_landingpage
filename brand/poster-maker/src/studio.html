@@ -27,7 +27,8 @@ h1 b{color:var(--gold)}
 .stage-body{padding:14px 16px 16px;display:grid;gap:14px;min-width:0}
 .stage-body[hidden]{display:none}
 .stagebar{border-top:1px solid var(--line);padding:12px 16px;display:grid;gap:10px;background:#111118;border-radius:0 0 16px 16px}
-.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;list-style:none;margin:0;padding:0}
+.steps li{display:grid}
 .step{all:unset;cursor:pointer;border-radius:9px;padding:7px 4px;text-align:center;font-size:11.5px;font-weight:800;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);line-height:1.15}
 .step b{display:block;font-size:13px}
 .step.done{color:var(--ink)} .step.done b::after{content:" ✓";color:var(--ok)}
@@ -296,7 +297,7 @@ a{color:var(--gold)}
     </div>
 
     <div class="stagebar" id="stagebar">
-      <div class="steps" id="steps" role="list" aria-label="Stages"></div>
+      <ol class="steps" id="steps" aria-label="Stages"></ol>
       <div class="navs"><button class="navbtn" type="button" id="backBtn">← Back</button><button class="navbtn gold" type="button" id="nextBtn">Next →</button></div>
     </div>
   </section>
@@ -406,7 +407,7 @@ function afterLoad(){
 /* ---------- stages ---------- */
 function buildSteps(){
   const box=$("steps"); box.textContent="";
-  STAGES.forEach((t,i)=>{ const b=document.createElement("button"); b.type="button"; b.className="step"; b.setAttribute("role","listitem"); b.innerHTML=`<b>${i+1}</b>${esc(SHORT[i])}`; b.setAttribute("aria-label",`Stage ${i+1}: ${t}`); b.addEventListener("click",()=>goStage(i)); box.append(b); });
+  STAGES.forEach((t,i)=>{ const li=document.createElement("li"); const b=document.createElement("button"); b.type="button"; b.className="step"; b.innerHTML=`<b>${i+1}</b>${esc(SHORT[i])}`; b.setAttribute("aria-label",`Stage ${i+1}: ${t}`); b.addEventListener("click",()=>goStage(i)); li.append(b); box.append(li); });
 }
 function markSteps(){
   document.querySelectorAll(".step").forEach((b,i)=>{ b.classList.toggle("done", visited.has(i) && i!==state.stage); if(i===state.stage) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
@@ -423,8 +424,11 @@ function goStage(i, focusTitle){
   if (i===2) brandCheck();
   if (i===3) buildPhotoLib();
   if (i===5){ brandCheck(); if(!$("caption").value || !capEdited) writeCaption(); if(!$("designName").value) $("designName").value = defaultName(); checkDuplicates(); }
-  if (focusTitle !== false) { $("stageTitle").focus({preventScroll:true}); const b=$("builder").getBoundingClientRect(); if (b.top < 0 || window.innerWidth<=900) $("builder").scrollIntoView({block:"start", behavior:"auto"}); }
+  if (focusTitle !== false) { fitScrollPadding(); $("stageTitle").focus({preventScroll:true}); const pinned = phoneLayout() ? $("previewPane").offsetHeight : 0; const top = $("builder").getBoundingClientRect().top + window.scrollY - pinned - 8; if (phoneLayout() || $("builder").getBoundingClientRect().top < 0) window.scrollTo({top: Math.max(0, top), behavior:"auto"}); }
 }
+/* phone: keep focused fields clear of the pinned preview (top) and the stage bar (bottom) */
+const phoneLayout = ()=>window.innerWidth<=900;
+function fitScrollPadding(){ const r=document.documentElement.style; if(!phoneLayout()){ r.scrollPaddingTop=""; r.scrollPaddingBottom=""; return; } r.scrollPaddingTop=($("previewPane").offsetHeight+8)+"px"; r.scrollPaddingBottom=($("stagebar").offsetHeight+8)+"px"; }
 $("backBtn").addEventListener("click",()=>goStage(state.stage-1));
 $("nextBtn").addEventListener("click",()=>{ if(state.stage===5){ newPoster(); } else goStage(state.stage+1); });
 function newPoster(){ pushHistory(); state.designId=null; $("designName").value=""; capEdited=false; $("caption").value=""; $("draftBox").textContent=""; made.gif=made.video=null; markAttach(); visited.clear(); visited.add(0); goStage(0); }
@@ -675,7 +679,9 @@ function buildSizes(){
 function markSize(){ document.querySelectorAll("[data-size]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.size===state.size))); const s=TP.SIZES[state.size]; $("sizeNote").textContent = `${s.label} · ${s.w} × ${s.h}`; }
 let raf=0, queued=false, playStart=0, lastReport={};
 function previewScale(anim){ const m=$("main"), W=TP.SIZES[state.size].w, H=TP.SIZES[state.size].h; const box=m.parentElement.clientWidth || 540; const css=Math.min(box-28, (Math.min(window.innerHeight*0.7,620))*W/H); return Math.max(0.3, Math.min(1, css*(window.devicePixelRatio||1)/W * (anim?0.85:1))); }
-function draw(){ if ($("play").checked) return; const rep={}; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {scale: previewScale(false), report: rep}); lastReport=rep; brandCheck(); }
+const checkCanvas = document.createElement("canvas");
+function validate(){ const rep={}; TP.render(checkCanvas, byId[state.tpl], currentFields(), cfg(), state.size, {scale:0.3, report:rep}); lastReport=rep; brandCheck(); markAttach(); }
+function draw(){ if ($("play").checked){ validate(); return; } const rep={}; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {scale: previewScale(false), report: rep}); lastReport=rep; brandCheck(); markAttach(); }
 function queueDraw(){ if(queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; draw(); saveDraft(); }); }
 function loop(now){
   if (!$("play").checked) { raf=0; draw(); return; }
@@ -686,7 +692,7 @@ function loop(now){
 function startPlay(){ playStart=performance.now(); if(!raf) raf=requestAnimationFrame(loop); }
 $("play").addEventListener("change", ()=>{ if ($("play").checked) startPlay(); else draw(); });
 $("gifDur").addEventListener("change", ()=>{ playStart=performance.now(); });
-$("biggerBtn").addEventListener("click",()=>{ const big=$("previewPane").classList.toggle("big"); $("biggerBtn").setAttribute("aria-pressed",String(big)); $("biggerBtn").textContent = big ? "Smaller" : "Bigger"; draw(); });
+$("biggerBtn").addEventListener("click",()=>{ const big=$("previewPane").classList.toggle("big"); $("biggerBtn").setAttribute("aria-pressed",String(big)); $("biggerBtn").textContent = big ? "Smaller" : "Bigger"; draw(); fitScrollPadding(); });
 
 /* ---------- brand check ---------- */
 function checks(sizeKey){
@@ -696,7 +702,7 @@ function checks(sizeKey){
   const phonePx = rep.titlePx ? rep.titlePx * 375 / (sizeKey==="discord"||(!sizeKey&&state.size==="discord") ? 1600*0.62 : W) : 99;
   out.push(phonePx >= 18 ? [true,"Title is big enough to read on a phone"] : [false,"Title is small on a phone: shorten it, or raise Title size in Fine-tune"]);
   out.push(!rep.cut ? [true,"Nothing is cut off with “…”"] : [false,"Some text is cut off with “…”: shorten the long line (title, topic or a name)"]);
-  out.push((rep.contrast||21) >= 3 ? [true,"Text stands out from the background"] : [false,"Text is hard to read on this photo: try Dark theme, another photo, or move the focus"]);
+  out.push((rep.contrast||21) >= 3 ? [true,"Text should stand out from the background (quick estimate: check busy photos by eye)"] : [false,"Text is hard to read on this photo: try Dark theme, another photo, or move the focus"]);
   out.push(rep.logos!==false ? [true,"TR and ZFT logos are on"] : [false,"Logos didn't load: reload the page"]);
   const dated = !!(byId[state.tpl].fields.date || byId[state.tpl].fields.time);
   if (dated) out.push(f.date && f.time ? [true,"Date and time are filled in"] : [false, !f.date ? "Add the date in Details" : "Add the start time in Details"]);
@@ -748,7 +754,10 @@ $("copyCap").addEventListener("click", async ()=>{ try{ await navigator.clipboar
 /* ---------- export ---------- */
 let downloads = null;
 const made = { gif:null, video:null };
-function fileBase(sizeKey){ const t=byId[state.tpl]; const d = state.f.date ? "-"+state.f.date : ""; return `tr-${t.id}${d}-${TP.SIZES[sizeKey||state.size].file}`; }
+/* a frozen copy of the design: every frame, zip member and filename of one export comes from it */
+function designKey(){ const imgs=[state.bgPhoto?state.bgPhoto.src.length+":"+state.bgPhoto.src.slice(-40):"", ...(state.f.speakers||[]).map(s=>s._img?s._img.src.length+":"+s._img.src.slice(-40):"")]; return JSON.stringify([designData(), imgs]); }
+function snapshot(){ return {tpl:byId[state.tpl], f:currentFields(), c:cfg(), size:state.size, date:state.f.date||"", key:designKey()}; }
+function fileBase(sizeKey, sn){ sn = sn || snapshot(); const d = sn.date ? "-"+sn.date : ""; return `tr-${sn.tpl.id}${d}-${TP.SIZES[sizeKey||sn.size].file}`; }
 async function offer(blob, filename, kind){
   const st=$("status");
   if (!window.claude){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 60000); st.textContent=`Downloaded ${filename}.`; return; }
@@ -761,7 +770,7 @@ async function offer(blob, filename, kind){
   const p=document.createElement("p"); p.className="note"; p.textContent = `Downloads aren't available in this view. Right-click or long-press the ${kind} to save it as ${filename}.`;
   res.append(p,el); st.textContent="";
 }
-function pngBlob(sizeKey){ return new Promise(res=>{ const c=document.createElement("canvas"); TP.render(c, byId[state.tpl], currentFields(), cfg(), sizeKey||state.size); c.toBlob(b=>res(b), "image/png"); }); }
+function pngBlob(sizeKey, sn){ sn = sn || snapshot(); return new Promise(res=>{ const c=document.createElement("canvas"); TP.render(c, sn.tpl, sn.f, sn.c, sizeKey||sn.size); c.toBlob(b=>res(b), "image/png"); }); }
 function preflight(){ const bad = checks().filter(x=>!x[0]); if (bad.length) $("status").textContent = "Heads up: " + bad[0][1] + ". You can still download."; else $("status").textContent=""; }
 $("dlPng").addEventListener("click", async ()=>{ preflight(); const b=await pngBlob(); await offer(b, fileBase()+".png", "image"); autoSave(); });
 /* tiny store-only zip (PNGs are already compressed) */
@@ -783,8 +792,9 @@ function zip(files){
 }
 $("dlPack").addEventListener("click", async ()=>{
   const btn=$("dlPack"); if(btn.disabled) return; btn.disabled=true; preflight(); $("status").textContent="Making all 4 sizes…";
-  try{ const files=[]; for (const k of Object.keys(TP.SIZES)){ const b=await pngBlob(k); files.push({name:fileBase(k)+".png", data:new Uint8Array(await b.arrayBuffer())}); await new Promise(r=>setTimeout(r)); }
-    await offer(zip(files), `tr-${state.tpl}${state.f.date?"-"+state.f.date:""}-all-sizes.zip`, "file"); autoSave(); }
+  const sn=snapshot();
+  try{ const files=[]; for (const k of Object.keys(TP.SIZES)){ const b=await pngBlob(k, sn); files.push({name:fileBase(k, sn)+".png", data:new Uint8Array(await b.arrayBuffer())}); await new Promise(r=>setTimeout(r)); }
+    await offer(zip(files), `tr-${sn.tpl.id}${sn.date?"-"+sn.date:""}-all-sizes.zip`, "file"); autoSave(); }
   catch(e){ $("status").textContent="Couldn't make the pack. Try again."; }
   btn.disabled=false;
 });
@@ -794,17 +804,16 @@ $("mkGif").addEventListener("click", async ()=>{
   if (busy) return; lockExports(true); $("result").hidden=true;
   const st=$("status"), bar=$("gifBar");
   const dur=Math.min(10, +$("gifDur").value), fps=+$("gifFps").value, delay=Math.round(100/fps), n=Math.round(dur*100/delay);
-  const S=TP.SIZES[state.size], gw=Math.min(+$("gifW").value, S.w) , gh=Math.round(S.h*gw/S.w);
+  const sn=snapshot(), S=TP.SIZES[sn.size], gw=Math.min(+$("gifW").value, S.w) , gh=Math.round(S.h*gw/S.w);
   const big=document.createElement("canvas"), small=document.createElement("canvas"); small.width=gw; small.height=gh; const sctx=small.getContext("2d",{willReadFrequently:true});
-  const tpl=byId[state.tpl], f=currentFields(), c=cfg();
-  const frame=(i)=>{ TP.render(big, tpl, f, c, state.size, {t: i*delay/100, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
+  const frame=(i)=>{ TP.render(big, sn.tpl, sn.f, sn.c, sn.size, {t: i*delay/100, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
   try{
     st.textContent="Reading colours…";
     const samples=[]; const step=Math.max(1, Math.floor(gw*gh/9000));
     for (let k=0;k<10;k++){ const d=frame(Math.floor(k*n/10)); for (let i=0;i<d.length;i+=4*step) samples.push(d[i],d[i+1],d[i+2]); await new Promise(r=>setTimeout(r)); }
     const gw2=new TRGif.GifWriter(gw,gh,{dither:5}); gw2.setPalette(new Uint8Array(samples));
     for (let i=0;i<n;i++){ gw2.addFrame(frame(i), delay); bar.style.width=((i+1)/n*100)+"%"; st.textContent=`Building GIF: frame ${i+1} of ${n}`; if(i%2===0) await new Promise(r=>setTimeout(r)); }
-    const blob=new Blob([gw2.finish()],{type:"image/gif"}); made.gif={blob, name:fileBase()+".gif"}; markAttach();
+    const blob=new Blob([gw2.finish()],{type:"image/gif"}); made.gif={blob, name:fileBase(null, sn)+".gif", key:sn.key}; markAttach();
     const mb=(blob.size/1048576).toFixed(1);
     st.textContent=`GIF ready: ${dur} s loop, ${gw}×${gh}, ${mb} MB.` + (blob.size>10*1048576 ? " Over Discord's 10 MB limit: try 540 px or a shorter loop." : "");
     await offer(blob, made.gif.name, "GIF"); autoSave();
@@ -816,32 +825,47 @@ $("mkVid").addEventListener("click", async ()=>{
   if (busy) return; const type=videoType(); const st=$("status");
   if (!type || !HTMLCanvasElement.prototype.captureStream){ st.textContent="This browser can't record video. Use Chrome or Edge, or make a GIF."; return; }
   lockExports(true); $("result").hidden=true;
-  const dur=Math.min(10, +$("gifDur").value), S=TP.SIZES[state.size], k=Math.min(1, 1080/Math.max(S.w,S.h));
+  const sn=snapshot(), dur=Math.min(10, +$("gifDur").value), S=TP.SIZES[sn.size], k=Math.min(1, 1080/Math.max(S.w,S.h)), bar=$("gifBar");
   const cv=document.createElement("canvas"); cv.width=Math.round(S.w*k); cv.height=Math.round(S.h*k); cv.style.cssText="position:fixed;left:-9999px;top:0"; document.body.append(cv);
-  const tpl=byId[state.tpl], f=currentFields(), c=cfg();
-  TP.render(cv, tpl, f, c, state.size, {t:0, dur, scale:k});
-  const stream=cv.captureStream(30), rec=new MediaRecorder(stream, {mimeType:type, videoBitsPerSecond:8e6}), chunks=[];
-  rec.ondataavailable=(e)=>{ if(e.data.size) chunks.push(e.data); };
-  const done=new Promise(r=>rec.onstop=r);
-  rec.start(250); const t0=performance.now(), bar=$("gifBar"), loops=dur<6?2:1;
-  await new Promise(resolve=>{ const tick=(now)=>{ const el=(now-t0)/1000; if (el>=dur*loops){ resolve(); return; } TP.render(cv, tpl, f, c, state.size, {t: el%dur, dur, scale:k}); bar.style.width=(el/(dur*loops)*100)+"%"; st.textContent=`Recording video: ${Math.ceil(dur*loops-el)} s left (keep this tab open)`; requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
-  rec.stop(); await done; stream.getTracks().forEach(t=>t.stop()); cv.remove();
-  const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
-  const blob=new Blob(chunks,{type:type.split(";")[0]}); made.video={blob, name:fileBase()+"."+ext}; markAttach();
-  st.textContent=`Video ready: ${dur*loops} s, ${cv.width}×${cv.height}, ${(blob.size/1048576).toFixed(1)} MB (${ext.toUpperCase()}).`;
-  bar.style.width="0"; lockExports(false);
-  await offer(blob, made.video.name, "video"); autoSave();
+  let stream=null, rec=null, result=null;
+  try{
+    TP.render(cv, sn.tpl, sn.f, sn.c, sn.size, {t:0, dur, scale:k});
+    stream=cv.captureStream(30); rec=new MediaRecorder(stream, {mimeType:type, videoBitsPerSecond:8e6}); const chunks=[];
+    rec.ondataavailable=(e)=>{ if(e.data.size) chunks.push(e.data); };
+    const done=new Promise((res,rej)=>{ rec.onstop=res; rec.onerror=(e)=>rej(e.error||e); });
+    rec.start(250); const t0=performance.now(), loops=dur<6?2:1;
+    await Promise.race([done.then(()=>{ throw new Error("stopped early"); }), new Promise(resolve=>{ const tick=(now)=>{ const el=(now-t0)/1000; if (el>=dur*loops){ resolve(); return; } TP.render(cv, sn.tpl, sn.f, sn.c, sn.size, {t: el%dur, dur, scale:k}); bar.style.width=(el/(dur*loops)*100)+"%"; st.textContent=`Recording video: ${Math.ceil(dur*loops-el)} s left (keep this tab open)`; requestAnimationFrame(tick); }; requestAnimationFrame(tick); })]);
+    rec.stop(); await done;
+    const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
+    const blob=new Blob(chunks,{type:type.split(";")[0]}); if(!blob.size) throw new Error("empty");
+    made.video={blob, name:fileBase(null, sn)+"."+ext, key:sn.key}; result=made.video; markAttach();
+    st.textContent=`Video ready: ${dur*loops} s, ${cv.width}×${cv.height}, ${(blob.size/1048576).toFixed(1)} MB (${ext.toUpperCase()}).`;
+  } catch(e){ st.textContent="Couldn't record a video in this browser. Make a GIF or a PNG instead."; try{ if(rec && rec.state!=="inactive") rec.stop(); }catch(_){} }
+  finally{ if(stream) stream.getTracks().forEach(t=>t.stop()); cv.remove(); bar.style.width="0"; lockExports(false); }
+  if (result){ await offer(result.blob, result.name, "video"); autoSave(); }
 });
 
 /* ---------- saved designs + team history ---------- */
 const LOCAL_KEY="designs";
 function defaultName(){ const t=byId[state.tpl]; return t.name.replace(/^The /,"") + (state.f.date ? " – "+shortDate(state.f.date) : ""); }
 function designData(){ return {tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.bgPhoto?"":state.photoKey, size:state.size, f: JSON.parse(JSON.stringify(state.f,(k,v)=>k==="_img"?undefined:v))}; }
-function openDesign(d){
-  if (!d || !byId[d.tpl]) return; pushHistory();
+function cleanDesign(d){
+  if (!d || typeof d!=="object" || !byId[d.tpl]) return null;
+  const s=(v,n)=>typeof v==="string"?v.slice(0,n):"", n=(v,lo,hi)=>typeof v==="number"&&isFinite(v)?Math.min(hi,Math.max(lo,v)):undefined;
+  const f0 = d.f && typeof d.f==="object" ? d.f : {}, f={};
+  for (const [k,m] of Object.entries({title:80,kicker:60,topic:220,where:60,channel:60,cta:80,link:200,partner:40,photoKey:40})) if (k in f0) f[k]=s(f0[k],m);
+  for (const k of ["date","time","endTime"]) f[k]= /^[\d:-]{5,10}$/.test(f0[k]||"") ? f0[k] : "";
+  f.live=!!f0.live;
+  for (const [k,lo,hi] of [["titleScale",0.7,1.3],["photoZoom",1,1.6],["focusX",0,1],["focusY",0,1]]){ const v=n(f0[k],lo,hi); if(v!==undefined) f[k]=v; }
+  f.speakers = Array.isArray(f0.speakers) ? f0.speakers.slice(0,3).filter(x=>x&&typeof x==="object").map(x=>{ const o={name:s(x.name,40), role:s(x.role,40)}; const z=n(x.zoom,1,2); if(z!==undefined) o.zoom=z; return o; }) : [];
+  if (f.partner && !PARTNERS.includes(f.partner)) f.partner="";
+  return {tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
+}
+function openDesign(d0){
+  const d=cleanDesign(d0); if (!d){ $("status").textContent="That design couldn't be opened."; return; } pushHistory();
   Object.assign(state, {tpl:d.tpl, style:TP.STYLES[d.style]?d.style:"signature", theme:TP.THEMES[d.theme]?d.theme:"show", font:d.font||"signature", motion:TP.MOTIONS[d.motion]?d.motion:"classic", grade:d.grade||"zft", photoKey:d.photoKey||"", bgPhoto:null});
   if (TP.SIZES[d.size]) { state.size=d.size; markSize(); }
-  state.f = Object.assign(freshFields(d.tpl), d.f||{}); state.f.speakers=(state.f.speakers||[]).slice(0,3);
+  state.f = Object.assign(freshFields(d.tpl), d.f);
   afterLoad(); capEdited=false; $("caption").value="";
 }
 async function saveDesign(auto){
@@ -867,12 +891,12 @@ function dItem(x, canDelete){
   const o=document.createElement("button"); o.type="button"; o.className="tbtn"; o.textContent="Open"; o.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId = x.mine ? x.id : null; $("designName").value = x.mine ? x.name : ""; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
   const dup=document.createElement("button"); dup.type="button"; dup.className="tbtn"; dup.textContent="Duplicate"; dup.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId=null; $("designName").value=(x.name||"")+" (copy)"; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
   act.append(o,dup);
-  if (canDelete){ const del=document.createElement("button"); del.type="button"; del.className="x"; del.textContent="Delete"; del.addEventListener("click", async ()=>{ if(!confirm(`Delete “${x.name}”?`)) return; try{ if(ZT) await api("designs.php",{act:"delete", id:x.id}); else store(LOCAL_KEY,(load(LOCAL_KEY)||[]).filter(y=>y.id!==x.id)); if(state.designId===x.id) state.designId=null; row.remove(); }catch(e){ $("dmNote").textContent="Couldn't delete it."; } }); act.append(del); }
+  if (canDelete){ const del=document.createElement("button"); del.type="button"; del.className="x"; del.textContent="Delete"; del.addEventListener("click", async ()=>{ if(!confirm(`Delete “${x.name}”?`)) return; try{ if(ZT) await api("designs.php",{act:"delete", id:x.id}); else store(LOCAL_KEY,(load(LOCAL_KEY)||[]).filter(y=>y.id!==x.id)); if(state.designId===x.id) state.designId=null; row.remove(); $("dmClose").focus(); $("dmNote").textContent=`Deleted “${x.name}”.`; }catch(e){ $("dmNote").textContent="Couldn't delete it."; } }); act.append(del); }
   row.append(info,act); return row;
 }
 let dmOpener=null;
 async function openDesigns(){
-  dmOpener=document.activeElement; $("designsModal").hidden=false; document.querySelector(".app").inert=true; $("dmClose").focus();
+  dmOpener=document.activeElement; $("designsModal").hidden=false; document.querySelector(".app").inert=true; const zb=document.querySelector(".ztbar"); if(zb) zb.inert=true; $("dmClose").focus();
   $("dmNote").textContent="Loading…"; $("dmMine").textContent=""; $("dmTeam").textContent="";
   $("dmTeamLabel").hidden = !ZT; $("dmTeam").hidden = !ZT;
   try{ const j=await fetchDesigns(); $("dmNote").textContent = ZT ? "Saved on the server: open them on any phone or computer. Team history shows the last 30 posters anyone made." : "Saved on this device only. On zeefreaks.io your designs follow you to any device.";
@@ -880,7 +904,7 @@ async function openDesigns(){
     (j.team||[]).forEach(x=>$("dmTeam").append(dItem(x, false))); if(ZT && !(j.team||[]).length) $("dmTeam").innerHTML='<p class="note">No team posters yet.</p>'; }
   catch(e){ $("dmNote").textContent="Couldn't load designs. Try again."; }
 }
-function closeDesigns(){ $("designsModal").hidden=true; document.querySelector(".app").inert=false; if(dmOpener && dmOpener.isConnected) dmOpener.focus(); }
+function closeDesigns(){ $("designsModal").hidden=true; document.querySelector(".app").inert=false; const zb=document.querySelector(".ztbar"); if(zb) zb.inert=false; if(dmOpener && dmOpener.isConnected) dmOpener.focus(); }
 $("designsBtn").addEventListener("click", openDesigns); $("dmClose").addEventListener("click", closeDesigns);
 $("designsModal").addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ e.preventDefault(); closeDesigns(); } if(e.key==="Tab"){ const f=[...$("designsModal").querySelectorAll("button")]; const i=f.indexOf(document.activeElement); if(e.shiftKey&&i<=0){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&i===f.length-1){ e.preventDefault(); f[0].focus(); } } });
 $("designsModal").addEventListener("click",(e)=>{ if(e.target===$("designsModal")) closeDesigns(); });
@@ -892,12 +916,16 @@ async function checkDuplicates(){
 }
 
 /* ---------- posting: draft first, the person's own click sends it ---------- */
-let attach="png";
-function markAttach(){ document.querySelectorAll("[data-attach]").forEach(b=>{ const k=b.dataset.attach; b.disabled = (k==="gif"&&!made.gif)||(k==="video"&&!made.video); if(b.disabled && attach===k) attach="png"; b.setAttribute("aria-pressed",String(attach===k)); }); }
+let attach="png", posting=false;
+function newOp(){ return (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,"0")).join("")).toLowerCase(); }
+function lockDrafts(on){ posting=on; $("draftDiscord").disabled=on; $("draftFb").disabled=on; }
+/* a GIF or video can only be attached while it still matches the design on screen */
+function fresh(m){ return m && m.key===designKey(); }
+function markAttach(){ document.querySelectorAll("[data-attach]").forEach(b=>{ const k=b.dataset.attach; const m = k==="gif"?made.gif:k==="video"?made.video:true; b.disabled = k!=="png" && !fresh(m); b.title = b.disabled && m && m!==true ? "Changed since you made it: make it again" : ""; if(b.disabled && attach===k) attach="png"; b.setAttribute("aria-pressed",String(attach===k)); }); }
 document.querySelectorAll("[data-attach]").forEach(b=>b.addEventListener("click",()=>{ if(b.disabled) return; attach=b.dataset.attach; markAttach(); }));
-async function attachment(){ if(attach==="gif"&&made.gif) return made.gif; if(attach==="video"&&made.video) return made.video; return {blob: await pngBlob(), name: fileBase()+".png"}; }
+async function attachment(){ if(attach==="gif"&&fresh(made.gif)) return made.gif; if(attach==="video"&&fresh(made.video)) return made.video; const sn=snapshot(); return {blob: await pngBlob(null, sn), name: fileBase(null, sn)+".png", key:sn.key}; }
 function draftCard(target){
-  const box=$("draftBox"); box.textContent="";
+  const box=$("draftBox"); if (posting) return null; box.textContent="";
   const card=document.createElement("div"); card.className="draft"; card.setAttribute("role","group"); card.setAttribute("aria-label","Post draft");
   const head=document.createElement("b"); const body=document.createElement("div"); body.className="row"; body.style.alignItems="flex-start";
   const prev=document.createElement("div"); const right=document.createElement("div"); right.style.cssText="display:grid;gap:8px;flex:1;min-width:200px";
@@ -913,7 +941,7 @@ function draftCard(target){
 }
 async function showPreview(el, a){ const url=URL.createObjectURL(a.blob); const m=document.createElement(a.blob.type.startsWith("video")?"video":"img"); m.src=url; if(m.tagName==="VIDEO"){ m.muted=true; m.loop=true; m.autoplay=true; m.playsInline=true; } else m.alt="Poster to post"; el.append(m); }
 $("draftDiscord").addEventListener("click", async ()=>{
-  const d=draftCard("discord"); d.head.textContent="Post to Discord";
+  const d=draftCard("discord"); if(!d) return; d.head.textContent="Post to Discord";
   if (!ZT){ d.who.textContent="Posting works on zeefreaks.io/posters after you sign in with Discord."; d.go.disabled=true; return; }
   if (ZT.via!=="discord"){ d.who.innerHTML='You signed in by email. <a href="auth-discord.php">Sign in with Discord</a> to post, so the post shows who sent it.'; d.go.disabled=true; return; }
   const chans=ZT.channels||[]; if(!chans.length){ d.who.textContent="No Discord channels are switched on yet. George adds them in the private settings."; d.go.disabled=true; return; }
@@ -921,11 +949,12 @@ $("draftDiscord").addEventListener("click", async ()=>{
   const a=await attachment(); await showPreview(d.prev, a);
   capKind="discord"; markCap(); if(!capEdited) writeCaption(); d.cap.value=$("caption").value;
   d.who.textContent=`Posts as “${ZT.name} via TR Poster Maker”.` + (a.blob.size>10*1048576?" This file is over 10 MB: Discord will refuse it. Attach the PNG or a smaller GIF.":"");
+  const op=newOp(); sel.addEventListener("change",()=>{ d.op=newOp(); }); d.op=op;
   d.go.addEventListener("click", ()=>sendPost("post-discord.php", {channel: sel.value, caption: d.cap.value}, a, d, "#"+sel.value));
   d.go.focus();
 });
 $("draftFb").addEventListener("click", async ()=>{
-  const d=draftCard("fb"); d.head.textContent="Post to the Trading Republic Facebook Page";
+  const d=draftCard("fb"); if(!d) return; d.head.textContent="Post to the Trading Republic Facebook Page";
   if (!ZT){ d.who.textContent="Posting works on zeefreaks.io/posters for Page admins."; d.go.disabled=true; return; }
   if (!ZT.admin){ d.who.textContent="Only admins can post to the TR Page. Download the poster and send it to George, or post it in Discord."; d.go.disabled=true; return; }
   const fb=ZT.fb||{}; if(!fb.ready){ d.who.textContent="The Facebook connection isn't set up yet (the Facebook app details go in the private settings)."; d.go.disabled=true; return; }
@@ -934,18 +963,26 @@ $("draftFb").addEventListener("click", async ()=>{
   await showPreview(d.prev, a);
   capKind="facebook"; markCap(); if(!capEdited) writeCaption(); d.cap.value=$("caption").value;
   d.who.textContent=`Posts on the ${fb.page||"Trading Republic"} Page, published right away.`;
+  d.op=newOp();
   d.go.addEventListener("click", ()=>sendPost("post-fb.php", {caption: d.cap.value}, a, d, "TR Page"));
   d.go.focus();
 });
 async function sendPost(url, fields, a, d, where){
-  if (d.go.disabled) return; d.go.disabled=true; d.st.textContent="Posting…";
-  const fd=new FormData(); fd.append("csrf", ZT.csrf); for (const [k,v] of Object.entries(fields)) fd.append(k, v); fd.append("file", a.blob, a.name);
-  try{ const r=await fetch(url,{method:"POST", body:fd}); const j=await r.json().catch(()=>({}));
-    if(!r.ok || !j.ok) throw j;
-    d.st.innerHTML = `Posted to ${esc(where)} ✓` + (j.url ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">Open the post</a>` : "");
-    d.go.textContent="Posted"; teamCache=null;
+  if (d.go.disabled || posting) return; d.go.disabled=true; lockDrafts(true); d.cap.readOnly=true; d.st.textContent="Posting…";
+  const fd=new FormData(); fd.append("csrf", ZT.csrf); fd.append("op", d.op); for (const [k,v] of Object.entries(fields)) fd.append(k, v); fd.append("file", a.blob, a.name);
+  let r=null, j={};
+  try{ r=await fetch(url,{method:"POST", body:fd}); j=await r.json().catch(()=>({})); } catch(e){ r=null; }
+  if (r && r.ok && j.ok){
+    d.st.innerHTML = `Posted to ${esc(where)} ✓` + (j.url && /^https:\/\//.test(j.url) ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">Open the post</a>` : "");
+    d.go.textContent="Posted"; teamCache=null; lockDrafts(false);
     try{ await saveDesign(true); if(state.designId) await api("designs.php",{act:"posted", id:state.designId, where}); }catch(e){}
-  } catch(e){ d.st.textContent = (e && e.message) ? e.message : "Couldn't post. Nothing was sent. Try again."; d.go.disabled=false; }
+    return;
+  }
+  lockDrafts(false);
+  const sure = r && r.status>=400 && r.status<500 && r.status!==409;   // the server says it did NOT post
+  if (sure){ d.st.textContent = j.message || "Couldn't post. Nothing was sent. Try again."; d.go.disabled=false; d.cap.readOnly=false; d.op = j.error==="op" ? newOp() : d.op; return; }
+  // no answer, a server error or "already sent": it may have gone out. Don't offer a quick retry.
+  d.st.textContent = (j && j.message) || `We couldn't confirm whether it posted. Check ${where} before trying again.`; d.go.textContent="Check first";
 }
 
 /* ---------- first-time guided tour ---------- */
@@ -1037,7 +1074,7 @@ function endTour(markDone){
 }
 function maybeAutoTour(){ const done = (ZT && ZT.tourDone) || !!load("tourDone2"); if (!done) setTimeout(startTour, 600); }
 $("tourBtn").addEventListener("click", startTour);
-let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(draw, 150); });
+let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(()=>{ draw(); fitScrollPadding(); }, 150); });
 
 /* ---------- boot ---------- */
 (async()=>{

@@ -26,6 +26,9 @@
   function A(hex, a) { const [r, g, b] = rgb(hex); return `rgba(${r},${g},${b},${a})`; }
   function lum(r, g, b) { return (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255; }
   function hexLum(hex) { return lum(...rgb(hex)); }
+  /* WCAG relative luminance (linearised sRGB), for the brand-check contrast estimate */
+  function relLum(r, g, b) { const f = (c) => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); }
+  const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
   function rng(seed) {
     let a = 0; for (const c of String(seed)) a = (a * 31 + c.charCodeAt(0)) >>> 0;
     return function () { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -593,7 +596,10 @@
     ctx.restore();
     const fonts = styleFonts(tpl, cfg.style, cfg);
     const mono = !!fonts.mono;
-    if (REP) { const R0 = lay.rect, [cr, cg2, cb] = avgColor(ctx, R0.x, R0.y + R0.h * 0.3, R0.w, R0.h * 0.7), bl = lum(cr, cg2, cb), il = hexLum(P.ink); REP.contrast = (Math.max(bl, il) + 0.05) / (Math.min(bl, il) + 0.05); }
+    if (REP) { // estimate: the brighter half of the text area against the body text colours (photos vary, so be conservative)
+      const R0 = lay.rect, h2 = R0.h * 0.35, a1 = avgColor(ctx, R0.x, R0.y + R0.h - 2 * h2, R0.w, h2), a2 = avgColor(ctx, R0.x, R0.y + R0.h - h2, R0.w, h2);
+      const bgs = [relLum(...a1), relLum(...a2)], inks = [P.ink, P.sub].map((c) => relLum(...rgb(c)));
+      REP.contrast = Math.min(...bgs.flatMap((b) => inks.map((i) => ratio(b, i)))); }
 
     // top bar
     const [lr, lg, lb] = avgColor(ctx, W - M - 260 * s, M, 260 * s, logoH);
