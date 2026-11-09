@@ -1,0 +1,368 @@
+{
+ "updated": "2026-11-08",
+ "colours": {
+  "yellowTribe": "#FFB400",
+  "black": "#000000",
+  "white": "#FFFFFF",
+  "siteGold": "#F9A825",
+  "siteBg": "#0B0B0F"
+ },
+ "files": [
+  {
+   "path": "ours/trading-republic/tr-app-icon-512.png",
+   "group": "ours",
+   "brand": "trading-republic",
+   "size": [
+    512,
+    512
+   ]
+  },
+  {
+   "path": "ours/trading-republic/tr-lockup-gold-500.png",
+   "group": "ours",
+   "brand": "trading-republic",
+   "size": [
+    500,
+    500
+   ]
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-black.png",
+   "group": "ours",
+   "brand": "trading-republic",
+   "size": [
+    2400,
+    1535
+   ]
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-black.svg",
+   "group": "ours",
+   "brand": "trading-republic"
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-gold.png",
+   "group": "ours",
+   "brand": "trading-republic",
+   "size": [
+    2400,
+    1535
+   ]
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-gold.svg",
+   "group": "ours",
+   "brand": "trading-republic"
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-white.png",
+   "group": "ours",
+   "brand": "trading-republic",
+   "size": [
+    2400,
+    1535
+   ]
+  },
+  {
+   "path": "ours/trading-republic/tr-mark-white.svg",
+   "group": "ours",
+   "brand": "trading-republic"
+  },
+  {
+   "path": "ours/zeefreaks/zf-monogram-black-500.png",
+   "group": "ours",
+   "brand": "zeefreaks",
+   "size": [
+    500,
+    500
+   ]
+  },
+  {
+   "path": "ours/zeefreaks/zf-monogram-white-500.png",
+   "group": "ours",
+   "brand": "zeefreaks",
+   "size": [
+    500,
+    500
+   ]
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-black.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    719
+   ]
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-black.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-gold-on-dark.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    719
+   ]
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-gold-on-dark.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-white.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    719
+   ]
+  },
+  {
+   "path": "ours/zft/zeefreaks-tribe-white.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zf-icon-black.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1660
+   ]
+  },
+  {
+   "path": "ours/zft/zf-icon-black.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zf-icon-gold.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1660
+   ]
+  },
+  {
+   "path": "ours/zft/zf-icon-gold.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zf-icon-white.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1660
+   ]
+  },
+  {
+   "path": "ours/zft/zf-icon-white.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-capsule-black.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    988
+   ]
+  },
+  {
+   "path": "ours/zft/zft-capsule-black.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-capsule-gold.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    988
+   ]
+  },
+  {
+   "path": "ours/zft/zft-capsule-gold.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-capsule-white.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    988
+   ]
+  },
+  {
+   "path": "ours/zft/zft-capsule-white.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-signature-black.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    788
+   ]
+  },
+  {
+   "path": "ours/zft/zft-signature-black.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-signature-white.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    788
+   ]
+  },
+  {
+   "path": "ours/zft/zft-signature-white.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-wordmark-black.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1230
+   ]
+  },
+  {
+   "path": "ours/zft/zft-wordmark-black.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-wordmark-gold.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1230
+   ]
+  },
+  {
+   "path": "ours/zft/zft-wordmark-gold.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "ours/zft/zft-wordmark-white.png",
+   "group": "ours",
+   "brand": "zft",
+   "size": [
+    2400,
+    1230
+   ]
+  },
+  {
+   "path": "ours/zft/zft-wordmark-white.svg",
+   "group": "ours",
+   "brand": "zft"
+  },
+  {
+   "path": "partners/binance/binance-logo.png",
+   "group": "partners",
+   "brand": "binance",
+   "size": [
+    288,
+    288
+   ]
+  },
+  {
+   "path": "partners/bitget/bitget-logo.png",
+   "group": "partners",
+   "brand": "bitget",
+   "size": [
+    276,
+    360
+   ]
+  },
+  {
+   "path": "partners/bybit/bybit-logo.png",
+   "group": "partners",
+   "brand": "bybit",
+   "size": [
+    476,
+    160
+   ]
+  },
+  {
+   "path": "partners/etoro/etoro-logo.png",
+   "group": "partners",
+   "brand": "etoro",
+   "size": [
+    540,
+    167
+   ]
+  },
+  {
+   "path": "partners/gate/gate-logo.png",
+   "group": "partners",
+   "brand": "gate",
+   "size": [
+    383,
+    360
+   ]
+  },
+  {
+   "path": "partners/mexc/mexc-logo.png",
+   "group": "partners",
+   "brand": "mexc",
+   "size": [
+    474,
+    70
+   ]
+  },
+  {
+   "path": "partners/okx/okx-logo.png",
+   "group": "partners",
+   "brand": "okx",
+   "size": [
+    748,
+    224
+   ]
+  },
+  {
+   "path": "partners/xm/xm-logo.svg",
+   "group": "partners",
+   "brand": "xm"
+  }
+ ],
+ "missing": [
+  {
+   "brand": "okx-wallet",
+   "status": "to get from partner"
+  },
+  {
+   "brand": "dragonfi",
+   "status": "to get from partner"
+  },
+  {
+   "brand": "meteora",
+   "status": "to get from partner"
+  }
+ ]
+}

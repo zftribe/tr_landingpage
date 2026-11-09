@@ -1,0 +1,15 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<pre id="out"></pre>
+<script>/*GIF_JS*/</script><script>/*POSTERS_JS*/</script>
+<script>const ASSETS=/*ASSETS_JSON*/;
+(async()=>{const TP=TRPoster;await TP.loadFonts();await TP.loadAssets(ASSETS);
+const q=new URLSearchParams(location.search); const [id,st,th,sz]=(q.get('j')||'council:split:show:square').split(':');
+const t0=performance.now();
+const tpl=TP.TEMPLATES.find(t=>t.id===id), f=JSON.parse(JSON.stringify(tpl.fields)); if(f.partner) f.partnerImg=TP.IMG['p_'+f.partner];
+const dur=+(q.get('d')||4), fps=10, delay=10, n=dur*fps, S=TP.SIZES[sz], gw=+(q.get('w')||360), gh=Math.round(S.h*gw/S.w);
+const big=document.createElement('canvas'), sm=document.createElement('canvas'); sm.width=gw; sm.height=gh; const sx=sm.getContext('2d',{willReadFrequently:true});
+const frame=i=>{TP.render(big,tpl,f,{style:st,theme:th},sz,{t:i*delay/100,dur}); sx.drawImage(big,0,0,gw,gh); return sx.getImageData(0,0,gw,gh).data;};
+const smp=[]; for(let k=0;k<10;k++){const d=frame(Math.floor(k*n/10)); for(let i=0;i<d.length;i+=4*7) smp.push(d[i],d[i+1],d[i+2]);}
+const g=new TRGif.GifWriter(gw,gh,{dither:5}); g.setPalette(new Uint8Array(smp)); for(let i=0;i<n;i++) g.addFrame(frame(i),delay);
+const b=g.finish(); let s=''; for(let i=0;i<b.length;i+=8192) s+=String.fromCharCode.apply(null,b.subarray(i,i+8192));
+document.getElementById('out').textContent='MS='+Math.round(performance.now()-t0)+'\n'+btoa(s);})();</script>

@@ -1,0 +1,1414 @@
+<title>TR Poster Maker</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bricolage+Grotesque:wght@800&family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@500;700&family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@700&family=Manrope:wght@500;700;800&family=Montserrat:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Playfair+Display:wght@900&family=Plus+Jakarta+Sans:wght@500;700;800&family=Poppins:wght@800&family=Russo+One&family=Space+Grotesk:wght@700&family=Unbounded:wght@800&family=Work+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: a stage-by-stage builder. Left: the stage you're on, with the stage bar (Back · 1–6 · Next) under it. Right: the live poster, pinned.
+   Phone: a small pinned preview on top, the stage in the middle, the stage bar fixed at the bottom. Single dark look matched to the TR site. */
+:root{
+  --bg:#0b0b0f; --panel:#13131a; --panel-2:#1a1a23; --line:#262632; --ink:#f5f5f7; --muted:#9a9aab; --gold:#FFB400; --gold-soft:rgba(255,180,0,.12); --danger:#ff6b6b; --ok:#3ddc84;
+  --display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif; --body:"DM Sans","Segoe UI",Arial,sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:14px;line-height:1.45}
+.app{max-width:1320px;margin:0 auto;padding-block:18px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr) minmax(0,540px);gap:22px;align-items:start}
+header.top{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--display);font-weight:800;font-size:24px;margin:0;letter-spacing:-.01em}
+h1 b{color:var(--gold)}
+.sub{color:var(--muted);margin:2px 0 0;font-size:13px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px;background:var(--panel-2)}
+.tbtn[disabled]{opacity:.4;cursor:not-allowed}
+/* stage panel */
+.builder{display:grid;gap:0;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:16px}
+.stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:16px 16px 0}
+.stagehead h2{font:800 19px var(--display);margin:0}
+.stagehead small{color:var(--gold);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:11px;white-space:nowrap}
+.stage-body{padding:14px 16px 16px;display:grid;gap:14px;min-width:0}
+.stage-body[hidden]{display:none}
+.stagebar{border-top:1px solid var(--line);padding:12px 16px;display:grid;gap:10px;background:#111118;border-radius:0 0 16px 16px}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px;list-style:none;margin:0;padding:0}
+.steps li{display:grid}
+.step{all:unset;cursor:pointer;border-radius:9px;padding:7px 4px;text-align:center;font-size:11.5px;font-weight:800;border:1px solid var(--line);background:var(--panel-2);color:var(--muted);line-height:1.15}
+.step b{display:block;font-size:13px}
+.step.done{color:var(--ink)} .step.done b::after{content:" ✓";color:var(--ok)}
+.step[aria-current="step"]{background:var(--gold);color:#111;border-color:var(--gold)} .step[aria-current="step"] b::after{color:#111}
+.navs{display:flex;justify-content:space-between;gap:8px}
+.navbtn{all:unset;cursor:pointer;border-radius:10px;padding:10px 16px;font-weight:800;font-size:14px;border:1px solid var(--line);text-align:center}
+.navbtn.gold{background:var(--gold);color:#111;border-color:var(--gold)}
+.navbtn.ghost{visibility:hidden}
+/* shared controls */
+.label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:800}
+.sec{display:grid;gap:8px;min-width:0}
+.tpls{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:10px}
+.tpl{all:unset;cursor:pointer;display:grid;gap:5px;border-radius:10px;padding:6px;border:1px solid transparent}
+.tpl canvas,.tpl img.ph{width:100%;aspect-ratio:1/1;border-radius:7px;display:block;background:#000;object-fit:cover}
+.tpl span{font-size:12px;font-weight:700;line-height:1.2}
+.tpl small{color:var(--muted);font-size:11px;line-height:1.2}
+.tpl[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.tw{position:relative;min-width:0}
+.tw>.tpl{width:100%;box-sizing:border-box}
+.tw[hidden]{display:none!important}
+.tplx{all:unset;cursor:pointer;position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:rgba(11,11,15,.82);color:#f5f5f7;font-size:16px;line-height:1;border:1px solid rgba(255,255,255,.25);opacity:0;transition:opacity .15s}
+.tw:hover .tplx,.tplx:focus-visible{opacity:1}
+@media (hover:none){.tplx{opacity:.9}}
+.confirm{position:absolute;inset:6px;border-radius:9px;background:rgba(11,11,15,.94);display:grid;align-content:center;gap:8px;padding:10px;text-align:center;font-size:12px}
+.confirm .row{justify-content:center}
+.confirm button{all:unset;cursor:pointer;border-radius:8px;padding:6px 10px;font-weight:800;font-size:12px;border:1px solid var(--line)}
+.confirm .yes{background:var(--danger);color:#111;border-color:var(--danger)}
+.morebar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.removed{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.removed button{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:4px 10px;color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chipbtn{all:unset;cursor:pointer;border:1px solid var(--line);background:var(--panel-2);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px}
+.chipbtn small{display:block;font-weight:500;color:var(--muted);font-size:11px}
+.chipbtn[aria-pressed="true"]{background:var(--gold);color:#111;border-color:var(--gold)}
+.chipbtn[aria-pressed="true"] small{color:#3a2a00}
+.chipbtn[disabled]{opacity:.45;cursor:not-allowed}
+.presets .chipbtn{border-radius:12px;border-color:rgba(255,180,0,.45)}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.styles .chipbtn{border-radius:10px;padding:9px 12px}
+.sws{display:flex;gap:8px;flex-wrap:wrap}
+.sw{all:unset;cursor:pointer;display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 10px 4px 4px;font-size:12px;font-weight:600;background:var(--panel-2)}
+.sw i{width:22px;height:22px;border-radius:50%;display:block;border:1px solid rgba(255,255,255,.2)}
+.sw[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:520px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.f{display:grid;gap:4px;min-width:0}
+.f label,.f .lab{font-size:12px;font-weight:700;color:var(--muted)}
+input[type=text],input[type=date],input[type=time],select,textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:9px 10px;min-width:0;width:100%;box-sizing:border-box}
+textarea{min-height:64px;resize:vertical}
+input[type=range]{accent-color:var(--gold);width:100%}
+.toggle{display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}
+.toggle input{accent-color:var(--gold);width:18px;height:18px}
+.spk{display:grid;grid-template-columns:56px minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:center;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:8px}
+.spk .zoom{grid-column:2/4;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+@media (max-width:520px){.spk{grid-template-columns:56px minmax(0,1fr) auto}.spk .role{grid-column:2/3}.spk .zoom{grid-column:1/-1}}
+.av{all:unset;cursor:pointer;width:56px;height:56px;border-radius:50%;background:var(--bg) center/cover no-repeat;border:2px dashed var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);text-align:center;line-height:1.1}
+.av.has{border-style:solid;border-color:var(--gold);color:transparent}
+.x{all:unset;cursor:pointer;color:var(--muted);font-size:12px;padding:6px 8px;border-radius:8px}
+.x:hover{color:var(--danger)}
+.btn{all:unset;cursor:pointer;text-align:center;font-weight:800;border-radius:10px;padding:11px 14px;background:var(--panel-2);border:1px solid var(--line)}
+.btn.gold{background:var(--gold);color:#111;border-color:var(--gold)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.note{color:var(--muted);font-size:12px;margin:0}
+.focusbox{position:relative;border-radius:10px;overflow:hidden;background:#000;max-width:340px;touch-action:none;cursor:crosshair;border:1px solid var(--line)}
+.focusbox img{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.focusdot{position:absolute;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 0 3px rgba(0,0,0,.5);background:rgba(255,180,0,.25);pointer-events:none}
+.focusbox:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.picker{display:grid;gap:10px;background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:12px;max-width:340px}
+.picker[hidden]{display:none}
+.sv{position:relative;height:160px;border-radius:10px;touch-action:none;cursor:crosshair;background-image:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent)}
+.sv i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}
+.hue{-webkit-appearance:none;appearance:none;height:14px;border-radius:99px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00)}
+.hue::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #111}
+.hue::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #111}
+.hexrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center}
+.hexrow .swatch{width:38px;height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.2)}
+.hexrow input{font:700 14px "JetBrains Mono",monospace;text-transform:uppercase}
+.contrast{font-size:12px;margin:0} .contrast .ok{color:var(--ok)} .contrast .bad{color:#ffcf6b}
+.fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:280px;overflow:auto;padding:2px 4px 2px 2px}
+.fontbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel-2);display:grid;gap:2px;min-width:0}
+.fontbtn span{font-size:21px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fontbtn small{font:600 11px var(--body);color:var(--muted)}
+.fontbtn[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.fontbtn:focus-visible,.sv:focus-visible,.crop:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.addfont{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.crop{position:relative;border-radius:12px;overflow:hidden;touch-action:none;cursor:grab;background:#000;border:2px solid var(--gold);max-width:100%}
+.crop:active{cursor:grabbing}
+.crop canvas{width:100%;height:100%;display:block}
+.crop .grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}
+.zoomrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;max-width:340px}
+.check{display:grid;gap:4px;font-size:13px}
+.check .ok{color:var(--ok)} .check .bad{color:#ffcf6b}
+.draft{border:1px solid rgba(255,180,0,.5);border-radius:12px;padding:12px;background:var(--gold-soft);display:grid;gap:10px}
+.draft img,.draft video{max-width:180px;border-radius:8px;border:1px solid var(--line);display:block}
+.draft .who{font-size:12px;color:var(--muted)}
+.tabs{display:flex;gap:6px}
+.status{font-size:13px;min-height:1.2em;margin:0}
+.bar{height:6px;border-radius:99px;background:var(--panel-2);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--gold);transition:width .1s}
+.result{display:grid;gap:8px}
+.result img,.result video{max-width:100%;border-radius:8px;border:1px solid var(--line)}
+.missing{color:var(--muted);font-size:12px;margin:0}
+.warn{border:1px solid rgba(255,207,107,.5);background:rgba(255,207,107,.08);border-radius:10px;padding:10px;font-size:13px}
+/* preview */
+.stage{position:sticky;top:max(12px,env(safe-area-inset-top,0px));display:grid;gap:10px;min-width:0}
+.canvaswrap{background:repeating-conic-gradient(#15151c 0 25%,#1b1b23 0 50%) 0 0/20px 20px;border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;place-items:center}
+#main{max-width:100%;max-height:min(68vh,620px);width:auto;height:auto;display:block;border-radius:6px;box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.sizes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sizes .chipbtn{border-radius:10px;text-align:center;padding:7px 4px;font-size:12px}
+.meta{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;color:var(--muted);flex-wrap:wrap}
+#checkLine{all:unset;cursor:pointer;font-weight:700}
+#checkLine.ok{color:var(--ok)} #checkLine.bad{color:#ffcf6b}
+.bigger{display:none}
+/* modal (My designs) */
+.modal{position:fixed;inset:0;z-index:60;background:rgba(5,5,8,.72);display:grid;place-items:center;padding:16px}
+.modal[hidden]{display:none}
+.sheet{width:min(720px,100%);max-height:min(86vh,800px);overflow:auto;background:#16161e;border:1px solid var(--line);border-radius:16px;padding:16px;display:grid;gap:12px;align-content:start}
+.sheet h3{font:800 18px var(--display);margin:0}
+.dlist{display:grid;gap:6px}
+.ditem{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel-2)}
+.ditem b{display:block;font-size:13px} .ditem small{color:var(--muted);font-size:12px}
+.ditem .row{gap:4px}
+.tpl:focus-visible,.chipbtn:focus-visible,.sw:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.step:focus-visible,.navbtn:focus-visible,.tbtn:focus-visible,#checkLine:focus-visible,a:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+a{color:var(--gold)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+/* phone and narrow screens: pinned mini preview on top, stage bar fixed at the bottom */
+@media (max-width:900px){
+  .app{grid-template-columns:minmax(0,1fr);padding-bottom:150px;gap:14px}
+  .stage{order:-1;top:0;z-index:20;background:var(--bg);padding:8px 0;margin-inline:-4px}
+  header.top{order:-2}
+  .canvaswrap{padding:6px}
+  #main{max-height:24vh}
+  .stage{gap:6px}
+  .sizes{gap:4px} .sizes .chipbtn{padding:5px 2px;font-size:11px} .sizes .chipbtn small{display:none}
+  .meta{font-size:11px} .bigger{padding:4px 10px;font-size:12px}
+  .stage.big #main{max-height:72vh}
+  .bigger{display:inline-block}
+  .stagebar{position:fixed;left:0;right:0;bottom:0;z-index:30;border-radius:0;padding:8px max(12px,env(safe-area-inset-left,0px)) max(8px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);box-shadow:0 -10px 30px rgba(0,0,0,.5)}
+  .step{font-size:0;padding:6px 2px} .step b{font-size:13px}
+  .navbtn{padding:9px 12px;font-size:13px}
+}
+
+.tour-shade{position:fixed;inset:0;background:rgba(5,5,8,.72);z-index:70}
+.tour-ring{position:fixed;z-index:71;border-radius:14px;box-shadow:0 0 0 3px var(--gold),0 0 0 9999px rgba(5,5,8,.72);pointer-events:none}
+.tour-tip{position:fixed;z-index:72;width:min(360px,calc(100vw - 24px));background:#16161e;border:1px solid rgba(255,180,0,.5);border-radius:14px;padding:16px;display:grid;gap:8px;box-shadow:0 18px 50px rgba(0,0,0,.6)}
+.tour-tip.center{left:50%!important;top:50%!important;transform:translate(-50%,-50%)}
+.tour-tip.dock{left:12px!important;right:12px;top:12px!important;width:auto}
+.tour-tip h3{font:800 17px var(--display);margin:0}
+.tour-tip p{margin:0;color:#cbcbd7;font-size:14px}
+.tour-step{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:800}
+.tour-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px}
+.tour-nav span{display:flex;gap:8px}
+.tour-nav button{all:unset;cursor:pointer;border-radius:9px;padding:8px 12px;font-weight:800;font-size:13px}
+.tour-nav .tour-skip{color:var(--muted)}
+.tour-nav .tour-back{border:1px solid var(--line)}
+.tour-nav .tour-next{background:var(--gold);color:#111}
+.tour-nav button[hidden]{display:none}
+</style>
+
+<!--USERBAR-->
+<div class="app">
+  <header class="top">
+    <div><h1>TR <b>Poster Maker</b></h1><p class="sub">Build it stage by stage. The poster on the right updates as you go. Times are Philippine time.</p></div>
+    <div class="tools">
+      <button class="tbtn" type="button" id="undoBtn" disabled aria-label="Undo" title="Undo (Ctrl+Z)">↶ Undo</button>
+      <button class="tbtn" type="button" id="redoBtn" disabled aria-label="Redo" title="Redo (Ctrl+Shift+Z)">↷ Redo</button>
+      <button class="tbtn" type="button" id="designsBtn">My designs</button>
+      <button class="tbtn" type="button" id="tourBtn">▶ Tour</button>
+    </div>
+  </header>
+
+  <section class="builder" id="builder" aria-labelledby="stageTitle">
+    <div class="stagehead"><h2 id="stageTitle" tabindex="-1"></h2><small id="stageNum"></small></div>
+
+    <!-- 1 · Template -->
+    <div class="stage-body" data-stage="0">
+      <div class="sec presets-sec"><div class="label">This week, in one tap</div><div class="row presets" id="presets"></div></div>
+      <div class="sec"><div class="label">Favourites · recurring sessions</div><div class="tpls" id="favs"></div></div>
+      <div class="sec"><div class="label">Base templates · starting points for anything new</div><div class="tpls" id="bases"></div>
+        <div class="morebar"><button class="btn" type="button" id="moreBtn" aria-expanded="false" aria-controls="bases"></button><span class="note" id="hideNote"></span></div>
+        <div class="removed" id="removed" hidden></div></div>
+    </div>
+
+    <!-- 2 · Look -->
+    <div class="stage-body" data-stage="1" hidden>
+      <div class="sec"><div class="label">Series looks</div><div class="styles" id="styles"></div></div>
+      <div class="sec"><div class="label">Bold blocks</div><div class="styles" id="styles2"></div></div>
+      <div class="sec"><div class="label">Colour theme</div><div class="sws" id="themes"></div>
+        <div class="picker" id="picker" hidden aria-label="Custom colour">
+          <div class="sv" id="sv" tabindex="0" role="slider" aria-label="Saturation and brightness. Arrow keys adjust."><i id="svDot"></i></div>
+          <input type="range" class="hue" id="hue" min="0" max="360" value="205" aria-label="Hue">
+          <div class="hexrow"><div class="swatch" id="swatch"></div><input type="text" id="hex" maxlength="7" aria-label="HEX colour" spellcheck="false" autocomplete="off"><button class="btn" type="button" id="copyHex">Copy</button></div>
+          <p class="contrast" id="contrast" aria-live="polite"></p>
+          <div class="row"><button class="btn gold" type="button" id="saveSw">Save as my swatch</button><button class="btn" type="button" id="teamSw" hidden>Share with the team</button><button class="x" type="button" id="delSw" hidden>Remove this swatch</button></div>
+          <p class="note" id="teamSwNote" aria-live="polite"></p>
+        </div></div>
+      <div class="sec"><div class="label">Fonts</div>
+        <div class="row" role="group" aria-label="Font for"><button class="chipbtn" type="button" data-ff="title" aria-pressed="true">Headline</button><button class="chipbtn" type="button" data-ff="body" aria-pressed="false">Body text</button></div>
+        <div class="fonts" id="fonts" role="group" aria-label="Fonts"></div>
+        <div class="addfont">
+          <div class="row"><input type="text" id="gfName" maxlength="40" placeholder="Add any Google Font by name, e.g. Righteous" style="flex:1;min-width:180px" aria-label="Google Font name"><button class="btn" type="button" id="gfAdd">Add</button></div>
+          <div class="row"><button class="btn" type="button" id="upBtn">Upload a font (.ttf .otf .woff2)</button><input type="file" id="upFile" accept=".ttf,.otf,.woff,.woff2" hidden></div>
+          <label class="toggle" id="teamFontRow" hidden><input type="checkbox" id="teamFont"> Share the next font I add with the whole team</label>
+          <p class="note" id="fontNote" aria-live="polite">Only free Google Fonts or fonts you own. Fonts you add stay in this browser.</p>
+        </div></div>
+    </div>
+
+    <!-- 3 · Details -->
+    <div class="stage-body" data-stage="2" hidden>
+      <div class="row" style="justify-content:space-between"><span class="note" id="detailsFor"></span><button class="x" id="reset" type="button">Reset to template</button></div>
+      <div class="grid2">
+        <div class="f"><label for="title">Title</label><input type="text" id="title" maxlength="80"></div>
+        <div class="f"><label for="kicker">Small line above the title</label><input type="text" id="kicker" maxlength="60"></div>
+      </div>
+      <div class="f"><label for="topic">Topic</label><textarea id="topic" maxlength="220"></textarea></div>
+      <div class="grid3">
+        <div class="f"><label for="date">Date</label><input type="date" id="date"></div>
+        <div class="f"><label for="time">Start (PH time)</label><input type="time" id="time"></div>
+        <div class="f"><label for="endTime">End (optional)</label><input type="time" id="endTime"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label for="where">Where</label><input type="text" id="where" maxlength="60" placeholder="FB Live · YouTube, Zoom, Ortigas…"></div>
+        <div class="f"><label for="channel">Discord channel or link</label><input type="text" id="channel" maxlength="60" placeholder="#upcoming-events"></div>
+      </div>
+      <div class="grid2">
+        <div class="f"><label for="cta">Call to action</label><input type="text" id="cta" maxlength="80" placeholder="Free for everyone"></div>
+        <div class="f"><label for="partner">Partner logo</label><select id="partner"></select></div>
+      </div>
+      <div class="f"><label for="link">Link for the caption (optional)</label><input type="text" id="link" maxlength="200" placeholder="https://… (FB Live, Zoom or sign-up link)"></div>
+      <p class="missing" id="missing"></p>
+      <label class="toggle"><input type="checkbox" id="live"> Show the red LIVE badge</label>
+      <div class="check" id="checkDetails" aria-live="polite"></div>
+      <div class="row" id="presetAdmin" hidden><button class="btn" type="button" id="savePreset">Save as the team preset for this show</button><span class="note" id="presetNote"></span></div>
+    </div>
+
+    <!-- 4 · Photo & speakers -->
+    <div class="stage-body" data-stage="3" hidden>
+      <div class="sec"><div class="label">Backdrop photo</div>
+        <div class="tpls" id="photoLib" style="grid-template-columns:repeat(auto-fill,minmax(76px,1fr))"></div>
+        <div class="row"><button class="btn" type="button" id="bgBtn">Upload a photo</button><button class="x" type="button" id="bgClear" hidden>No photo</button><button class="x" type="button" id="askPhoto">Ask Codex for a new photo</button></div>
+        <div class="row" role="group" aria-label="Photo colour"><button class="chipbtn" type="button" data-grade="zft">Dark theme<small>moody, tinted to the colour theme</small></button><button class="chipbtn" type="button" data-grade="natural">Original theme<small>the photo's own colours</small></button></div>
+        <input type="file" id="bgFile" accept="image/*" hidden>
+      </div>
+      <div class="sec" id="focusSec" hidden><div class="label">Frame the photo · drag to move, scroll or pinch to zoom</div>
+        <div class="crop" id="crop" tabindex="0" role="slider" data-nozoom aria-label="Photo frame. Drag to move, scroll or pinch to zoom. Arrow keys move, plus and minus zoom." aria-valuetext=""><canvas id="cropC" width="600" height="600"></canvas><div class="grid"></div></div>
+        <div class="zoomrow"><span aria-hidden="true">−</span><input type="range" id="cropZoom" min="100" max="300" step="1" value="100" aria-label="Photo zoom"><span aria-hidden="true">+</span></div>
+        <div class="row"><button class="btn" type="button" id="focusReset">Reset</button><span class="note" id="cropNote"></span></div>
+      </div>
+      <div class="sec"><div class="label">Hosts and speakers · <span id="spkCount">up to 3</span></div>
+        <div id="spkList" style="display:grid;gap:8px"></div>
+        <button class="btn" type="button" id="addSpk">+ Add speaker</button>
+        <p class="note">Tap the circle to add a photo. Square head-and-shoulders photos work best.</p>
+        <input type="file" id="spkFile" accept="image/*" hidden>
+      </div>
+    </div>
+
+    <!-- 5 · Fine-tune -->
+    <div class="stage-body" data-stage="4" hidden>
+      <div class="f"><label for="titleScale">Title size <span id="titleScaleV"></span></label><input type="range" id="titleScale" min="70" max="130" step="5" value="100"></div>
+      <div class="f"><label for="photoZoom">Photo zoom <span id="photoZoomV"></span></label><input type="range" id="photoZoom" min="100" max="300" step="5" value="100"></div>
+      <p class="note">Everything stays inside the safe edges: a bigger title stops growing when it runs out of room.</p>
+      <div class="sec"><div class="label">Motion (GIF and video)</div><div class="styles" id="motions"></div></div>
+      <label class="toggle"><input type="checkbox" id="play"> Play the animation in the preview</label>
+      <button class="x" type="button" id="tuneReset" style="justify-self:start">Reset fine-tune</button>
+    </div>
+
+    <!-- 6 · Generate & share -->
+    <div class="stage-body" data-stage="5" hidden>
+      <div class="warn" id="dupWarn" hidden></div>
+      <div class="sec"><div class="label">Brand check</div><div class="check" id="checkFull" aria-live="polite"></div></div>
+      <div class="sec"><div class="label">Download</div>
+        <div class="btns">
+          <button class="btn gold" type="button" id="dlPng">PNG · this size</button>
+          <button class="btn" type="button" id="dlPack">All 4 sizes (zip)</button>
+          <button class="btn" type="button" id="mkGif">Animated GIF</button>
+          <button class="btn" type="button" id="mkVid">Video</button>
+        </div>
+        <div class="grid3">
+          <div class="f"><label for="gifDur">Loop length</label><select id="gifDur"><option value="4">4 s</option><option value="6" selected>6 s</option><option value="8">8 s</option><option value="10">10 s</option></select></div>
+          <div class="f"><label for="gifFps">GIF smoothness</label><select id="gifFps"><option value="10">10 fps</option><option value="12" selected>12 fps</option><option value="15">15 fps</option></select></div>
+          <div class="f"><label for="gifW">GIF width</label><select id="gifW"><option value="540">540 px (small)</option><option value="720" selected>720 px</option><option value="1080">Full size</option></select></div>
+        </div>
+        <div class="bar" aria-hidden="true"><i id="gifBar"></i></div>
+        <p class="status" id="status" role="status"></p>
+        <div class="result" id="result" hidden></div>
+      </div>
+      <div class="sec"><div class="label">Caption</div>
+        <div class="tabs" role="group" aria-label="Caption for"><button class="chipbtn" type="button" data-cap="discord">Discord</button><button class="chipbtn" type="button" data-cap="facebook">Facebook</button></div>
+        <textarea id="caption" rows="9" maxlength="1900" aria-label="Caption"></textarea>
+        <div class="row"><button class="btn" type="button" id="copyCap">Copy caption</button><button class="x" type="button" id="reCap">Write it again from the details</button></div>
+      </div>
+      <div class="sec"><div class="label">Save</div>
+        <div class="row"><input type="text" id="designName" maxlength="60" aria-label="Design name" style="max-width:280px"><button class="btn" type="button" id="saveDesign">Save design</button></div>
+      </div>
+      <div class="sec"><div class="label">Post</div>
+        <div class="row" role="group" aria-label="Attach"><span class="note">Attach:</span><button class="chipbtn" type="button" data-attach="png" aria-pressed="true">PNG</button><button class="chipbtn" type="button" data-attach="gif" disabled>GIF</button><button class="chipbtn" type="button" data-attach="video" disabled>Video</button></div>
+        <div class="btns"><button class="btn" type="button" id="draftDiscord">Post to Discord…</button><button class="btn" type="button" id="draftFb">Post to the TR Facebook Page…</button><button class="btn" type="button" id="draftEvent">Create a Discord event…</button></div>
+        <div class="sec" id="schedSec" hidden><div class="label">Scheduled Discord posts</div><div class="dlist" id="schedList"></div></div>
+        <div id="draftBox"></div>
+        <p class="note">Nothing is posted until you press <b>Confirm and post</b> on the draft. The TR Facebook <i>Group</i> stays manual: Facebook doesn't let apps post there.</p>
+      </div>
+    </div>
+
+    <div class="stagebar" id="stagebar">
+      <ol class="steps" id="steps" aria-label="Stages"></ol>
+      <div class="navs"><button class="navbtn" type="button" id="backBtn">← Back</button><button class="navbtn gold" type="button" id="nextBtn">Next →</button></div>
+    </div>
+  </section>
+
+  <aside class="stage" id="previewPane" aria-label="Live preview">
+    <div class="canvaswrap"><canvas id="main" width="1080" height="1080" aria-label="Poster preview"></canvas></div>
+    <div class="meta"><span id="sizeNote"></span><button type="button" id="checkLine" aria-label="Brand check, go to the check"></button><button class="tbtn bigger" type="button" id="biggerBtn" aria-pressed="false">Bigger</button></div>
+    <div class="sizes" id="sizes" role="group" aria-label="Size"></div>
+  </aside>
+</div>
+
+<div class="modal" id="designsModal" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dmTitle">
+  <div class="row" style="justify-content:space-between"><h3 id="dmTitle">My designs</h3><button class="tbtn" type="button" id="dmClose">Close</button></div>
+  <p class="note" id="dmNote"></p>
+  <div class="label">Mine</div><div class="dlist" id="dmMine"></div>
+  <div class="label" id="dmTeamLabel">Team history · last 30</div><div class="dlist" id="dmTeam"></div>
+</div></div>
+
+<script>/*GIF_JS*/</script>
+<script>/*POSTERS_JS*/</script>
+<script>
+const ASSETS = /*ASSETS_JSON*/;
+const MISSING = ["OKX Wallet","DragonFi","Meteora"];
+const TP = window.TRPoster;
+const byId = Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+const $ = (id)=>document.getElementById(id);
+const ZT = window.ZT || null;               // set by zeefreaks.io for signed-in users
+const FIELDS = ["title","kicker","topic","date","time","endTime","where","channel","cta","partner","link"];
+const PARTNERS = Object.keys(ASSETS).filter(k=>k.startsWith("p_")).map(k=>k.slice(2));
+const PNAME = {okx:"OKX",binance:"Binance",bitget:"Bitget",bybit:"Bybit",gate:"Gate",mexc:"MEXC",xm:"XM (past)",etoro:"eToro (past)"};
+const PHOTOS = Object.keys(ASSETS).filter(k=>k.startsWith("ph_")).map(k=>k.slice(3));
+const STAGES = ["Pick a template","Choose the look","Fill in the details","Photo & speakers","Fine-tune","Generate & share"];
+const SHORT = ["Template","Look","Details","Photo","Fine-tune","Share"];
+
+const state = { tpl:"hunt", style:"signature", theme:"show", font:"signature", titleFont:"", titleWeight:800, bodyFont:"", custom:"#7DC4FA", motion:"classic", size:"square", f:null, bgPhoto:null, photoKey:"", grade:"zft", stage:0, designId:null };
+const visited = new Set([0]);
+function store(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); }catch(e){} }
+function load(k){ try{ return JSON.parse(localStorage.getItem("trpm:"+k)); }catch(e){ return null; } }
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function defaultPhoto(id){ return PHOTOS.includes(id+"-1") ? id+"-1" : ""; }
+function freshFields(id){ const f = JSON.parse(JSON.stringify(byId[id].fields)); f.title = f.title || byId[id].name; f.link = f.link || ""; f.speakers = (f.speakers||[]).map(s=>({name:s.name,role:s.role})); return f; }
+function currentFields(){
+  const f = Object.assign({}, state.f);
+  f.partnerImg = f.partner ? TP.IMG["p_"+f.partner] : null;
+  f.bgPhoto = state.bgPhoto || (state.photoKey ? TP.IMG["ph_"+state.photoKey] : null);
+  f.grade = state.grade;
+  f.speakers = (state.f.speakers||[]).map(s=>Object.assign({}, s, {photo: s._img||null}));
+  return f;
+}
+function cfg(){ applyCustom(); return {style:state.style, theme:state.theme, font:state.font, motion:state.motion, titleFont:state.titleFont||undefined, titleWeight:state.titleWeight, bodyFont:state.bodyFont||undefined}; }
+function cloneF(f){ return Object.assign({}, f, {speakers:(f.speakers||[]).map(s=>Object.assign({}, s))}); }
+
+/* ---------- PH-time dates + weekly presets ---------- */
+function phToday(){ const p = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()); return p; } // YYYY-MM-DD
+function addDays(iso, n){ const [Y,M,D]=iso.split("-").map(Number); const d=new Date(Date.UTC(Y,M-1,D+n)); return d.toISOString().slice(0,10); }
+function weekday(iso){ const [Y,M,D]=iso.split("-").map(Number); return new Date(Date.UTC(Y,M-1,D)).getUTCDay(); }
+function nextWeekday(wd){ const t=phToday(); for(let i=0;i<7;i++){ const d=addDays(t,i); if(weekday(d)===wd) return d; } return t; }
+/* the nth weekday of a month (e.g. 3rd Saturday); this month's if it hasn't passed, else next month's */
+function nthWeekday(Y, M, wd, nth){ const first=new Date(Date.UTC(Y, M-1, 1)).getUTCDay(); const day=1+((wd-first+7)%7)+(nth-1)*7; const d=new Date(Date.UTC(Y, M-1, day)); return d.getUTCMonth()===M-1 ? d.toISOString().slice(0,10) : null; }
+function nextNth(wd, nth){ const t=phToday(); let [Y,M]=t.split("-").map(Number); for (let k=0;k<3;k++){ const d=nthWeekday(Y,M,wd,nth); if (d && d>=t) return d; M++; if(M>12){ M=1; Y++; } } return t; }
+function presetDate(p, fallback){ return p.weekday===undefined ? fallback : (p.nth ? nextNth(p.weekday, p.nth) : nextWeekday(p.weekday)); }
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const BUILTIN_PRESETS = { hunt:{weekday:2}, charts:{weekday:3}, council:{weekday:4}, mmu:{weekday:1}, meetup:{weekday:6, nth:3} };
+function teamPresets(){ return (ZT && ZT.presets) || load("presets") || {}; }
+function presetFor(id){ const p = Object.assign({}, BUILTIN_PRESETS[id]||{}, teamPresets()[id]||{}); return Object.keys(p).length ? p : null; }
+function shortDate(iso){ if(!iso) return ""; const [Y,M,D]=iso.split("-").map(Number); return `${DAYS[weekday(iso)].slice(0,3)} ${MONTHS[M-1]} ${D}`; }
+function fmtT(t){ if(!t) return ""; let [h,m]=t.split(":").map(Number); const ap=h>=12?"PM":"AM"; h=h%12||12; return h+(m?":"+String(m).padStart(2,"0"):"")+" "+ap; }
+function applyPreset(id){
+  const p = presetFor(id); if(!p) return;
+  pushHistory();
+  state.tpl=id; state.f = freshFields(id); state.bgPhoto=null; state.designId=null;
+  if (p.fields) Object.assign(state.f, JSON.parse(JSON.stringify(p.fields)));
+  if (p.weekday !== undefined) state.f.date = presetDate(p, state.f.date);
+  if (p.style && TP.STYLES[p.style]) state.style = p.style;
+  if (p.theme && TP.THEMES[p.theme]) state.theme = p.theme;
+  state.photoKey = p.photoKey !== undefined ? p.photoKey : defaultPhoto(id); state.f.photoKey = state.photoKey;
+  afterLoad(); $("status").textContent="";
+  goStage(2); // straight to the details to check them
+}
+function buildPresets(){
+  const box=$("presets"); box.textContent="";
+  const favs = TP.TEMPLATES.filter(t=>t.fav && presetFor(t.id) && !hidden.has(t.id));
+  box.closest(".presets-sec").hidden = !favs.length;
+  for (const t of favs){ const p=presetFor(t.id); const f=Object.assign(freshFields(t.id), p.fields||{}); const d = presetDate(p, f.date);
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.innerHTML=`★ Next ${esc(t.name.replace(/^The /,""))}<small>${esc(shortDate(d))}${f.time?" · "+esc(fmtT(f.time)):""}</small>`;
+    b.addEventListener("click",()=>applyPreset(t.id)); box.append(b); }
+}
+
+/* ---------- undo / redo ---------- */
+const undoStack=[], redoStack=[];
+const LOOKKEYS=["font","titleFont","titleWeight","bodyFont","custom"];
+function snap(){ return {...Object.fromEntries(LOOKKEYS.map(k=>[k,state[k]])), tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.photoKey, bgPhoto:state.bgPhoto, designId:state.designId, f:cloneF(state.f)}; }
+function restore(s){ for (const k of LOOKKEYS) state[k]=s[k]; Object.assign(state, {tpl:s.tpl, style:s.style, theme:s.theme, font:s.font, motion:s.motion, grade:s.grade, photoKey:s.photoKey, bgPhoto:s.bgPhoto, designId:s.designId}); state.f=cloneF(s.f); afterLoad(); }
+let typing=null;
+function pushHistory(coalesce){
+  if (coalesce){ if (typing) return; typing=setTimeout(()=>{ typing=null; }, 900); }
+  undoStack.push(snap()); if (undoStack.length>20) undoStack.shift(); redoStack.length=0; markUndo();
+}
+function undo(){ if(!undoStack.length) return; redoStack.push(snap()); restore(undoStack.pop()); markUndo(); }
+function redo(){ if(!redoStack.length) return; undoStack.push(snap()); restore(redoStack.pop()); markUndo(); }
+function markUndo(){ $("undoBtn").disabled=!undoStack.length; $("redoBtn").disabled=!redoStack.length; }
+$("undoBtn").addEventListener("click", undo); $("redoBtn").addEventListener("click", redo);
+document.addEventListener("keydown",(e)=>{ if(!(e.ctrlKey||e.metaKey) || e.key.toLowerCase()!=="z" || tourEls) return; const t=e.target; if(t && (t.tagName==="INPUT"||t.tagName==="TEXTAREA")) return; e.preventDefault(); e.shiftKey?redo():undo(); });
+/* refresh every control after a state jump (template switch, preset, undo, open a design) */
+function afterLoad(){
+  document.querySelectorAll(".tpl[data-id]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.id===state.tpl)));
+  layoutTemplates(); markLook(); markGrade(); $("picker").hidden = state.theme!=="custom"; if(state.theme==="custom"){ hsv=rgb2hsv(...(fromHex(state.custom)||[125,196,250])); paintPicker(); } fillForm(); renderSpeakers(); buildPhotoLib(); fillTune(); drawThumbs(); draw(); saveDraft(); store("last", state.tpl);
+}
+
+/* ---------- stages ---------- */
+function buildSteps(){
+  const box=$("steps"); box.textContent="";
+  STAGES.forEach((t,i)=>{ const li=document.createElement("li"); const b=document.createElement("button"); b.type="button"; b.className="step"; b.innerHTML=`<b>${i+1}</b>${esc(SHORT[i])}`; b.setAttribute("aria-label",`Stage ${i+1}: ${t}`); b.addEventListener("click",()=>goStage(i)); li.append(b); box.append(li); });
+}
+function markSteps(){
+  document.querySelectorAll(".step").forEach((b,i)=>{ b.classList.toggle("done", visited.has(i) && i!==state.stage); if(i===state.stage) b.setAttribute("aria-current","step"); else b.removeAttribute("aria-current"); });
+  $("backBtn").classList.toggle("ghost", state.stage===0); $("backBtn").setAttribute("aria-hidden", String(state.stage===0)); $("backBtn").tabIndex = state.stage===0 ? -1 : 0;
+  $("nextBtn").textContent = state.stage===5 ? "Start a new poster" : `Next: ${SHORT[state.stage+1]} →`;
+}
+function goStage(i, focusTitle){
+  if (i<0 || i>5) return;
+  state.stage=i; visited.add(i);
+  document.querySelectorAll(".stage-body").forEach(s=>s.hidden = +s.dataset.stage!==i);
+  $("stageTitle").textContent = STAGES[i]; $("stageNum").textContent = `Stage ${i+1} of 6`;
+  markSteps();
+  if (i===0) drawThumbs();
+  if (i===2) brandCheck();
+  if (i===3) buildPhotoLib();
+  if (i===5){ loadSchedule(); brandCheck(); if(!$("caption").value || !capEdited) writeCaption(); if(!$("designName").value) $("designName").value = defaultName(); checkDuplicates(); }
+  if (focusTitle !== false) { fitScrollPadding(); $("stageTitle").focus({preventScroll:true}); const pinned = phoneLayout() ? $("previewPane").offsetHeight : 0; const top = $("builder").getBoundingClientRect().top + window.scrollY - pinned - 8; if (phoneLayout() || $("builder").getBoundingClientRect().top < 0) window.scrollTo({top: Math.max(0, top), behavior:"auto"}); }
+}
+/* phone: keep focused fields clear of the pinned preview (top) and the stage bar (bottom) */
+const phoneLayout = ()=>window.innerWidth<=900;
+function fitScrollPadding(){ const r=document.documentElement.style; if(!phoneLayout()){ r.scrollPaddingTop=""; r.scrollPaddingBottom=""; return; } r.scrollPaddingTop=($("previewPane").offsetHeight+8)+"px"; r.scrollPaddingBottom=($("stagebar").offsetHeight+8)+"px"; }
+$("backBtn").addEventListener("click",()=>goStage(state.stage-1));
+$("nextBtn").addEventListener("click",()=>{ if(state.stage===5){ newPoster(); } else goStage(state.stage+1); });
+function newPoster(){ pushHistory(); state.designId=null; $("designName").value=""; capEdited=false; $("caption").value=""; $("draftBox").textContent=""; made.gif=made.video=null; markAttach(); visited.clear(); visited.add(0); goStage(0); }
+
+/* ---------- template picker: collapsible base list + remove/restore ---------- */
+const BASE_SHOWN = 8;
+let hidden = new Set([...(ZT && ZT.hidden ? ZT.hidden : []), ...((load("hidden")||[]))]);
+let showAll = !!load("showAll");
+function teamWide(){ return !!(ZT && ZT.admin); }
+const visibleTemplates = () => TP.TEMPLATES.filter(t=>!hidden.has(t.id));
+async function api(url, body){
+  const r = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify(Object.assign({csrf: ZT.csrf}, body))});
+  let j=null; try{ j=await r.json(); }catch(e){}
+  if(!r.ok) throw Object.assign(new Error("http"), {status:r.status, body:j});
+  return j||{};
+}
+async function saveHidden(id, hide){
+  if (teamWide()){
+    try{ await api("prefs.php", {act: hide?"hide":"restore", id}); }
+    catch(e){ $("status").textContent = "Couldn't save that for the team. Try again."; return false; }
+  } else {
+    const mine = new Set(load("hidden")||[]); hide ? mine.add(id) : mine.delete(id); store("hidden", [...mine]);
+  }
+  hide ? hidden.add(id) : hidden.delete(id); return true;
+}
+function buildTemplates(){
+  for (const t of TP.TEMPLATES){
+    const w = document.createElement("div"); w.className="tw"; w.dataset.wrap=t.id;
+    const b = document.createElement("button"); b.className="tpl"; b.type="button"; b.dataset.id=t.id; b.setAttribute("aria-pressed","false");
+    const c = document.createElement("canvas"); c.width = 324; c.height = 324; c.setAttribute("aria-hidden","true");
+    b.append(c); const n=document.createElement("span"); n.textContent=t.name; const sm=document.createElement("small"); sm.textContent=t.blurb; b.append(n,sm);
+    b.addEventListener("click",()=>selectTemplate(t.id));
+    const x = document.createElement("button"); x.type="button"; x.className="tplx"; x.textContent="×"; x.setAttribute("aria-label","Remove "+t.name);
+    x.addEventListener("click",(e)=>{ e.stopPropagation(); askRemove(w, t, x); });
+    w.append(b, x);
+    (t.fav ? $("favs") : $("bases")).append(w);
+  }
+  $("moreBtn").addEventListener("click", ()=>{ showAll=!showAll; store("showAll", showAll); layoutTemplates(); drawThumbs(); });
+}
+function askRemove(w, t, trigger){
+  if (w.querySelector(".confirm")) return;
+  const box=document.createElement("div"); box.className="confirm"; box.setAttribute("role","group"); box.setAttribute("aria-label","Remove "+t.name+"?");
+  const title=document.createElement("b"); title.textContent="Remove "+t.name+"?";
+  const msg=document.createElement("span");
+  const last = visibleTemplates().length <= 1;
+  msg.textContent = last ? "This is the last template. Restore another one first." : (teamWide() ? "Hidden for everyone. You can restore it below." : "Hidden for you. You can restore it below.");
+  const row=document.createElement("div"); row.className="row";
+  const yes=document.createElement("button"); yes.type="button"; yes.className="yes"; yes.textContent="Remove"; if (last) yes.disabled = true;
+  const no=document.createElement("button"); no.type="button"; no.textContent="Cancel";
+  row.append(yes,no); box.append(title,msg,row);
+  const close=()=>{ box.remove(); trigger.focus(); };
+  no.addEventListener("click", close);
+  box.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ e.preventDefault(); close(); } });
+  yes.addEventListener("click", async ()=>{
+    yes.disabled = true;
+    if(await saveHidden(t.id,true)){
+      box.remove();
+      if(state.tpl===t.id){ const next=visibleTemplates()[0]; if(next) selectTemplate(next.id, true); }
+      layoutTemplates(); buildPresets();
+      const focusTo = document.querySelector(`[data-wrap="${state.tpl}"] .tpl`) || $("removed").querySelector("button");
+      if (focusTo) focusTo.focus();
+    } else yes.disabled = false;
+  });
+  w.append(box); no.focus();
+}
+function layoutTemplates(){
+  let shown=0; const baseVisible = TP.TEMPLATES.filter(t=>!t.fav && !hidden.has(t.id));
+  for (const t of TP.TEMPLATES){
+    const w=document.querySelector(`[data-wrap="${t.id}"]`); if(!w) continue;
+    let vis = !hidden.has(t.id);
+    if (vis && !t.fav){ shown++; if (!showAll && shown > BASE_SHOWN && t.id!==state.tpl) vis=false; }
+    w.hidden = !vis;
+  }
+  const extra = Math.max(0, baseVisible.length - BASE_SHOWN);
+  $("moreBtn").hidden = extra===0;
+  $("moreBtn").textContent = showAll ? "Show fewer ▴" : `More templates (${extra}) ▾`;
+  $("moreBtn").setAttribute("aria-expanded", String(showAll));
+  $("hideNote").textContent = teamWide() ? "Removing a template hides it for the whole team." : "Press × on a template to remove it.";
+  const rem=$("removed"); rem.textContent=""; const hid=TP.TEMPLATES.filter(t=>hidden.has(t.id));
+  rem.hidden = !hid.length;
+  if (hid.length){ rem.append(document.createTextNode(`Removed (${hid.length}):`));
+    for (const t of hid){ const r=document.createElement("button"); r.type="button"; r.textContent="↺ "+t.name; r.setAttribute("aria-label","Restore "+t.name);
+      r.addEventListener("click", async ()=>{ r.disabled = true; if(await saveHidden(t.id,false)){ layoutTemplates(); buildPresets(); drawThumbs(); const tb=document.querySelector(`[data-wrap="${t.id}"] .tpl`); if(tb && !tb.closest("[hidden]")) tb.focus(); else $("moreBtn").focus(); } else r.disabled=false; }); rem.append(r); } }
+}
+/* thumbnails: small (324 px), drawn a few per frame so clicks stay instant; only while stage 1 is open */
+let thumbGen = 0;
+function thumbKey(){ return [state.style,state.theme,state.grade,state.font,state.titleFont,state.bodyFont,state.custom].join("|"); }
+function drawThumb(b){
+  const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
+  const dp = defaultPhoto(t.id); if (dp) { f.bgPhoto = TP.IMG["ph_"+dp]; f.grade = state.grade; }
+  const c=cfg(); delete c.motion; TP.render(b.querySelector("canvas"), t, f, c, "square", {scale: 0.3});
+  b.dataset.key = thumbKey();
+}
+function drawThumbs(){
+  if (state.stage!==0) return;
+  const gen = ++thumbGen, key = thumbKey();
+  const list = [...document.querySelectorAll(".tpl[data-id]")].filter(b=>!b.closest("[hidden]") && b.dataset.key !== key);
+  let i = 0;
+  const step = ()=>{ if (gen !== thumbGen) return; const t0 = performance.now(); while (i < list.length && performance.now() - t0 < 10) drawThumb(list[i++]); if (i < list.length) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
+}
+function selectTemplate(id, quiet){
+  if (id===state.tpl && !quiet) { draw(); return; }
+  pushHistory(); saveDraft();
+  state.tpl = id; state.f = load("draft:"+id) || freshFields(id); state.bgPhoto = null; state.designId=null;
+  (state.f.speakers||[]).forEach(s=>{ delete s._img; });
+  state.photoKey = state.f.photoKey !== undefined ? state.f.photoKey : defaultPhoto(id);
+  afterLoad();
+}
+function saveDraft(){ if(!state.f) return; const copy = JSON.parse(JSON.stringify(state.f, (k,v)=>k==="_img"?undefined:v)); store("draft:"+state.tpl, copy); }
+
+/* ---------- look ---------- */
+function buildLook(){
+  for (const [k,s] of Object.entries(TP.STYLES)){
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.style=k; b.innerHTML=`${esc(s.name)}<small>${esc(s.note)}</small>`;
+    b.addEventListener("click",()=>{ if(state.style===k) return; pushHistory(); state.style=k; store("style",k); markLook(); draw(); });
+    (s.look==="bold" ? $("styles2") : $("styles")).append(b);
+  }
+  for (const [k,t] of Object.entries(TP.THEMES)){
+    if (k==="custom") continue;
+    const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.theme=k;
+    const i=document.createElement("i"); i.style.background = k==="show" ? "conic-gradient(#e9d3a6 0 20%,#5dff9e 0 40%,#FFB400 0 60%,#ff9a2e 0 80%,#cfd0d4 0)" : `linear-gradient(135deg, ${t.bg} 0 50%, ${t.accent} 50% 100%)`;
+    b.append(i, document.createTextNode(t.name));
+    b.addEventListener("click",()=>{ if(state.theme===k) return; pushHistory(); state.theme=k; store("theme",k); $("picker").hidden=true; markLook(); draw(); });
+    $("themes").append(b);
+  }
+  buildSwatches(); buildFonts();
+  for (const [k,m] of Object.entries(TP.MOTIONS)){
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.motion=k; b.innerHTML=`${esc(m.name)}<small>${esc(m.note)}</small>`;
+    b.addEventListener("click",()=>{ if(state.motion===k) return; pushHistory(); state.motion=k; store("motion",k); markLook(); if(!$("play").checked){ $("play").checked=true; startPlay(); } else playStart=performance.now(); });
+    $("motions").append(b);
+  }
+}
+function markLook(){
+  document.querySelectorAll("[data-style]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.style===state.style)));
+  document.querySelectorAll("[data-theme]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.theme===state.theme)));
+  document.querySelectorAll("[data-sw]").forEach(b=>b.setAttribute("aria-pressed", String(state.theme==="custom" && (b.dataset.sw===state.custom || (b.dataset.sw==="new" && !mySw.includes(state.custom))))));
+  markFonts();
+  document.querySelectorAll("[data-motion]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.motion===state.motion)));
+}
+
+/* ---------- custom colour (George 10 Nov, pick A: the colour is the accent and block; background stays dark in its hue) ---------- */
+function hsv2rgb(h,s,v){ const f=(n)=>{ const k=(n+h/60)%6; return v - v*s*Math.max(0,Math.min(k,4-k,1)); }; return [f(5),f(3),f(1)].map(x=>Math.round(x*255)); }
+function rgb2hsv(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn; let h=0; if(d){ h = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; if(h<0) h+=360; } return [h, mx?d/mx:0, mx]; }
+const toHex=(r,g,b)=>"#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+const fromHex=(h)=>{ const m=/^#?([0-9a-f]{6}|[0-9a-f]{3})$/i.exec(String(h||"").trim()); if(!m) return null; let x=m[1]; if(x.length===3) x=x.split("").map(c=>c+c).join(""); const n=parseInt(x,16); return [n>>16&255,n>>8&255,n&255]; };
+function relLumC(r,g,b){ const f=c=>{ c/=255; return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4); }; return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b); }
+const cRatio=(a,b)=>(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+function hslHex(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1)); return toHex(...[f(0),f(8),f(4)].map(x=>Math.round(x*255))); }
+function themeFrom(hex){ const c=fromHex(hex)||[125,196,250]; const [h,s]=rgb2hsv(...c); const sat=Math.round(Math.min(60,s*100)); const L=relLumC(...c);
+  return { name:"My colour", bg:hslHex(h,sat,6), bg2:hslHex(h,sat,15), ink:"#ffffff", sub:hslHex(h,Math.min(sat,30),86), accent:toHex(...c), block:toHex(...c), blockInk: cRatio(L,1)>=cRatio(L,0) ? "#ffffff" : "#111111" }; }
+let customFor="";
+function applyCustom(){ if (customFor!==state.custom){ TP.THEMES.custom = themeFrom(state.custom); customFor=state.custom; } }
+let mySw = (load("swatches")||[]).filter(x=>fromHex(x)).slice(0,8);
+const teamColours = ()=>((ZT && ZT.brand && ZT.brand.colours)||[]).filter(x=>fromHex(x));
+let hsv=[205,0.5,0.98];
+function buildSwatches(){
+  document.querySelectorAll("[data-sw]").forEach(b=>b.remove());
+  const mk=(key,label,bg)=>{ const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.sw=key; const i=document.createElement("i"); i.style.background=bg; b.append(i, document.createTextNode(label));
+    b.addEventListener("click",()=>{ pushHistory(); if(key!=="new"){ state.custom=key; } state.theme="custom"; store("theme","custom"); store("custom",state.custom); hsv=rgb2hsv(...fromHex(state.custom)); $("picker").hidden=false; paintPicker(); markLook(); draw(); drawThumbs(); }); $("themes").append(b); };
+  for (const h of teamColours()) mk(h, "★ "+h, h);
+  for (const h of mySw) if (!teamColours().includes(h)) mk(h, h, h);
+  mk("new", "＋ Custom colour", "conic-gradient(red,yellow,lime,cyan,blue,magenta,red)");
+}
+function paintPicker(pushHex){
+  const c=fromHex(state.custom); $("swatch").style.background=state.custom; if(pushHex!==false) $("hex").value=state.custom;
+  $("sv").style.backgroundColor=toHex(...hsv2rgb(hsv[0],1,1)); $("svDot").style.left=(hsv[1]*100)+"%"; $("svDot").style.top=((1-hsv[2])*100)+"%"; $("hue").value=Math.round(hsv[0]);
+  $("sv").setAttribute("aria-valuetext", `${state.custom}, saturation ${Math.round(hsv[1]*100)}%, brightness ${Math.round(hsv[2]*100)}%`);
+  const t=themeFrom(state.custom), L=relLumC(...c), onBg=cRatio(L, relLumC(...fromHex(t.bg))), onBlock=cRatio(L, t.blockInk==="#ffffff"?1:0);
+  $("contrast").innerHTML = `<span class="${onBg>=3?"ok":"bad"}">${onBg>=3?"✓":"⚠"} Colour on the dark background ${onBg.toFixed(1)} : 1</span> · <span class="ok">✓ ${t.blockInk==="#ffffff"?"White":"Black"} text on blocks ${onBlock.toFixed(1)} : 1</span>` + (onBg<3 ? `<br><span class="bad">Too dark to stand out as an accent: pick a lighter colour.</span>` : "");
+  $("delSw").hidden = !mySw.includes(state.custom); $("teamSw").hidden = !(ZT && ZT.admin) || teamColours().includes(state.custom);
+}
+function setCustomFromHsv(push){ state.custom=toHex(...hsv2rgb(...hsv)); state.theme="custom"; store("custom",state.custom); store("theme","custom"); paintPicker(push); markLook(); queueDraw(); }
+(function picker(){ const el=$("sv"); let down=false;
+  const set=(e)=>{ const r=el.getBoundingClientRect(); hsv[1]=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); hsv[2]=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); setCustomFromHsv(); };
+  el.addEventListener("pointerdown",e=>{ pushHistory(); down=true; el.setPointerCapture(e.pointerId); set(e); }); el.addEventListener("pointermove",e=>{ if(down) set(e); }); el.addEventListener("pointerup",()=>{ down=false; drawThumbs(); });
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[-.03,0],ArrowRight:[.03,0],ArrowUp:[0,.03],ArrowDown:[0,-.03]}[e.key]; if(!k) return; e.preventDefault(); pushHistory(true); hsv[1]=Math.min(1,Math.max(0,hsv[1]+k[0])); hsv[2]=Math.min(1,Math.max(0,hsv[2]+k[1])); setCustomFromHsv(); });
+  $("hue").addEventListener("input",()=>{ pushHistory(true); hsv[0]=+$("hue").value; setCustomFromHsv(); });
+  $("hue").addEventListener("change",drawThumbs);
+  $("hex").addEventListener("input",()=>{ const c=fromHex($("hex").value); if(!c) return; pushHistory(true); hsv=rgb2hsv(...c); state.custom=toHex(...c); state.theme="custom"; store("custom",state.custom); paintPicker(false); markLook(); queueDraw(); });
+  $("hex").addEventListener("change",()=>{ $("hex").value=state.custom; drawThumbs(); });
+  $("copyHex").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(state.custom); $("copyHex").textContent="Copied ✓"; }catch(e){ $("hex").select(); $("copyHex").textContent="Ctrl+C"; } setTimeout(()=>$("copyHex").textContent="Copy",1800); });
+  $("teamSw").addEventListener("click", async ()=>{ try{ const j=await api("brand.php",{act:"add_colour", hex:state.custom}); ZT.brand=Object.assign({}, ZT.brand, {colours:j.colours}); $("teamSwNote").textContent=`${state.custom} is now in every Guild Leader's colours (★).`; buildSwatches(); markLook(); paintPicker(); }catch(e){ $("teamSwNote").textContent="Couldn't share it. Try again."; } });
+  $("saveSw").addEventListener("click",()=>{ if(!mySw.includes(state.custom)) mySw.unshift(state.custom); mySw=mySw.slice(0,8); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
+  $("delSw").addEventListener("click",()=>{ mySw=mySw.filter(x=>x!==state.custom); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
+})();
+
+/* ---------- fonts (pick A: added and uploaded fonts stay in this browser) ---------- */
+const FONTS = [
+  ["ZFT Slant","",800,"title","One slanted face for every show"],["Show's own font","",800,"title","Each series keeps its type"],
+  ["Anton","Anton",400,"title","Tall and loud"],["Bebas Neue","Bebas Neue",400,"title","Clean caps"],["Archivo Black","Archivo Black",400,"title","Heavy, wide"],
+  ["Montserrat","Montserrat",900,"title","Geometric black"],["Poppins","Poppins",800,"both","Round and friendly"],["Oswald","Oswald",700,"title","Condensed"],["Russo One","Russo One",400,"title","Sporty, techy"],
+  ["Unbounded","Unbounded",800,"title","Wide and modern"],["Bricolage Grotesque","Bricolage Grotesque",800,"title","Editorial character"],["Space Grotesk","Space Grotesk",700,"both","Tech and data"],["Playfair Display","Playfair Display",900,"title","Classy serif"],
+  ["DM Sans","",700,"body","The usual body text"],["Inter","Inter",700,"body","Very readable"],["Manrope","Manrope",700,"body","Soft, modern"],["Plus Jakarta Sans","Plus Jakarta Sans",800,"both","The tool's own"],["Work Sans","Work Sans",700,"body","Plain and clear"],["IBM Plex Sans","IBM Plex Sans",700,"body","Serious, technical"],
+];
+const CURATED = new Set(FONTS.map(f=>f[1]).filter(Boolean));
+let extraFonts = [];          // [label, family, weight, "both", note]
+let ffFor = "title";
+const safeFont = (n)=>String(n||"").replace(/[^A-Za-z0-9 _-]/g,"").trim().slice(0,40);
+function googleLink(name){ const id="gf-"+name.replace(/ /g,"_"); if(document.getElementById(id)) return Promise.resolve(true);
+  const l=document.createElement("link"); l.id=id; l.rel="stylesheet"; l.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,"+")}:wght@400;700;800&display=swap`;
+  return new Promise(r=>{ l.onload=()=>r(true); l.onerror=()=>{ l.remove(); r(false); }; document.head.append(l); setTimeout(()=>r(false),8000); }); }
+async function ensureFont(name, w){ name=safeFont(name); if(!name) return true;
+  if (!CURATED.has(name) && !name.startsWith("Mine ") && !name.startsWith("Team ")) await googleLink(name);
+  try{ const f=await document.fonts.load(`${w||700} 40px "${name}"`); return f.length>0; }catch(e){ return false; } }
+function buildFonts(){ const box=$("fonts"); box.textContent="";
+  for (const [label,fam,w,use,note] of FONTS.concat(extraFonts)) {
+    if (ffFor==="title" && use==="body") continue; if (ffFor==="body" && (use==="title")) continue;
+    const b=document.createElement("button"); b.type="button"; b.className="fontbtn"; b.dataset.fam=fam; b.dataset.label=label;
+    const sp=document.createElement("span"); sp.textContent = ffFor==="title" ? "THE HUNT" : "Learn the setup";
+    sp.style.fontFamily = fam ? `"${fam}", sans-serif` : (label==="ZFT Slant" ? '"Archivo Black", sans-serif' : label==="DM Sans" ? '"DM Sans", sans-serif' : 'Anton, sans-serif'); sp.style.fontWeight=w; if(label==="ZFT Slant") sp.style.fontStyle="italic";
+    const sm=document.createElement("small"); sm.textContent=`${label} · ${note}`; b.append(sp,sm); b.setAttribute("aria-label", `${label}: ${note}`);
+    b.addEventListener("click", async ()=>{ pushHistory(); if (fam) await ensureFont(fam, w);
+      if (ffFor==="title"){ state.titleFont=fam; state.titleWeight=w; if(label==="ZFT Slant") state.font="signature"; if(label==="Show's own font") state.font="show"; store("titleFont",state.titleFont); store("titleWeight",w); store("font",state.font); }
+      else { state.bodyFont=fam; store("bodyFont",fam); }
+      markLook(); draw(); drawThumbs(); });
+    box.append(b); }
+  markFonts(); }
+function markFonts(){ document.querySelectorAll(".fontbtn").forEach(b=>{ const fam=b.dataset.fam, label=b.dataset.label; let on;
+  if (ffFor==="body") on = (state.bodyFont||"")===fam; else on = fam ? state.titleFont===fam : (!state.titleFont && ((label==="ZFT Slant"&&state.font==="signature")||(label==="Show's own font"&&state.font==="show")));
+  b.setAttribute("aria-pressed", String(on)); }); }
+document.querySelectorAll("[data-ff]").forEach(b=>b.addEventListener("click",()=>{ ffFor=b.dataset.ff; document.querySelectorAll("[data-ff]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); buildFonts(); }));
+$("gfAdd").addEventListener("click", async ()=>{ const name=safeFont($("gfName").value); const note=$("fontNote"); if(!name){ note.textContent="Type a font name from fonts.google.com."; return; }
+  note.textContent=`Loading ${name}…`; const ok = await googleLink(name); let loaded=false; if(ok){ try{ loaded=(await document.fonts.load(`700 40px "${name}"`)).length>0; }catch(e){} }
+  if(!loaded){ note.textContent=`Couldn't find “${name}” on Google Fonts. Check the spelling on fonts.google.com.`; return; }
+  if (!extraFonts.some(f=>f[1]===name)) extraFonts.unshift([name,name,700,"both","Added from Google Fonts"]);
+  const list=(load("gfonts")||[]).filter(x=>x!==name); list.unshift(name); store("gfonts", list.slice(0,12));
+  let shared=""; if (ZT && ZT.admin && $("teamFont").checked){ try{ const j=await api("brand.php",{act:"add_gfont", name}); ZT.brand=Object.assign({}, ZT.brand, {gfonts:j.gfonts}); shared=" Shared with the whole team."; $("teamFont").checked=false; }catch(e){ shared=" (Couldn't share it with the team.)"; } }
+  note.textContent=`Added ${name}. It's at the top of the list.`+shared; $("gfName").value=""; buildFonts(); });
+$("upBtn").addEventListener("click",()=>$("upFile").click());
+/* uploaded fonts live in this browser's IndexedDB */
+function fontDB(){ return new Promise((res)=>{ try{ const r=indexedDB.open("trpm-fonts",1); r.onupgradeneeded=()=>r.result.createObjectStore("f"); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }catch(e){ res(null); } }); }
+async function fontPut(name, buf){ const db=await fontDB(); if(!db) return; await new Promise(r=>{ const t=db.transaction("f","readwrite"); t.objectStore("f").put(buf,name); t.oncomplete=r; t.onerror=r; }); }
+async function fontAll(){ const db=await fontDB(); if(!db) return []; return new Promise(r=>{ const out=[]; const t=db.transaction("f"); const c=t.objectStore("f").openCursor(); c.onsuccess=()=>{ const k=c.result; if(k){ out.push([k.key,k.value]); k.continue(); } else r(out); }; c.onerror=()=>r(out); }); }
+async function addFontFace(name, buf){ try{ const ff=new FontFace(name, buf); await ff.load(); document.fonts.add(ff); if(!extraFonts.some(f=>f[1]===name)) extraFonts.unshift([name.replace(/^Mine /,""),name,400,"both","Uploaded (this browser)"]); return true; }catch(e){ return false; } }
+$("upFile").addEventListener("change", async (e)=>{ const file=e.target.files[0]; e.target.value=""; if(!file) return; const note=$("fontNote");
+  if (file.size>5*1048576){ note.textContent="That font file is over 5 MB."; return; }
+  const name=safeFont("Mine "+file.name.replace(/\.[^.]+$/,"")); const buf=await file.arrayBuffer();
+  if (ZT && ZT.admin && $("teamFont").checked){   // team upload: stored on the server for every Guild Leader
+    const fd=new FormData(); fd.append("csrf",ZT.csrf); fd.append("act","upload_font"); fd.append("name", name.replace(/^Mine /,"")); fd.append("file", new Blob([buf]), file.name);
+    try{ const r=await fetch("brand.php",{method:"POST",body:fd}); const j=await r.json(); if(!r.ok||!j.ok) throw j; ZT.brand=Object.assign({}, ZT.brand, {fonts:j.fonts}); $("teamFont").checked=false; await loadTeamFonts(); note.textContent=`Shared ${file.name} with the whole team. Only fonts we own or free fonts.`; buildFonts(); }
+    catch(err){ note.textContent=(err&&err.message)||"Couldn't share that font. Try again."; }
+    return; }
+  if (await addFontFace(name, buf)){ await fontPut(name, buf); note.textContent=`Added ${file.name}. Only use fonts you own or that are free.`; buildFonts(); }
+  else note.textContent="That file isn't a font this browser can read. Try .ttf, .otf or .woff2."; });
+/* team fonts: Google names load from Google; uploaded files come from brand.php (signed-in only) */
+async function loadTeamFonts(){ if(!ZT || !ZT.brand) return;
+  for (const g of (ZT.brand.gfonts||[]).map(safeFont).filter(Boolean)){ if (!extraFonts.some(f=>f[1]===g)) extraFonts.unshift([g,g,700,"both","Team font"]); await googleLink(g); }
+  for (const f of (ZT.brand.fonts||[])){ const name=safeFont("Team "+f.name); if (extraFonts.some(x=>x[1]===name)) continue;
+    try{ const r=await fetch("brand.php?font="+encodeURIComponent(f.id)); if(!r.ok) continue; const ff=new FontFace(name, await r.arrayBuffer()); await ff.load(); document.fonts.add(ff); extraFonts.unshift([f.name,name,400,"both","Team font"]); }catch(e){} } }
+async function restoreFonts(){
+  await loadTeamFonts(); $("teamFontRow").hidden = !(ZT && ZT.admin);
+  for (const n of (load("gfonts")||[]).map(safeFont).filter(Boolean)) if (!extraFonts.some(f=>f[1]===n)) extraFonts.push([n,n,700,"both","Added from Google Fonts"]);
+  for (const [n,buf] of await fontAll()) await addFontFace(n, buf);
+  await Promise.all(extraFonts.filter(f=>!f[1].startsWith("Mine ")).map(f=>googleLink(f[1])));
+  await ensureFont(state.titleFont, state.titleWeight); await ensureFont(state.bodyFont, 700);
+}
+
+/* ---------- details ---------- */
+function buildPartner(){
+  const sel=$("partner"); sel.append(new Option("None",""));
+  for (const p of PARTNERS) sel.append(new Option(PNAME[p]||p, p));
+  $("missing").textContent = "Not in the library yet (ask the partner for the official file): " + MISSING.join(", ") + ".";
+}
+function fillForm(){
+  for (const k of FIELDS) $(k).value = state.f[k] || "";
+  $("live").checked = !!state.f.live;
+  $("detailsFor").textContent = "Template: " + byId[state.tpl].name;
+  const adm = teamWide() && byId[state.tpl].fav; $("presetAdmin").hidden = !adm;
+  if (adm){ const p=(teamPresets()||{})[state.tpl]; $("presetNote").textContent = p && p.by ? `Current preset by ${p.by}.` : "Saves host, time, place, link and photo; the date fills in each week."; }
+}
+for (const k of FIELDS) $(k).addEventListener("input", ()=>{ pushHistory(true); state.f[k] = $(k).value; queueDraw(); });
+$("live").addEventListener("change", ()=>{ pushHistory(); state.f.live = $("live").checked; queueDraw(); });
+$("reset").addEventListener("click", ()=>{ pushHistory(); state.f = freshFields(state.tpl); state.bgPhoto=null; state.photoKey=defaultPhoto(state.tpl); store("draft:"+state.tpl, null); afterLoad(); });
+$("savePreset").addEventListener("click", async ()=>{
+  const f=cloneF(state.f); delete f.date; f.speakers=(f.speakers||[]).map(s=>({name:s.name||"",role:s.role||""}));
+  const wd = state.f.date ? weekday(state.f.date) : (BUILTIN_PRESETS[state.tpl]||{}).weekday;
+  const monthly = !!(presetFor(state.tpl)||{}).nth, nth = monthly && state.f.date ? Math.ceil(+state.f.date.slice(8,10)/7) : undefined;
+  const preset={fields:f, weekday:wd, nth, photoKey:state.photoKey, style:state.style, theme:state.theme};
+  try{ const j=await api("presets.php",{act:"save", tpl:state.tpl, preset}); ZT.presets=j.presets||ZT.presets; $("presetNote").textContent="Saved for the team. \"Next "+byId[state.tpl].name.replace(/^The /,"")+"\" now fills these in."; buildPresets(); }
+  catch(e){ $("presetNote").textContent="Couldn't save the preset. Try again."; }
+});
+
+/* ---------- photo library + focus ---------- */
+function readImage(file, max){
+  return new Promise((res)=>{ const fr=new FileReader(); fr.onload=()=>{ const img=new Image(); img.onload=()=>{ const s=Math.min(1, max/Math.max(img.width,img.height)); if(s===1) return res(img); const c=document.createElement("canvas"); c.width=Math.round(img.width*s); c.height=Math.round(img.height*s); c.getContext("2d").drawImage(img,0,0,c.width,c.height); const o=new Image(); o.onload=()=>res(o); o.src=c.toDataURL("image/jpeg",0.9); }; img.onerror=()=>res(null); img.src=fr.result; }; fr.onerror=()=>res(null); fr.readAsDataURL(file); });
+}
+$("bgBtn").addEventListener("click", ()=>$("bgFile").click());
+$("bgFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; const img = await readImage(f, 1600); e.target.value=""; if(!img) return; pushHistory(); state.bgPhoto = img; state.photoKey=""; delete state.f.focusX; delete state.f.focusY; buildPhotoLib(); draw(); });
+$("bgClear").addEventListener("click", ()=>{ pushHistory(); state.bgPhoto=null; state.photoKey=""; state.f.photoKey=""; saveDraft(); buildPhotoLib(); draw(); });
+function photosFor(id){ const own = PHOTOS.filter(k=>k.startsWith(id+"-")); const gen = PHOTOS.filter(k=>k.startsWith("generic-")); const rest = PHOTOS.filter(k=>!own.includes(k)&&!gen.includes(k)); return own.concat(gen, rest); }
+let showAllPhotos=false;
+function buildPhotoLib(){
+  const lib=$("photoLib"); lib.textContent="";
+  const all = photosFor(state.tpl), own = all.filter(k=>k.startsWith(state.tpl+"-")).length;
+  const list = showAllPhotos ? all : all.slice(0, Math.max(own, 3) + 3);
+  for (const k of list){ const b=document.createElement("button"); b.type="button"; b.className="tpl"; b.setAttribute("aria-pressed", String(state.photoKey===k && !state.bgPhoto)); b.setAttribute("aria-label","Photo "+k);
+    const im=document.createElement("img"); im.className="ph"; im.src=ASSETS["ph_"+k]; im.alt=""; im.loading="lazy";
+    b.append(im); b.addEventListener("click",()=>{ pushHistory(); state.photoKey = state.photoKey===k ? "" : k; state.f.photoKey = state.photoKey; state.bgPhoto=null; delete state.f.focusX; delete state.f.focusY; saveDraft(); buildPhotoLib(); draw(); }); lib.append(b); }
+  if (all.length > list.length || showAllPhotos){ const m=document.createElement("button"); m.type="button"; m.className="btn"; m.style.gridColumn="1/-1"; m.textContent = showAllPhotos ? "Show fewer photos ▴" : `All photos (${all.length}) ▾`; m.addEventListener("click",()=>{ showAllPhotos=!showAllPhotos; buildPhotoLib(); }); lib.append(m); }
+  $("bgClear").hidden = !(state.bgPhoto || state.photoKey);
+  const src = state.bgPhoto ? state.bgPhoto.src : (state.photoKey ? ASSETS["ph_"+state.photoKey] : "");
+  $("focusSec").hidden = !src; drawCrop();
+}
+/* profile-picture framing: the frame is the poster's shape; drag pans (focusX/Y), wheel/pinch/slider zoom (photoZoom 1–3×) */
+function cropPhoto(){ return state.bgPhoto || (state.photoKey ? TP.IMG["ph_"+state.photoKey] : null); }
+function drawCrop(){ const img=cropPhoto(), cc=$("cropC"); if(!img || $("focusSec").hidden) return;
+  const S=TP.SIZES[state.size], k=Math.min(Math.min(340, $("focusSec").clientWidth||340)/S.w, 360/S.h); const cw=Math.round(S.w*k), ch=Math.round(S.h*k);
+  const box=$("crop"); box.style.width=cw+"px"; box.style.height=ch+"px"; const W=Math.round(cw*2), H=Math.round(ch*2); if(cc.width!==W||cc.height!==H){ cc.width=W; cc.height=H; }
+  const x=cc.getContext("2d"), z=1.02*(state.f.photoZoom||1), sc=Math.max(W/img.width, H/img.height)*z, iw=img.width*sc, ih=img.height*sc;
+  x.clearRect(0,0,W,H); x.drawImage(img, (W-iw)*(state.f.focusX??0.5), (H-ih)*(state.f.focusY??0.45), iw, ih);
+  const zp=Math.round((state.f.photoZoom||1)*100); $("cropZoom").value=zp; $("cropNote").textContent=`Zoom ${zp}%`; box.setAttribute("aria-valuetext", `Zoom ${zp}%`); }
+function cropPan(dx,dy){ const img=cropPhoto(); if(!img) return; const cc=$("cropC"), W=cc.width, H=cc.height, z=1.02*(state.f.photoZoom||1), sc=Math.max(W/img.width,H/img.height)*z, iw=img.width*sc, ih=img.height*sc, k=W/cc.clientWidth;
+  if(iw>W+0.5) state.f.focusX=Math.min(1,Math.max(0,(state.f.focusX??0.5) - dx*k/(iw-W))); if(ih>H+0.5) state.f.focusY=Math.min(1,Math.max(0,(state.f.focusY??0.45) - dy*k/(ih-H))); drawCrop(); queueDraw(); }
+function cropZoom(z){ state.f.photoZoom=Math.min(3,Math.max(1,Math.round(z*100)/100)); if(state.f.photoZoom===1) delete state.f.photoZoom; drawCrop(); fillTune(); queueDraw(); }
+(function cropFrame(){ const el=$("crop"), pts=new Map(); let pinch=0, pz=1;
+  el.addEventListener("pointerdown",e=>{ pushHistory(); el.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(pts.size===2){ const [a,b]=[...pts.values()]; pinch=Math.hypot(a.x-b.x,a.y-b.y); pz=state.f.photoZoom||1; } });
+  el.addEventListener("pointermove",e=>{ const p=pts.get(e.pointerId); if(!p) return; const n={x:e.clientX,y:e.clientY};
+    if(pts.size===2){ pts.set(e.pointerId,n); const [a,b]=[...pts.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch) cropZoom(pz*d/pinch); }
+    else { cropPan(n.x-p.x, n.y-p.y); pts.set(e.pointerId,n); } });
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=0; }; el.addEventListener("pointerup",up); el.addEventListener("pointercancel",up);
+  el.addEventListener("wheel",e=>{ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)*Math.exp(-e.deltaY*0.0015)); },{passive:false});
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[12,0],ArrowRight:[-12,0],ArrowUp:[0,12],ArrowDown:[0,-12]}[e.key];
+    if(k){ e.preventDefault(); pushHistory(true); cropPan(...k); } else if(e.key==="+"||e.key==="="){ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)*1.1); } else if(e.key==="-"){ e.preventDefault(); pushHistory(true); cropZoom((state.f.photoZoom||1)/1.1); } });
+  $("cropZoom").addEventListener("input",()=>{ pushHistory(true); cropZoom(+$("cropZoom").value/100); });
+  $("focusReset").addEventListener("click",()=>{ pushHistory(); delete state.f.focusX; delete state.f.focusY; delete state.f.photoZoom; drawCrop(); fillTune(); draw(); });
+})();
+function markGrade(){ document.querySelectorAll("[data-grade]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.grade===state.grade))); }
+document.querySelectorAll("[data-grade]").forEach(b=>b.addEventListener("click",()=>{ if(state.grade===b.dataset.grade) return; pushHistory(); state.grade=b.dataset.grade; store("grade",state.grade); markGrade(); draw(); }));
+$("askPhoto").addEventListener("click", async ()=>{
+  const note = prompt("What should the new photo show? (for example: a trader at night with three screens, gold light)");
+  if (note===null) return;
+  if (!ZT){ $("askPhoto").textContent="Ask George in chat: requests work on zeefreaks.io"; return; }
+  try{ await api("prefs.php",{act:"photo_request", tpl:state.tpl, note:note.slice(0,300)}); $("askPhoto").textContent="Request sent ✓ (new photos usually land within a day)"; }
+  catch(e){ $("askPhoto").textContent="Couldn't send the request. Try again."; }
+});
+
+/* ---------- speakers ---------- */
+let spkTarget = 0;
+function renderSpeakers(){
+  const list=$("spkList"); list.textContent="";
+  const sp = state.f.speakers = state.f.speakers || [];
+  sp.forEach((s,i)=>{
+    const row=document.createElement("div"); row.className="spk";
+    const av=document.createElement("button"); av.type="button"; av.className="av"+(s._img?" has":""); av.textContent = s._img ? "" : "Add photo"; av.setAttribute("aria-label", `Photo for speaker ${i+1}`);
+    if (s._img) av.style.backgroundImage = `url(${s._img.src})`;
+    av.addEventListener("click", ()=>{ spkTarget=i; $("spkFile").click(); });
+    const n=document.createElement("input"); n.type="text"; n.maxLength=40; n.placeholder="Name"; n.value=s.name||""; n.id="spkName"+i; n.setAttribute("aria-label",`Speaker ${i+1} name`);
+    n.addEventListener("input",()=>{ pushHistory(true); s.name=n.value; queueDraw(); });
+    const r=document.createElement("input"); r.type="text"; r.maxLength=40; r.placeholder="Role (Coach, Founder…)"; r.value=s.role||""; r.className="role"; r.id="spkRole"+i; r.setAttribute("aria-label",`Speaker ${i+1} role`);
+    r.addEventListener("input",()=>{ pushHistory(true); s.role=r.value; queueDraw(); });
+    const x=document.createElement("button"); x.type="button"; x.className="x"; x.textContent="Remove"; x.addEventListener("click",()=>{ pushHistory(); sp.splice(i,1); renderSpeakers(); draw(); });
+    row.append(av,n,r,x);
+    if (s._img){ const z=document.createElement("label"); z.className="zoom"; z.textContent="Photo zoom"; const zr=document.createElement("input"); zr.type="range"; zr.min="100"; zr.max="200"; zr.step="10"; zr.value=String(Math.round((s.zoom||1)*100)); zr.setAttribute("aria-label",`Speaker ${i+1} photo zoom`); zr.addEventListener("input",()=>{ pushHistory(true); s.zoom=+zr.value/100; queueDraw(); }); z.append(zr); row.append(z); }
+    list.append(row);
+  });
+  $("addSpk").disabled = sp.length>=3;
+  $("spkCount").textContent = `${sp.length} of 3`;
+}
+$("addSpk").addEventListener("click", ()=>{ const sp=state.f.speakers; if(sp.length>=3) return; pushHistory(); sp.push({name:"",role:""}); renderSpeakers(); draw(); $("spkName"+(sp.length-1))?.focus(); });
+$("spkFile").addEventListener("change", async (e)=>{ const f=e.target.files[0]; if(!f) return; const img = await readImage(f, 700); e.target.value=""; if(img && state.f.speakers[spkTarget]){ pushHistory(); state.f.speakers[spkTarget]._img = img; } renderSpeakers(); draw(); });
+
+/* ---------- fine-tune ---------- */
+function fillTune(){
+  $("titleScale").value = Math.round((state.f.titleScale||1)*100); $("photoZoom").value = Math.round((state.f.photoZoom||1)*100);
+  $("titleScaleV").textContent = $("titleScale").value+"%"; $("photoZoomV").textContent = $("photoZoom").value+"%";
+  $("photoZoom").disabled = !(state.bgPhoto || state.photoKey);
+}
+$("titleScale").addEventListener("input",()=>{ pushHistory(true); state.f.titleScale=+$("titleScale").value/100; $("titleScaleV").textContent=$("titleScale").value+"%"; queueDraw(); });
+$("photoZoom").addEventListener("input",()=>{ pushHistory(true); state.f.photoZoom=+$("photoZoom").value/100; $("photoZoomV").textContent=$("photoZoom").value+"%"; drawCrop(); queueDraw(); });
+$("tuneReset").addEventListener("click",()=>{ pushHistory(); delete state.f.titleScale; delete state.f.photoZoom; state.motion="classic"; markLook(); fillTune(); draw(); });
+
+/* ---------- sizes + preview ---------- */
+function buildSizes(){
+  for (const [k,s] of Object.entries(TP.SIZES)){
+    const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.dataset.size=k; b.innerHTML=`${esc(s.label)}<small>${esc(s.sub)}</small>`;
+    b.addEventListener("click",()=>{ state.size=k; store("size",k); markSize(); draw(); drawCrop(); });
+    $("sizes").append(b);
+  }
+}
+function markSize(){ document.querySelectorAll("[data-size]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.size===state.size))); const s=TP.SIZES[state.size]; $("sizeNote").textContent = `${s.label} · ${s.w} × ${s.h}`; }
+let raf=0, queued=false, playStart=0, lastReport={};
+function previewScale(anim){ const m=$("main"), W=TP.SIZES[state.size].w, H=TP.SIZES[state.size].h; const box=m.parentElement.clientWidth || 540; const css=Math.min(box-28, (Math.min(window.innerHeight*0.7,620))*W/H); return Math.max(0.3, Math.min(1, css*(window.devicePixelRatio||1)/W * (anim?0.85:1))); }
+const checkCanvas = document.createElement("canvas");
+function validate(){ const rep={}; TP.render(checkCanvas, byId[state.tpl], currentFields(), cfg(), state.size, {scale:0.3, report:rep}); lastReport=rep; brandCheck(); markAttach(); }
+function draw(){ if ($("play").checked){ validate(); return; } const rep={}; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {scale: previewScale(false), report: rep}); lastReport=rep; brandCheck(); markAttach(); }
+function queueDraw(){ if(queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; draw(); saveDraft(); }); }
+function loop(now){
+  if (!$("play").checked) { raf=0; draw(); return; }
+  const dur = +$("gifDur").value; const t = ((now - playStart)/1000) % dur;
+  TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {t, dur, scale: previewScale(true)});
+  raf = requestAnimationFrame(loop);
+}
+function startPlay(){ playStart=performance.now(); if(!raf) raf=requestAnimationFrame(loop); }
+$("play").addEventListener("change", ()=>{ if ($("play").checked) startPlay(); else draw(); });
+$("gifDur").addEventListener("change", ()=>{ playStart=performance.now(); });
+$("biggerBtn").addEventListener("click",()=>{ const big=$("previewPane").classList.toggle("big"); $("biggerBtn").setAttribute("aria-pressed",String(big)); $("biggerBtn").textContent = big ? "Smaller" : "Bigger"; draw(); fitScrollPadding(); });
+
+/* ---------- brand check ---------- */
+function checks(sizeKey){
+  let rep = lastReport;
+  if (sizeKey && sizeKey!==state.size){ rep={}; const c=document.createElement("canvas"); TP.render(c, byId[state.tpl], currentFields(), cfg(), sizeKey, {scale:0.25, report:rep}); }
+  const out=[]; const f=state.f, W=rep.W||1080;
+  const phonePx = rep.titlePx ? rep.titlePx * 375 / (sizeKey==="discord"||(!sizeKey&&state.size==="discord") ? 1600*0.62 : W) : 99;
+  out.push(phonePx >= 18 ? [true,"Title is big enough to read on a phone"] : [false,"Title is small on a phone: shorten it, or raise Title size in Fine-tune"]);
+  out.push(!rep.cut ? [true,"Nothing is cut off with “…”"] : [false,"Some text is cut off with “…”: shorten the long line (title, topic or a name)"]);
+  out.push((rep.contrast||21) >= 3 ? [true,"Text should stand out from the background (quick estimate: check busy photos by eye)"] : [false,"Text is hard to read on this photo: try Dark theme, another photo, or move the focus"]);
+  out.push(rep.logos!==false ? [true,"TR and ZFT logos are on"] : [false,"Logos didn't load: reload the page"]);
+  const dated = !!(byId[state.tpl].fields.date || byId[state.tpl].fields.time);
+  if (dated) out.push(f.date && f.time ? [true,"Date and time are filled in"] : [false, !f.date ? "Add the date in Details" : "Add the start time in Details"]);
+  if (f.date && f.date < phToday()) out.push([false,"The date is in the past: check Details"]);
+  return out;
+}
+function brandCheck(){
+  const c = checks(); const bad = c.filter(x=>!x[0]);
+  const line=$("checkLine"); line.className = bad.length ? "bad" : "ok"; line.textContent = bad.length ? `⚠ Brand check: ${bad.length} to fix` : "✓ Brand check";
+  const html = c.map(([ok,t])=>`<span class="${ok?"ok":"bad"}">${ok?"✓":"⚠"} ${esc(t)}</span>`).join("");
+  if (state.stage===2) $("checkDetails").innerHTML = bad.length ? bad.map(([,t])=>`<span class="bad">⚠ ${esc(t)}</span>`).join("") : `<span class="ok">✓ Brand check: all good</span>`;
+  if (state.stage===5) $("checkFull").innerHTML = html;
+}
+$("checkLine").addEventListener("click",()=>goStage(5));
+
+/* ---------- caption writer (Steph/Jairus format) ---------- */
+let capKind = "discord", capEdited = false;
+function whenWord(iso, time){
+  if(!iso) return ""; const t=phToday(); const h = time ? +time.split(":")[0] : 12;
+  if (iso===t) return h>=17 ? "tonight" : "today"; if (iso===addDays(t,1)) return h>=17 ? "tomorrow night" : "tomorrow";
+  if (iso>t && iso<=addDays(t,6)) return "this "+DAYS[weekday(iso)]; return "on "+shortDate(iso);
+}
+function writeCaption(){
+  const f=state.f, t=byId[state.tpl]; const T=(f.title||t.name).toUpperCase();
+  const names=(f.speakers||[]).map(s=>s.name).filter(Boolean); const who = names.length ? names.join(names.length===2?" and ":", ") : "";
+  const dt=[f.date?`${DAYS[weekday(f.date)]}, ${MONTHS[+f.date.slice(5,7)-1]} ${+f.date.slice(8,10)}`:"", f.time?fmtT(f.time)+(f.endTime?" – "+fmtT(f.endTime):"")+" PH time":""].filter(Boolean).join(" · ");
+  const when=whenWord(f.date, f.time);
+  const L=[];
+  if (capKind==="discord"){
+    L.push("Hi @everyone! 👋",""); L.push(when ? `See you ${when} on ${T}${who?` with ${who}`:""}!` : `${T}${who?` with ${who}`:""}`);
+    if (f.topic) L.push("", f.topic.trim());
+    L.push(""); if (dt) L.push("✅ "+dt); if (f.where) L.push("✅ "+f.where); if (f.cta) L.push("✅ "+f.cta); if (f.link) L.push("✅ "+f.link);
+    if (f.channel && /^#/.test(f.channel) && f.channel!=="#upcoming-events") L.push("✅ Questions? Drop them in "+f.channel);
+    L.push("","See you there! 🚀");
+  } else {
+    L.push(when ? `${T} is ${when}${who?` with ${who}`:""}!` : `${T}${who?` with ${who}`:""}`);
+    if (f.topic) L.push("", f.topic.trim());
+    L.push(""); if (dt) L.push("✅ "+dt); if (f.where) L.push("✅ "+f.where); if (f.cta) L.push("✅ "+f.cta); if (f.link) L.push("✅ "+f.link);
+    L.push("","Join the Trading Republic community on Discord and level up with us. See you there! 🚀");
+  }
+  $("caption").value = L.join("\n").replace(/\n{3,}/g,"\n\n").trim(); capEdited=false; markCap();
+}
+function markCap(){ document.querySelectorAll("[data-cap]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.cap===capKind))); }
+document.querySelectorAll("[data-cap]").forEach(b=>b.addEventListener("click",()=>{ capKind=b.dataset.cap; writeCaption(); }));
+$("caption").addEventListener("input",()=>{ capEdited=true; });
+$("reCap").addEventListener("click", writeCaption);
+$("copyCap").addEventListener("click", async ()=>{ try{ await navigator.clipboard.writeText($("caption").value); $("copyCap").textContent="Copied ✓"; } catch(e){ $("caption").select(); $("copyCap").textContent="Press Ctrl+C to copy"; } setTimeout(()=>$("copyCap").textContent="Copy caption", 2200); });
+
+/* ---------- export ---------- */
+let downloads = null;
+const made = { gif:null, video:null };
+/* a frozen copy of the design: every frame, zip member and filename of one export comes from it */
+function designKey(){ const imgs=[state.bgPhoto?state.bgPhoto.src.length+":"+state.bgPhoto.src.slice(-40):"", ...(state.f.speakers||[]).map(s=>s._img?s._img.src.length+":"+s._img.src.slice(-40):"")]; return JSON.stringify([designData(), imgs]); }
+function snapshot(){ return {tpl:byId[state.tpl], f:currentFields(), c:cfg(), size:state.size, date:state.f.date||"", key:designKey()}; }
+function fileBase(sizeKey, sn){ sn = sn || snapshot(); const d = sn.date ? "-"+sn.date : ""; return `tr-${sn.tpl.id}${d}-${TP.SIZES[sizeKey||sn.size].file}`; }
+async function offer(blob, filename, kind){
+  const st=$("status");
+  if (!window.claude){ const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href), 60000); st.textContent=`Downloaded ${filename}.`; return; }
+  if (downloads){
+    try { await downloads.save({filename, data: blob}); st.textContent = `Saved ${filename}.`; return; }
+    catch(e){ if (e && e.code==="declined") { st.textContent = "Download cancelled."; return; } }
+  }
+  const url = URL.createObjectURL(blob); const res=$("result"); res.hidden=false; res.textContent="";
+  const el=document.createElement(kind==="video"?"video":"img"); el.src=url; if(kind==="video"){ el.controls=true; el.loop=true; } else el.alt=filename;
+  const p=document.createElement("p"); p.className="note"; p.textContent = `Downloads aren't available in this view. Right-click or long-press the ${kind} to save it as ${filename}.`;
+  res.append(p,el); st.textContent="";
+}
+function pngBlob(sizeKey, sn){ sn = sn || snapshot(); return new Promise(res=>{ const c=document.createElement("canvas"); TP.render(c, sn.tpl, sn.f, sn.c, sizeKey||sn.size); c.toBlob(b=>res(b), "image/png"); }); }
+function preflight(){ const bad = checks().filter(x=>!x[0]); if (bad.length) $("status").textContent = "Heads up: " + bad[0][1] + ". You can still download."; else $("status").textContent=""; }
+$("dlPng").addEventListener("click", async ()=>{ preflight(); const b=await pngBlob(); await offer(b, fileBase()+".png", "image"); autoSave(); });
+/* tiny store-only zip (PNGs are already compressed) */
+const CRC=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(u){ let c=0xFFFFFFFF; for(let i=0;i<u.length;i++) c=CRC[(c^u[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zip(files){
+  const enc=new TextEncoder(), parts=[], central=[]; let off=0;
+  const d=new Date(), dt=((d.getHours()<<11)|(d.getMinutes()<<5)|(d.getSeconds()>>1)), dd=(((d.getFullYear()-1980)<<9)|((d.getMonth()+1)<<5)|d.getDate());
+  for (const f of files){
+    const name=enc.encode(f.name), crc=crc32(f.data), h=new DataView(new ArrayBuffer(30));
+    h.setUint32(0,0x04034b50,true); h.setUint16(4,20,true); h.setUint16(6,0,true); h.setUint16(8,0,true); h.setUint16(10,dt,true); h.setUint16(12,dd,true); h.setUint32(14,crc,true); h.setUint32(18,f.data.length,true); h.setUint32(22,f.data.length,true); h.setUint16(26,name.length,true); h.setUint16(28,0,true);
+    parts.push(h.buffer, name, f.data);
+    const c=new DataView(new ArrayBuffer(46)); c.setUint32(0,0x02014b50,true); c.setUint16(4,20,true); c.setUint16(6,20,true); c.setUint16(8,0,true); c.setUint16(10,0,true); c.setUint16(12,dt,true); c.setUint16(14,dd,true); c.setUint32(16,crc,true); c.setUint32(20,f.data.length,true); c.setUint32(24,f.data.length,true); c.setUint16(28,name.length,true); c.setUint16(30,0,true); c.setUint16(32,0,true); c.setUint16(34,0,true); c.setUint16(36,0,true); c.setUint32(38,0,true); c.setUint32(42,off,true);
+    central.push(c.buffer, name); off += 30+name.length+f.data.length;
+  }
+  const csize=central.reduce((a,b)=>a+(b.byteLength??b.length),0), e=new DataView(new ArrayBuffer(22));
+  e.setUint32(0,0x06054b50,true); e.setUint16(8,files.length,true); e.setUint16(10,files.length,true); e.setUint32(12,csize,true); e.setUint32(16,off,true);
+  return new Blob([...parts, ...central, e.buffer], {type:"application/zip"});
+}
+$("dlPack").addEventListener("click", async ()=>{
+  const btn=$("dlPack"); if(btn.disabled) return; btn.disabled=true; preflight(); $("status").textContent="Making all 4 sizes…";
+  const sn=snapshot();
+  try{ const files=[]; for (const k of Object.keys(TP.SIZES)){ const b=await pngBlob(k, sn); files.push({name:fileBase(k, sn)+".png", data:new Uint8Array(await b.arrayBuffer())}); await new Promise(r=>setTimeout(r)); }
+    await offer(zip(files), `tr-${sn.tpl.id}${sn.date?"-"+sn.date:""}-all-sizes.zip`, "file"); autoSave(); }
+  catch(e){ $("status").textContent="Couldn't make the pack. Try again."; }
+  btn.disabled=false;
+});
+let busy=false;
+function lockExports(on){ busy=on; ["mkGif","mkVid","dlPack","dlPng"].forEach(id=>$(id).disabled=on); }
+$("mkGif").addEventListener("click", async ()=>{
+  if (busy) return; lockExports(true); $("result").hidden=true;
+  const st=$("status"), bar=$("gifBar");
+  const dur=Math.min(10, +$("gifDur").value), fps=+$("gifFps").value, delay=Math.round(100/fps), n=Math.round(dur*100/delay);
+  const sn=snapshot(), S=TP.SIZES[sn.size], gw=Math.min(+$("gifW").value, S.w) , gh=Math.round(S.h*gw/S.w);
+  const big=document.createElement("canvas"), small=document.createElement("canvas"); small.width=gw; small.height=gh; const sctx=small.getContext("2d",{willReadFrequently:true});
+  const frame=(i)=>{ TP.render(big, sn.tpl, sn.f, sn.c, sn.size, {t: i*delay/100, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
+  try{
+    st.textContent="Reading colours…";
+    const samples=[]; const step=Math.max(1, Math.floor(gw*gh/9000));
+    for (let k=0;k<10;k++){ const d=frame(Math.floor(k*n/10)); for (let i=0;i<d.length;i+=4*step) samples.push(d[i],d[i+1],d[i+2]); await new Promise(r=>setTimeout(r)); }
+    const gw2=new TRGif.GifWriter(gw,gh,{dither:5}); gw2.setPalette(new Uint8Array(samples));
+    for (let i=0;i<n;i++){ gw2.addFrame(frame(i), delay); bar.style.width=((i+1)/n*100)+"%"; st.textContent=`Building GIF: frame ${i+1} of ${n}`; if(i%2===0) await new Promise(r=>setTimeout(r)); }
+    const blob=new Blob([gw2.finish()],{type:"image/gif"}); made.gif={blob, name:fileBase(null, sn)+".gif", key:sn.key}; markAttach();
+    const mb=(blob.size/1048576).toFixed(1);
+    st.textContent=`GIF ready: ${dur} s loop, ${gw}×${gh}, ${mb} MB.` + (blob.size>10*1048576 ? " Over Discord's 10 MB limit: try 540 px or a shorter loop." : "");
+    await offer(blob, made.gif.name, "GIF"); autoSave();
+  } catch(e){ st.textContent = "Couldn't build the GIF. Try a smaller width or shorter loop."; }
+  bar.style.width="0"; lockExports(false);
+});
+function videoType(){ if(!window.MediaRecorder) return null; for (const t of ["video/mp4;codecs=avc1.42E01E","video/mp4","video/webm;codecs=vp9","video/webm;codecs=vp8","video/webm"]) if (MediaRecorder.isTypeSupported(t)) return t; return null; }
+$("mkVid").addEventListener("click", async ()=>{
+  if (busy) return; const type=videoType(); const st=$("status");
+  if (!type || !HTMLCanvasElement.prototype.captureStream){ st.textContent="This browser can't record video. Use Chrome or Edge, or make a GIF."; return; }
+  lockExports(true); $("result").hidden=true;
+  const sn=snapshot(), dur=Math.min(10, +$("gifDur").value), S=TP.SIZES[sn.size], k=Math.min(1, 1080/Math.max(S.w,S.h)), bar=$("gifBar");
+  const cv=document.createElement("canvas"); cv.width=Math.round(S.w*k); cv.height=Math.round(S.h*k); cv.style.cssText="position:fixed;left:-9999px;top:0"; document.body.append(cv);
+  let stream=null, rec=null, result=null;
+  try{
+    TP.render(cv, sn.tpl, sn.f, sn.c, sn.size, {t:0, dur, scale:k});
+    stream=cv.captureStream(30); rec=new MediaRecorder(stream, {mimeType:type, videoBitsPerSecond:8e6}); const chunks=[];
+    rec.ondataavailable=(e)=>{ if(e.data.size) chunks.push(e.data); };
+    const done=new Promise((res,rej)=>{ rec.onstop=res; rec.onerror=(e)=>rej(e.error||e); });
+    rec.start(250); const t0=performance.now(), loops=dur<6?2:1;
+    await Promise.race([done.then(()=>{ throw new Error("stopped early"); }), new Promise(resolve=>{ const tick=(now)=>{ const el=(now-t0)/1000; if (el>=dur*loops){ resolve(); return; } TP.render(cv, sn.tpl, sn.f, sn.c, sn.size, {t: el%dur, dur, scale:k}); bar.style.width=(el/(dur*loops)*100)+"%"; st.textContent=`Recording video: ${Math.ceil(dur*loops-el)} s left (keep this tab open)`; requestAnimationFrame(tick); }; requestAnimationFrame(tick); })]);
+    rec.stop(); await done;
+    const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
+    const blob=new Blob(chunks,{type:type.split(";")[0]}); if(!blob.size) throw new Error("empty");
+    made.video={blob, name:fileBase(null, sn)+"."+ext, key:sn.key}; result=made.video; markAttach();
+    st.textContent=`Video ready: ${dur*loops} s, ${cv.width}×${cv.height}, ${(blob.size/1048576).toFixed(1)} MB (${ext.toUpperCase()}).`;
+  } catch(e){ st.textContent="Couldn't record a video in this browser. Make a GIF or a PNG instead."; try{ if(rec && rec.state!=="inactive") rec.stop(); }catch(_){} }
+  finally{ if(stream) stream.getTracks().forEach(t=>t.stop()); cv.remove(); bar.style.width="0"; lockExports(false); }
+  if (result){ await offer(result.blob, result.name, "video"); autoSave(); }
+});
+
+/* ---------- saved designs + team history ---------- */
+const LOCAL_KEY="designs";
+function defaultName(){ const t=byId[state.tpl]; return t.name.replace(/^The /,"") + (state.f.date ? " – "+shortDate(state.f.date) : ""); }
+function designData(){ return {custom:state.custom, titleFont:state.titleFont, titleWeight:state.titleWeight, bodyFont:state.bodyFont, tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.bgPhoto?"":state.photoKey, size:state.size, f: JSON.parse(JSON.stringify(state.f,(k,v)=>k==="_img"?undefined:v))}; }
+function cleanDesign(d){
+  if (!d || typeof d!=="object" || !byId[d.tpl]) return null;
+  const s=(v,n)=>typeof v==="string"?v.slice(0,n):"", n=(v,lo,hi)=>typeof v==="number"&&isFinite(v)?Math.min(hi,Math.max(lo,v)):undefined;
+  const f0 = d.f && typeof d.f==="object" ? d.f : {}, f={};
+  for (const [k,m] of Object.entries({title:80,kicker:60,topic:220,where:60,channel:60,cta:80,link:200,partner:40,photoKey:40})) if (k in f0) f[k]=s(f0[k],m);
+  for (const k of ["date","time","endTime"]) f[k]= /^[\d:-]{5,10}$/.test(f0[k]||"") ? f0[k] : "";
+  f.live=!!f0.live;
+  for (const [k,lo,hi] of [["titleScale",0.7,1.3],["photoZoom",1,3],["focusX",0,1],["focusY",0,1]]){ const v=n(f0[k],lo,hi); if(v!==undefined) f[k]=v; }
+  f.speakers = Array.isArray(f0.speakers) ? f0.speakers.slice(0,3).filter(x=>x&&typeof x==="object").map(x=>{ const o={name:s(x.name,40), role:s(x.role,40)}; const z=n(x.zoom,1,2); if(z!==undefined) o.zoom=z; return o; }) : [];
+  if (f.partner && !PARTNERS.includes(f.partner)) f.partner="";
+  const fname=(v)=>typeof v==="string" && /^[A-Za-z0-9 _-]{0,40}$/.test(v) ? v : "";
+  return {custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
+}
+function openDesign(d0){
+  const d=cleanDesign(d0); if (!d){ $("status").textContent="That design couldn't be opened."; return; } pushHistory();
+  if (d.custom) state.custom=d.custom; state.titleFont=d.titleFont; state.titleWeight=d.titleWeight; state.bodyFont=d.bodyFont; ensureFont(d.titleFont, d.titleWeight).then(()=>ensureFont(d.bodyFont, 700)).then(()=>{ draw(); drawThumbs(); });
+  Object.assign(state, {tpl:d.tpl, style:TP.STYLES[d.style]?d.style:"signature", theme:(TP.THEMES[d.theme]||d.theme==="custom")?d.theme:"show", font:d.font||"signature", motion:TP.MOTIONS[d.motion]?d.motion:"classic", grade:d.grade||"zft", photoKey:d.photoKey||"", bgPhoto:null});
+  if (TP.SIZES[d.size]) { state.size=d.size; markSize(); }
+  state.f = Object.assign(freshFields(d.tpl), d.f);
+  afterLoad(); capEdited=false; $("caption").value="";
+}
+async function saveDesign(auto){
+  const name = ($("designName").value || defaultName()).slice(0,60); const data=designData();
+  if (ZT){
+    try{ const j=await api("designs.php",{act:"save", id: state.designId, name, design:data, auto:!!auto}); state.designId=j.id; if(!auto) $("status").textContent=`Saved “${name}”. Find it under My designs, on any device.`; }
+    catch(e){ if(!auto) $("status").textContent="Couldn't save the design. Try again."; }
+  } else {
+    const list=load(LOCAL_KEY)||[]; const id=state.designId||("l"+Date.now()); const i=list.findIndex(x=>x.id===id); const row={id,name,at:new Date().toISOString(),design:data};
+    if(i>=0) list[i]=row; else list.unshift(row); store(LOCAL_KEY, list.slice(0,30)); state.designId=id; if(!auto) $("status").textContent=`Saved “${name}” on this device.`;
+  }
+}
+function autoSave(){ saveDesign(true); }
+$("saveDesign").addEventListener("click",()=>saveDesign(false));
+let teamCache=null;
+async function fetchDesigns(){ if(!ZT) return {mine:(load(LOCAL_KEY)||[]).map(x=>({id:x.id,name:x.name,at:x.at,tpl:x.design.tpl,date:x.design.f.date,mine:true})), team:[]}; const r=await fetch("designs.php?list=1",{headers:{Accept:"application/json"}}); if(!r.ok) throw 0; const j=await r.json(); teamCache=j.team||[]; return j; }
+async function getDesign(id){ if(!ZT){ const x=(load(LOCAL_KEY)||[]).find(x=>x.id===id); return x&&x.design; } const r=await fetch("designs.php?id="+encodeURIComponent(id)); if(!r.ok) throw 0; return (await r.json()).design; }
+function ago(iso){ const m=Math.round((Date.now()-Date.parse(iso))/60000); if(m<1) return "just now"; if(m<60) return m+" min ago"; const h=Math.round(m/60); if(h<24) return h+" h ago"; return Math.round(h/24)+" d ago"; }
+function dItem(x, canDelete){
+  const row=document.createElement("div"); row.className="ditem";
+  const info=document.createElement("div"); info.innerHTML=`<b>${esc(x.name||"Untitled")}</b><small>${esc((byId[x.tpl]||{}).name||x.tpl)}${x.date?" · "+esc(shortDate(x.date)):""} · ${x.by?esc(x.by)+" · ":""}${esc(ago(x.at))}${x.posted?" · posted to "+esc(x.posted):""}</small>`;
+  const act=document.createElement("div"); act.className="row";
+  const o=document.createElement("button"); o.type="button"; o.className="tbtn"; o.textContent="Open"; o.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId = x.mine ? x.id : null; $("designName").value = x.mine ? x.name : ""; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
+  const dup=document.createElement("button"); dup.type="button"; dup.className="tbtn"; dup.textContent="Duplicate"; dup.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId=null; $("designName").value=(x.name||"")+" (copy)"; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
+  act.append(o,dup);
+  if (canDelete){ const del=document.createElement("button"); del.type="button"; del.className="x"; del.textContent="Delete"; del.addEventListener("click", async ()=>{ if(!confirm(`Delete “${x.name}”?`)) return; try{ if(ZT) await api("designs.php",{act:"delete", id:x.id}); else store(LOCAL_KEY,(load(LOCAL_KEY)||[]).filter(y=>y.id!==x.id)); if(state.designId===x.id) state.designId=null; row.remove(); $("dmClose").focus(); $("dmNote").textContent=`Deleted “${x.name}”.`; }catch(e){ $("dmNote").textContent="Couldn't delete it."; } }); act.append(del); }
+  row.append(info,act); return row;
+}
+let dmOpener=null;
+async function openDesigns(){
+  dmOpener=document.activeElement; $("designsModal").hidden=false; document.querySelector(".app").inert=true; const zb=document.querySelector(".ztbar"); if(zb) zb.inert=true; $("dmClose").focus();
+  $("dmNote").textContent="Loading…"; $("dmMine").textContent=""; $("dmTeam").textContent="";
+  $("dmTeamLabel").hidden = !ZT; $("dmTeam").hidden = !ZT;
+  try{ const j=await fetchDesigns(); $("dmNote").textContent = ZT ? "Saved on the server: open them on any phone or computer. Team history shows the last 30 posters anyone made." : "Saved on this device only. On zeefreaks.io your designs follow you to any device.";
+    (j.mine||[]).forEach(x=>$("dmMine").append(dItem(Object.assign({mine:true},x), true))); if(!(j.mine||[]).length) $("dmMine").innerHTML='<p class="note">Nothing saved yet. Use “Save design” on the last stage.</p>';
+    (j.team||[]).forEach(x=>$("dmTeam").append(dItem(x, false))); if(ZT && !(j.team||[]).length) $("dmTeam").innerHTML='<p class="note">No team posters yet.</p>'; }
+  catch(e){ $("dmNote").textContent="Couldn't load designs. Try again."; }
+}
+function closeDesigns(){ $("designsModal").hidden=true; document.querySelector(".app").inert=false; const zb=document.querySelector(".ztbar"); if(zb) zb.inert=false; if(dmOpener && dmOpener.isConnected) dmOpener.focus(); }
+$("designsBtn").addEventListener("click", openDesigns); $("dmClose").addEventListener("click", closeDesigns);
+$("designsModal").addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ e.preventDefault(); closeDesigns(); } if(e.key==="Tab"){ const f=[...$("designsModal").querySelectorAll("button")]; const i=f.indexOf(document.activeElement); if(e.shiftKey&&i<=0){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey&&i===f.length-1){ e.preventDefault(); f[0].focus(); } } });
+$("designsModal").addEventListener("click",(e)=>{ if(e.target===$("designsModal")) closeDesigns(); });
+async function checkDuplicates(){
+  const w=$("dupWarn"); w.hidden=true; if(!ZT || !state.f.date) return;
+  try{ if(!teamCache) await fetchDesigns(); const me = ZT.name||""; const d=(teamCache||[]).find(x=>x.tpl===state.tpl && x.date===state.f.date && x.by!==me && x.id!==state.designId);
+    if (d){ w.hidden=false; w.innerHTML=`<b>${esc(d.by)}</b> already made ${esc(byId[state.tpl].name)} for ${esc(shortDate(d.date))} (${esc(ago(d.at))})${d.posted?`, posted to ${esc(d.posted)}`:""}. Check before posting twice. <button class="x" type="button" id="dupOpen">Open theirs</button>`; $("dupOpen").addEventListener("click", async ()=>{ const dd=await getDesign(d.id); openDesign(dd); state.designId=null; goStage(5); }); } }
+  catch(e){}
+}
+
+/* ---------- posting: draft first, the person's own click sends it ---------- */
+let attach="png", posting=false;
+function newOp(){ return (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,"0")).join("")).toLowerCase(); }
+function lockDrafts(on){ posting=on; $("draftDiscord").disabled=on; $("draftFb").disabled=on; $("draftEvent").disabled=on; }
+/* a GIF or video can only be attached while it still matches the design on screen */
+function fresh(m){ return m && m.key===designKey(); }
+function markAttach(){ document.querySelectorAll("[data-attach]").forEach(b=>{ const k=b.dataset.attach; const m = k==="gif"?made.gif:k==="video"?made.video:true; b.disabled = k!=="png" && !fresh(m); b.title = b.disabled && m && m!==true ? "Changed since you made it: make it again" : ""; if(b.disabled && attach===k) attach="png"; b.setAttribute("aria-pressed",String(attach===k)); }); }
+document.querySelectorAll("[data-attach]").forEach(b=>b.addEventListener("click",()=>{ if(b.disabled) return; attach=b.dataset.attach; markAttach(); }));
+async function attachment(){ if(attach==="gif"&&fresh(made.gif)) return made.gif; if(attach==="video"&&fresh(made.video)) return made.video; const sn=snapshot(); return {blob: await pngBlob(null, sn), name: fileBase(null, sn)+".png", key:sn.key}; }
+function draftCard(target){
+  const box=$("draftBox"); if (posting) return null; box.textContent="";
+  const card=document.createElement("div"); card.className="draft"; card.setAttribute("role","group"); card.setAttribute("aria-label","Post draft");
+  const head=document.createElement("b"); const body=document.createElement("div"); body.className="row"; body.style.alignItems="flex-start";
+  const prev=document.createElement("div"); const right=document.createElement("div"); right.style.cssText="display:grid;gap:8px;flex:1;min-width:200px";
+  const cap=document.createElement("textarea"); cap.rows=7; cap.maxLength=1900; cap.setAttribute("aria-label","Caption for this post");
+  const who=document.createElement("p"); who.className="who";
+  const row=document.createElement("div"); row.className="row";
+  const go=document.createElement("button"); go.type="button"; go.className="btn gold"; go.textContent="Confirm and post";
+  const no=document.createElement("button"); no.type="button"; no.className="btn"; no.textContent="Cancel";
+  const st=document.createElement("p"); st.className="status"; st.setAttribute("role","status");
+  row.append(go,no); right.append(cap, who, row, st); body.append(prev,right); card.append(head, body); box.append(card);
+  no.addEventListener("click",()=>{ box.textContent=""; $({discord:"draftDiscord",fb:"draftFb",event:"draftEvent"}[target]).focus(); });
+  return {card, head, prev, cap, who, go, st, right};
+}
+async function showPreview(el, a){ const url=URL.createObjectURL(a.blob); const m=document.createElement(a.blob.type.startsWith("video")?"video":"img"); m.src=url; if(m.tagName==="VIDEO"){ m.muted=true; m.loop=true; m.autoplay=true; m.playsInline=true; } else m.alt="Poster to post"; el.append(m); }
+$("draftDiscord").addEventListener("click", async ()=>{
+  const d=draftCard("discord"); if(!d) return; d.head.textContent="Post to Discord";
+  if (!ZT){ d.who.textContent="Posting works on zeefreaks.io/posters after you sign in with Discord."; d.go.disabled=true; return; }
+  if (ZT.via!=="discord"){ d.who.innerHTML='You signed in by email. <a href="auth-discord.php">Sign in with Discord</a> to post, so the post shows who sent it.'; d.go.disabled=true; return; }
+  const chans=ZT.channels||[]; if(!chans.length){ d.who.textContent="No Discord channels are switched on yet. George adds them in the private settings."; d.go.disabled=true; return; }
+  const sel=document.createElement("select"); sel.setAttribute("aria-label","Channel"); chans.forEach(c=>sel.append(new Option("#"+c,c))); d.right.prepend(sel);
+  const a=await attachment(); await showPreview(d.prev, a);
+  capKind="discord"; markCap(); if(!capEdited) writeCaption(); d.cap.value=$("caption").value;
+  d.who.textContent=`Posts as “${ZT.name} via TR Poster Maker”.` + (a.blob.size>10*1048576?" This file is over 10 MB: Discord will refuse it. Attach the PNG or a smaller GIF.":"");
+  const op=newOp(); sel.addEventListener("change",()=>{ d.op=newOp(); }); d.op=op;
+  // when: now, or a time later (PH time, up to 30 days)
+  const when=document.createElement("div"); when.className="row"; when.innerHTML='<label class="toggle"><input type="radio" name="dwhen" value="now" checked> Post now</label><label class="toggle"><input type="radio" name="dwhen" value="later"> Schedule</label><input type="datetime-local" aria-label="Post at (PH time)" hidden style="max-width:230px">';
+  const at=when.querySelector("input[type=datetime-local]"); at.min=phNowLocal(5); at.max=phNowLocal(30*1440); at.value = defaultSchedule();
+  when.addEventListener("change",()=>{ const later=when.querySelector('input[value=later]').checked; at.hidden=!later; d.go.textContent = later ? "Confirm and schedule" : "Confirm and post"; d.who.textContent = later && !ZT.cron ? "Heads up: the server timer isn't switched on yet, so a scheduled post waits until George turns it on." : `Posts as “${ZT.name} via TR Poster Maker”.`; d.op=newOp(); });
+  d.right.insertBefore(when, d.cap);
+  d.go.addEventListener("click", ()=>{ const later=when.querySelector('input[value=later]').checked;
+    if (later) sendPost("schedule.php", {act:"schedule", channel: sel.value, caption: d.cap.value, at: at.value, title: state.f.title||""}, a, d, "#"+sel.value, "Scheduled for "+fmtLocal(at.value)+" PH time in");
+    else sendPost("post-discord.php", {channel: sel.value, caption: d.cap.value}, a, d, "#"+sel.value); });
+  d.go.focus();
+});
+$("draftFb").addEventListener("click", async ()=>{
+  const d=draftCard("fb"); if(!d) return; d.head.textContent="Post to the Trading Republic Facebook Page";
+  if (!ZT){ d.who.textContent="Posting works on zeefreaks.io/posters for Page admins."; d.go.disabled=true; return; }
+  if (!ZT.admin){ d.who.textContent="Only admins can post to the TR Page. Download the poster and send it to George, or post it in Discord."; d.go.disabled=true; return; }
+  const fb=ZT.fb||{}; if(!fb.ready){ d.who.textContent="The Facebook connection isn't set up yet (the Facebook app details go in the private settings)."; d.go.disabled=true; return; }
+  if (!fb.connected){ d.who.innerHTML=`Connect Facebook once per session: <a href="fb-login.php">Sign in with Facebook</a>. Your design stays saved here.`; saveDraft(); autoSave(); d.go.disabled=true; return; }
+  const a=await attachment(); if(a.blob.type==="image/gif"){ d.who.textContent="Facebook shows GIFs as still images on Page posts. Attach the PNG or the video instead."; d.go.disabled=true; return; }
+  await showPreview(d.prev, a);
+  capKind="facebook"; markCap(); if(!capEdited) writeCaption(); d.cap.value=$("caption").value;
+  d.who.textContent=`Posts on the ${fb.page||"Trading Republic"} Page, published right away.`;
+  d.op=newOp();
+  d.go.addEventListener("click", ()=>sendPost("post-fb.php", {caption: d.cap.value}, a, d, "TR Page"));
+  d.go.focus();
+});
+/* PH-time helpers for the schedule picker (value format YYYY-MM-DDTHH:MM) */
+function phNowLocal(addMin){ const t=new Date(Date.now()+addMin*60000); const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(t).reduce((o,x)=>(o[x.type]=x.value,o),{}); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; }
+function defaultSchedule(){ const soon=phNowLocal(60); if (state.f.date && state.f.time){ const ev=state.f.date+"T"+state.f.time; const [h,m]=state.f.time.split(":").map(Number); const twoBefore=state.f.date+"T"+String(Math.max(0,h-2)).padStart(2,"0")+":"+String(m).padStart(2,"0"); if (twoBefore>soon) return twoBefore; } return soon; }
+function fmtLocal(v){ if(!v) return ""; return shortDate(v.slice(0,10))+", "+fmtT(v.slice(11,16)); }
+async function loadSchedule(){ if(!ZT || ZT.via!=="discord") return; try{ const r=await fetch("schedule.php"); const j=await r.json(); renderSchedule(j.items||[]); }catch(e){} }
+function renderSchedule(items){ const box=$("schedList"); box.textContent=""; const live=items.filter(x=>x.status==="queued"||x.status==="sending"||(x.status!=="cancelled"&&x.at>Date.now()/1000-86400));
+  $("schedSec").hidden=!live.length;
+  for (const x of live){ const row=document.createElement("div"); row.className="ditem"; const dt=new Date(x.at*1000).toLocaleString("en-PH",{timeZone:"Asia/Manila",weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+    const info=document.createElement("div"); info.innerHTML=`<b>${esc(x.title||"Poster")} → #${esc(x.channel)}</b><small>${esc(dt)} PH time · ${esc({queued:"waiting",sending:"sending now",done:"posted",failed:"didn't post",unknown:"check the channel"}[x.status]||x.status)}${x.mine?"":" · by "+esc(x.by)}</small>`;
+    const act=document.createElement("div"); act.className="row";
+    if (x.status==="queued"){ const c=document.createElement("button"); c.type="button"; c.className="x"; c.textContent="Cancel"; c.addEventListener("click", async ()=>{ c.disabled=true; try{ const j=await api("schedule.php",{act:"cancel", id:x.id}); renderSchedule(j.items||[]); $("schedSec").focus?.(); }catch(e){ c.disabled=false; c.textContent=(e.body&&e.body.message)||"Couldn't cancel"; } }); act.append(c); }
+    if (x.url && /^https:\/\//.test(x.url)){ const a=document.createElement("a"); a.href=x.url; a.target="_blank"; a.rel="noopener"; a.textContent="Open"; act.append(a); }
+    row.append(info, act); box.append(row); } }
+$("draftEvent").addEventListener("click", async ()=>{
+  const d=draftCard("event"); if(!d) return; d.head.textContent="Create a Discord event";
+  if (!ZT){ d.who.textContent="Discord events work on zeefreaks.io/posters after you sign in with Discord."; d.go.disabled=true; return; }
+  if (ZT.via!=="discord"){ d.who.innerHTML='You signed in by email. <a href="auth-discord.php">Sign in with Discord</a> to create events.'; d.go.disabled=true; return; }
+  if (!ZT.events){ d.who.textContent="Discord events aren't switched on yet: George is adding the TR Tools bot to the server."; d.go.disabled=true; return; }
+  const f=state.f; if (!f.date || !f.time){ d.who.textContent="Add the date and start time in Details first."; d.go.disabled=true; return; }
+  const sn=snapshot(); const a={blob: await pngBlob("discord", sn), name: fileBase("discord", sn)+".png"}; await showPreview(d.prev, a);
+  const mk=(label, el)=>{ const w=document.createElement("label"); w.className="f"; const l=document.createElement("span"); l.className="lab"; l.textContent=label; w.append(l, el); return w; };
+  const name=document.createElement("input"); name.type="text"; name.maxLength=100; name.value=(f.title||byId[state.tpl].name);
+  const loc=document.createElement("input"); loc.type="text"; loc.maxLength=100; loc.value=f.where||f.channel||"Discord";
+  const st=document.createElement("input"); st.type="datetime-local"; st.value=f.date+"T"+f.time;
+  const en=document.createElement("input"); en.type="datetime-local"; en.value=f.endTime ? f.date+"T"+f.endTime : "";
+  d.cap.value=[f.topic, f.cta, f.link].filter(Boolean).join("\n\n").slice(0,1000); d.cap.maxLength=1000; d.cap.setAttribute("aria-label","Event description");
+  const grid=document.createElement("div"); grid.className="grid2"; grid.append(mk("Event name",name), mk("Where",loc), mk("Starts (PH time)",st), mk("Ends (optional, PH time)",en));
+  d.right.insertBefore(grid, d.cap);
+  d.who.textContent="Shows in Discord's Events list with this poster as the cover (Discord cover size). Members can tap Interested and get reminded.";
+  d.go.textContent="Confirm and create"; d.op=newOp();
+  d.go.addEventListener("click", ()=>sendPost("event.php", {name:name.value, location:loc.value, start:st.value, end:en.value, description:d.cap.value}, a, d, "Discord events", "Created in"));
+  d.go.focus();
+});
+async function sendPost(url, fields, a, d, where, verb){
+  if (d.go.disabled || posting) return; d.go.disabled=true; lockDrafts(true); d.cap.readOnly=true; d.st.textContent="Posting…";
+  const fd=new FormData(); fd.append("csrf", ZT.csrf); fd.append("op", d.op); for (const [k,v] of Object.entries(fields)) fd.append(k, v); fd.append("file", a.blob, a.name);
+  let r=null, j={};
+  try{ r=await fetch(url,{method:"POST", body:fd}); j=await r.json().catch(()=>({})); } catch(e){ r=null; }
+  if (r && r.ok && j.ok){
+    d.st.innerHTML = `${esc(verb||"Posted to")} ${esc(where)} ✓` + (j.url && /^https:\/\//.test(j.url) ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">Open it</a>` : "");
+    d.go.textContent = verb && verb.startsWith("Scheduled") ? "Scheduled" : verb ? "Done" : "Posted"; teamCache=null; lockDrafts(false);
+    if (j.items) renderSchedule(j.items);
+    try{ await saveDesign(true); if(state.designId) await api("designs.php",{act:"posted", id:state.designId, where}); }catch(e){}
+    return;
+  }
+  lockDrafts(false);
+  const sure = r && r.status>=400 && r.status<500 && r.status!==409;   // the server says it did NOT post
+  if (sure){ d.st.textContent = j.message || "Couldn't post. Nothing was sent. Try again."; d.go.disabled=false; d.cap.readOnly=false; d.op = j.error==="op" ? newOp() : d.op; return; }
+  // no answer, a server error or "already sent": it may have gone out. Don't offer a quick retry.
+  d.st.textContent = (j && j.message) || `We couldn't confirm whether it posted. Check ${where} before trying again.`; d.go.textContent="Check first";
+}
+
+/* ---------- first-time guided tour ---------- */
+const TOUR = [
+  { sel: null, title: "Welcome to the TR Poster Maker", text: "You build a poster in six short stages. A quick tour: skip it any time, replay it from ▶ Tour." },
+  { sel: "#builder .stagehead", title: "1 · The stage you're on", text: "Each stage does one job: template, look, details, photo and speakers, fine-tune, then generate and share." },
+  { sel: "#previewPane", ph: "#previewPane .canvaswrap", title: "2 · The live preview", text: "The poster updates with every pick. It's exactly what you'll download or post." },
+  { sel: "#steps", title: "3 · Jump between stages", text: "Tap any number to go back and refine just that part. Your other choices stay as they are. Back and Next walk through them in order." },
+  { sel: "#presets", up: ".presets-sec", title: "4 · This week in one tap", text: "“Next Hunt”, “Next Council” and the others fill in the host, time and place, with this week's date." },
+  { sel: "#checkLine", up: ".meta", title: "5 · Brand check", text: "A green tick means it's ready. If something needs fixing (text too small, cut off, hard to read, no date), it tells you in one line." },
+  { sel: "#undoBtn", up: ".tools", title: "6 · Undo and My designs", text: "Undo or redo your last 20 changes. Save designs on the last stage and reopen them from My designs, even on another device." },
+  { sel: null, title: "7 · Generate and share", text: "The last stage makes PNGs, all four sizes, a GIF or a video, writes the caption, and drafts a post for Discord or the TR Page. Nothing posts until you press Confirm and post." },
+];
+let tourIdx = -1, tourEls = null, tourOpener = null;
+const isPhone = () => window.innerWidth < 640;
+function tourTarget(st){
+  const phone = isPhone(), sel = phone && st.ph ? st.ph : st.sel; if(!sel) return null;
+  let el=document.querySelector(sel); if(el && st.up){ el = el.closest(st.up) || el; }
+  return el && el.offsetParent !== null && !el.closest("[hidden]") ? el : null;
+}
+function startTour(){
+  if (tourEls) endTour(false);
+  tourOpener = document.activeElement; if (state.stage!==0) goStage(0, false);
+  const ring=document.createElement("div"); ring.className="tour-ring";
+  const tip=document.createElement("div"); tip.className="tour-tip"; tip.setAttribute("role","dialog"); tip.setAttribute("aria-modal","true"); tip.setAttribute("aria-labelledby","tourTitle"); tip.setAttribute("aria-describedby","tourText");
+  tip.innerHTML = '<div class="tour-step" id="tourStep" aria-live="polite"></div><h3 id="tourTitle"></h3><p id="tourText"></p><div class="tour-nav"><button type="button" class="tour-skip" id="tourSkip">Skip tour</button><span><button type="button" class="tour-back" id="tourBack">Back</button><button type="button" class="tour-next" id="tourNext">Next</button></span></div>';
+  const shade=document.createElement("div"); shade.className="tour-shade";
+  document.body.append(shade, ring, tip); tourEls={ring,tip,shade};
+  const app=document.querySelector(".app"); if(app) app.inert = true;
+  const bar=document.querySelector(".ztbar"); if(bar) bar.inert = true;
+  tip.querySelector("#tourSkip").addEventListener("click",()=>endTour(true));
+  tip.querySelector("#tourBack").addEventListener("click",()=>tourGo(tourIdx-1));
+  tip.querySelector("#tourNext").addEventListener("click",()=>tourIdx>=TOUR.length-1?endTour(true):tourGo(tourIdx+1));
+  tip.addEventListener("keydown", tourKeys);
+  window.addEventListener("resize", tourPlace); window.addEventListener("scroll", tourPlace, true);
+  tourGo(0);
+}
+function tourKeys(e){
+  if(!tourEls) return;
+  if(e.key==="Escape"){ e.preventDefault(); endTour(true); return; }
+  if(e.key==="ArrowRight"){ e.preventDefault(); tourEls.tip.querySelector("#tourNext").click(); return; }
+  if(e.key==="ArrowLeft"){ e.preventDefault(); if(tourIdx>0) tourGo(tourIdx-1); return; }
+  if(e.key==="Tab"){ const f=[...tourEls.tip.querySelectorAll("button:not([hidden])")]; if(!f.length) return; const i=f.indexOf(document.activeElement);
+    if(e.shiftKey && (i<=0)){ e.preventDefault(); f[f.length-1].focus(); } else if(!e.shiftKey && (i===f.length-1 || i<0)){ e.preventDefault(); f[0].focus(); } }
+}
+function tourGo(i){
+  tourIdx=Math.max(0,Math.min(TOUR.length-1,i)); const st=TOUR[tourIdx], t=tourEls.tip;
+  t.querySelector("#tourStep").textContent = `Step ${tourIdx+1} of ${TOUR.length}`;
+  t.querySelector("#tourTitle").textContent = st.title; t.querySelector("#tourText").textContent = st.text;
+  t.querySelector("#tourBack").hidden = tourIdx===0;
+  t.querySelector("#tourNext").textContent = tourIdx===TOUR.length-1 ? "Start making posters" : "Next";
+  const el=tourTarget(st);
+  if (el){ const r=el.getBoundingClientRect(); const fixed = getComputedStyle(el.closest(".stagebar")||document.body).position==="fixed" || el.closest(".stage")&&isPhone();
+    if (!fixed){ const dy = isPhone() ? r.top - window.innerHeight*0.45 : (r.top + r.height/2 - window.innerHeight/2); window.scrollBy({top: dy, behavior:"auto"}); } }
+  tourPlace(); t.querySelector("#tourNext").focus({preventScroll:true});
+}
+function tourPlace(){
+  if(!tourEls) return; const st=TOUR[tourIdx], el=tourTarget(st), {ring,tip,shade}=tourEls;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  tip.style.left=""; tip.style.removeProperty("top");
+  if(!el){ ring.hidden=true; shade.hidden=false; tip.classList.remove("dock"); tip.classList.add("center"); return; }
+  shade.hidden=true; ring.hidden=false; tip.classList.remove("center");
+  const r=el.getBoundingClientRect(), pad=8;
+  ring.style.left=(r.left-pad)+"px"; ring.style.top=(r.top-pad)+"px"; ring.style.width=(r.width+pad*2)+"px"; ring.style.height=(r.height+pad*2)+"px";
+  if (isPhone()){ // dock the tip at the top or the bottom, on the side away from the target
+    tip.classList.add("dock"); const th=tip.offsetHeight, below = (r.top + r.bottom)/2 < vh/2;
+    if (below){ tip.style.setProperty("top", Math.min(vh - th - 12, Math.max(r.bottom + 16, vh - th - 170)) + "px", "important"); }
+    return; }
+  tip.classList.remove("dock");
+  const tw=tip.offsetWidth, th=tip.offsetHeight;
+  let top = r.bottom + 16; if (top + th > vh - 12) top = r.top - th - 16; if (top < 12) top = Math.max(12, Math.min(vh - th - 12, r.top + 12));
+  let left = Math.min(Math.max(12, r.left), vw - tw - 12);
+  tip.style.left=left+"px"; tip.style.top=top+"px";
+}
+function markTourDone(){
+  store("tourDone2", true);
+  if (ZT && !ZT.tourDone){
+    api("prefs.php",{act:"tour_done"}).then(()=>{ ZT.tourDone=true; }).catch(()=>{ $("status").textContent = "Couldn't save that you've seen the tour; it may show again next time."; });
+  }
+}
+function endTour(markDone){
+  if(!tourEls) return; Object.values(tourEls).forEach(e=>e.remove()); tourEls=null; tourIdx=-1;
+  const app=document.querySelector(".app"); if(app) app.inert = false;
+  const bar=document.querySelector(".ztbar"); if(bar) bar.inert = false;
+  window.removeEventListener("resize", tourPlace); window.removeEventListener("scroll", tourPlace, true);
+  if (markDone) markTourDone();
+  const back = (tourOpener && tourOpener.isConnected && tourOpener !== document.body) ? tourOpener : $("tourBtn");
+  back.focus({preventScroll:true});
+}
+function maybeAutoTour(){ const done = (ZT && ZT.tourDone) || !!load("tourDone2"); if (!done) setTimeout(startTour, 600); }
+$("tourBtn").addEventListener("click", startTour);
+let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(()=>{ draw(); fitScrollPadding(); drawCrop(); }, 150); });
+
+/* ---------- boot ---------- */
+(async()=>{
+  buildSteps(); buildTemplates(); buildLook(); buildPartner(); buildSizes();
+  state.style = load("style") || "signature"; if(!TP.STYLES[state.style]) state.style="signature";
+  state.theme = load("theme") || "show"; if(!TP.THEMES[state.theme]) state.theme="show";
+  state.font = load("font") || "signature"; if(!["signature","show"].includes(state.font)) state.font="signature";
+  state.custom = fromHex(load("custom")) ? toHex(...fromHex(load("custom"))) : "#7DC4FA";
+  state.titleFont = safeFont(load("titleFont")); state.titleWeight = [400,700,800,900].includes(load("titleWeight")) ? load("titleWeight") : 800; state.bodyFont = safeFont(load("bodyFont"));
+  state.theme = load("theme")==="custom" ? "custom" : state.theme;
+  state.motion = load("motion") || "classic"; if(!TP.MOTIONS[state.motion]) state.motion="classic";
+  state.size = load("size") || "square"; if(!TP.SIZES[state.size]) state.size="square";
+  state.grade = load("grade") || "zft"; markSize(); markCap();
+  const last = load("last"); if (!visibleTemplates().length) { hidden.clear(); store("hidden", []); }
+  state.tpl = (byId[last] && !hidden.has(last)) ? last : visibleTemplates()[0].id; state.f = load("draft:"+state.tpl) || freshFields(state.tpl);
+  state.photoKey = state.f.photoKey !== undefined ? state.f.photoKey : defaultPhoto(state.tpl);
+  buildPresets(); goStage(0, false);
+  await TP.loadFonts(); await TP.loadAssets(ASSETS); await restoreFonts(); buildFonts();
+  afterLoad(); markUndo(); markAttach();
+  if (/[?&]fb=connected/.test(location.search)){ history.replaceState(null, "", location.pathname); visited.add(1).add(2).add(3).add(4); goStage(5); $("status").textContent="Facebook connected. Press “Post to the TR Facebook Page…” again."; }
+  else maybeAutoTour();
+  try { if (window.claude && window.claude.use) downloads = await window.claude.use("downloads"); } catch(e){}
+})();
+</script>
+
+<!-- Photo viewer drop-in (George, 9 Nov 2026). Paste this block just before </body> in any artifact.
+     Click any picture (60 px or wider, not inside a link) to open it fit to screen.
+     ‹ › buttons, arrow keys or a swipe switch between all the page's pictures (or those inside the same [data-gallery]).
+     The mouse wheel zooms toward the pointer; drag to move; double-click zooms in or back to fit; Esc or a dark-area click closes.
+     Opt a picture out with data-nozoom (on the image or any parent). Pictures that are controls (pickers, sliders,
+     pressed buttons) must be opted out, so a click still selects them. Uses its own pv- class names, so it never clashes with the page. -->
+<style>
+#pv-box{position:fixed;inset:0;z-index:2147483000;background:rgb(8 10 14 / .96);color:#fff;user-select:none;touch-action:none;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+#pv-box[hidden]{display:none}
+.pv-stage{position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:calc(56px + env(safe-area-inset-top,0px)) max(56px,env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) max(56px,env(safe-area-inset-left,0px));box-sizing:border-box;cursor:zoom-in}
+.pv-stage.zoomed{cursor:grab}.pv-stage.drag{cursor:grabbing}
+#pv-img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;flex:none;object-fit:contain;border-radius:6px;transform-origin:0 0;will-change:transform}
+.pv-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:linear-gradient(rgb(0 0 0 / .6),transparent)}
+#pv-cap{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#pv-count{font-variant-numeric:tabular-nums;opacity:.8;font-size:12.5px}
+.pv-btn{font:inherit;border:0;border-radius:999px;background:rgb(255 255 255 / .16);color:#fff;min-width:40px;height:40px;padding:0 12px;cursor:pointer;display:grid;place-items:center;font-size:16px}
+.pv-btn:hover,.pv-btn:focus-visible{background:rgb(255 255 255 / .3);outline:none}
+.pv-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;font-size:28px;line-height:1;padding:0}
+.pv-prev{left:max(8px,env(safe-area-inset-left,0px))}.pv-next{right:max(8px,env(safe-area-inset-right,0px))}
+.pv-nav[hidden],#pv-fit[hidden]{display:none}
+.pv-hint{position:absolute;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12.5px;opacity:.7}
+@media (max-width:600px),(pointer:coarse){.pv-hint{display:none}.pv-stage{padding-left:8px;padding-right:8px}}
+img.pv-zoomable{cursor:zoom-in}
+</style>
+<div id="pv-box" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <div class="pv-stage" id="pv-stage"><img id="pv-img" alt="" draggable="false"></div>
+  <div class="pv-top"><span id="pv-cap"></span><span id="pv-count"></span><button type="button" class="pv-btn" id="pv-fit" hidden>Fit to screen</button><button type="button" class="pv-btn" id="pv-close" aria-label="Close">✕</button></div>
+  <button type="button" class="pv-btn pv-nav pv-prev" id="pv-prev" aria-label="Previous picture">‹</button>
+  <button type="button" class="pv-btn pv-nav pv-next" id="pv-next" aria-label="Next picture">›</button>
+  <div class="pv-hint">Scroll to zoom · drag to move · double-click to fit · ← → to switch · Esc to close</div>
+</div>
+<script>
+(() => {
+  const q = id => document.getElementById(id);
+  const box = q('pv-box'), stage = q('pv-stage'), img = q('pv-img');
+  let list = [], i = 0, s = 1, x = 0, y = 0, drag = null, tx = null, back = null;
+  const ok = el => el && el.tagName === 'IMG' && !el.closest('#pv-box') && !el.hasAttribute('data-nozoom') && !el.closest('a[href],[data-nozoom],[role=slider],[role=radio],[role=option],[aria-pressed]')
+    && el.getBoundingClientRect().width >= 60;
+  // Mark pictures so they show the zoom cursor (new ones too, as the page redraws).
+  const mark = () => document.querySelectorAll('img:not(.pv-zoomable)').forEach(el => { if (ok(el)) el.classList.add('pv-zoomable'); });
+  new MutationObserver(mark).observe(document.body, { childList: true, subtree: true }); addEventListener('load', mark); mark();
+  const apply = () => { img.style.transform = `translate(${x}px,${y}px) scale(${s})`; stage.classList.toggle('zoomed', s > 1); q('pv-fit').hidden = s === 1; };
+  const reset = () => { s = 1; x = 0; y = 0; apply(); };
+  const zoomAt = (cx, cy, ns) => {
+    ns = Math.min(8, Math.max(1, ns)); if (ns === 1) { reset(); return; }
+    const r = img.getBoundingClientRect(), bx = r.left - x, by = r.top - y, px = cx - bx, py = cy - by;
+    x = px - (px - x) * ns / s; y = py - (py - y) * ns / s; s = ns; apply();
+  };
+  const show = k => {
+    i = (k + list.length) % list.length; reset();
+    const el = list[i]; img.src = el.currentSrc || el.src; img.alt = el.alt || '';
+    const cap = el.alt || el.closest('figure')?.querySelector('figcaption')?.textContent || el.title || '';
+    q('pv-cap').textContent = cap.trim();
+    q('pv-count').textContent = list.length > 1 ? `${i + 1} / ${list.length}` : '';
+    q('pv-prev').hidden = q('pv-next').hidden = list.length < 2;
+  };
+  const close = () => { box.hidden = true; img.removeAttribute('src'); document.documentElement.style.overflow = ''; back?.focus?.(); };
+  // Capture phase, so a picture inside a page's own button opens here instead of the old viewer.
+  document.addEventListener('click', e => {
+    const el = e.target.closest?.('img'); if (!ok(el)) return;
+    e.preventDefault(); e.stopPropagation();
+    const scope = el.closest('[data-gallery]') || document;
+    list = [...scope.querySelectorAll('img')].filter(ok);
+    back = document.activeElement; box.hidden = false; document.documentElement.style.overflow = 'hidden';
+    show(Math.max(0, list.indexOf(el))); q('pv-close').focus();
+  }, true);
+  stage.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, s * (e.deltaY < 0 ? 1.2 : 1 / 1.2)); }, { passive: false });
+  stage.addEventListener('dblclick', e => { if (s > 1) reset(); else zoomAt(e.clientX, e.clientY, 2.5); });
+  stage.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch') return;
+    if (s > 1) { drag = { sx: e.clientX - x, sy: e.clientY - y }; stage.classList.add('drag'); stage.setPointerCapture(e.pointerId); }
+    else if (e.target === stage) close();
+  });
+  stage.addEventListener('pointermove', e => { if (!drag) return; x = e.clientX - drag.sx; y = e.clientY - drag.sy; apply(); });
+  stage.addEventListener('pointerup', () => { drag = null; stage.classList.remove('drag'); });
+  stage.addEventListener('touchstart', e => { if (e.touches.length === 1) tx = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', e => { if (tx === null || s > 1) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1)); }, { passive: true });
+  q('pv-prev').onclick = () => show(i - 1); q('pv-next').onclick = () => show(i + 1);
+  q('pv-close').onclick = close; q('pv-fit').onclick = reset;
+  document.addEventListener('keydown', e => {
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowRight') show(i + 1);
+    else if (e.key === 'ArrowLeft') show(i - 1);
+    else if (e.key === '+' || e.key === '=') { const r = stage.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, s * 1.25); }
+    else if (e.key === '-') { const r = stage.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, s / 1.25); }
+    else if (e.key === '0') reset();
+    else return;
+    e.preventDefault(); e.stopPropagation();
+  }, true);
+})();
+</script>

@@ -1,0 +1,12 @@
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>body{margin:0;background:#888;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}canvas{width:var(--w,360px);height:auto}</style>
+<script>/*POSTERS_JS*/</script>
+<script>const ASSETS=/*ASSETS_JSON*/;
+(async()=>{const TP=TRPoster;await TP.loadFonts();await TP.loadAssets(ASSETS);
+const q=new URLSearchParams(location.search); if(q.get('w')) document.body.style.setProperty('--w',q.get('w'));
+const by=Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+const bgp = q.get('bg') ? await TP.loadImg(null, q.get('bg')) : null;
+for(const j of (q.get('j')||'hunt:signature:show:square').split(',')){const [id,st,th,sz,tt]=j.split(':');const c=document.createElement('canvas');document.body.appendChild(c);const f=JSON.parse(JSON.stringify(by[id].fields));if(f.partner)f.partnerImg=TP.IMG['p_'+f.partner]; if(q.get('sp')){const mk=(h)=>{const c=document.createElement('canvas');c.width=c.height=400;const x=c.getContext('2d');const g=x.createLinearGradient(0,0,400,400);g.addColorStop(0,'hsl('+h+',60%,55%)');g.addColorStop(1,'hsl('+(h+40)+',60%,25%)');x.fillStyle=g;x.fillRect(0,0,400,400);x.fillStyle='rgba(255,255,255,.85)';x.beginPath();x.arc(200,160,80,0,7);x.fill();x.beginPath();x.ellipse(200,400,150,130,0,0,7);x.fill();return c;}; f.speakers=[{name:'Iluso',role:'Coach',photo:mk(20)},{name:'Sicilian Trader',role:'Coach',photo:mk(200)},{name:'Glacier',role:'Coach',photo:mk(120)}].slice(0,+q.get('sp'));}if(q.get('long')){f.title='W'.repeat(100); f.where='Ortigas '+'W'.repeat(100); f.channel='#'+'W'.repeat(150); f.kicker='K'.repeat(90); f.cta='C'.repeat(120); f.speakers=[{name:'N'.repeat(80),role:'R'.repeat(80)}];}
+if(q.get('ph')){f.bgPhoto=TP.IMG['ph_'+id+'-'+q.get('ph')]; f.grade=q.get('grade')||'zft';}
+if(bgp){f.bgPhoto=bgp; f.grade=q.get('grade')||'zft';} TP.render(c,by[id],f,{style:st,theme:th},sz,tt?{t:+tt,dur:8}:{});}
+document.title='done';})();</script>

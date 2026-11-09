@@ -1,0 +1,212 @@
+<title>Poster Maker Upgrades</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Plus+Jakarta+Sans:wght@700;800&family=Anton&display=swap">
+<style>
+/* Layout: one card per idea — what it is, a small before → after picture (web and phone), then Build now / Later / Skip. Summary + Submit at the bottom. */
+:root{
+  --bg:#0b0b0f; --panel:#13131a; --panel2:#1a1a23; --line:#262632; --ink:#f5f5f7; --muted:#9a9aab; --gold:#FFB400; --gold-soft:rgba(255,180,0,.12); --green:#3ddc84; --red:#ff6b6b;
+  --display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif; --body:"DM Sans","Segoe UI",Arial,sans-serif; color-scheme:dark;
+}
+body{background:var(--bg);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1{font:800 clamp(26px,4vw,38px)/1.1 var(--display);margin:0;text-wrap:balance}
+h1 b{color:var(--gold)}
+h2{font:800 18px var(--display);margin:0}
+h3{font:800 13px var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:12px 0 0}
+p{margin:0}
+.lede{color:var(--muted);max-width:70ch}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:18px;align-items:center}
+@media (max-width:760px){.card{grid-template-columns:minmax(0,1fr)}}
+.card.rec{border-color:rgba(255,180,0,.45)}
+.tag{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:2px 8px;background:var(--gold);color:#111;margin-left:6px;vertical-align:middle}
+.why{color:var(--muted);font-size:14px;margin-top:6px}
+.cost{font-size:12px;color:var(--muted);margin-top:8px}
+.choices{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.choices label{cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-weight:700;font-size:13px;background:var(--panel2)}
+.choices input{position:absolute;opacity:0;pointer-events:none}
+.choices label:has(input:checked){background:var(--gold);color:#111;border-color:var(--gold)}
+.choices label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.ba{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:center}
+.arrow{color:var(--gold);font-weight:800}
+.pane{display:grid;gap:6px}
+.pane small{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+.scr{background:#0f0f15;border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:5px;min-height:118px;align-content:start;font-size:10px;color:var(--muted)}
+.phone{border:5px solid #000;border-radius:16px;max-width:96px;justify-self:center;min-height:150px}
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 96px;gap:8px;align-items:end}
+.blk{background:var(--panel2);border-radius:5px;height:10px}
+.blk.g{background:var(--gold)}
+.blk.s{height:6px;width:60%}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:1px 6px;font-size:9px;color:var(--ink)}
+.chip.on{background:var(--gold);color:#111;border-color:var(--gold)}
+.mini{aspect-ratio:1/1;border-radius:6px;background:#111 center/cover;position:relative;overflow:hidden}
+.mini b{position:absolute;left:8%;bottom:16%;font:400 clamp(10px,2.2vw,16px)/1 Anton,Impact,sans-serif;color:#fff;text-transform:uppercase}
+.row{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.cap{background:var(--panel2);border-radius:6px;padding:5px;color:var(--ink);font-size:9px;line-height:1.35}
+.bad{color:var(--red)} .ok{color:var(--green)}
+.sum{position:sticky;bottom:max(12px,env(safe-area-inset-bottom,0px));background:rgba(19,19,26,.96);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;backdrop-filter:blur(6px)}
+button.go{all:unset;cursor:pointer;background:var(--gold);color:#111;font-weight:800;border-radius:10px;padding:11px 18px}
+button.go:focus-visible{outline:2px solid #fff;outline-offset:2px}
+textarea{width:100%;box-sizing:border-box;min-height:70px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+.status{font-size:13px;color:var(--muted)}
+</style>
+
+<main class="wrap">
+  <header>
+    <p style="color:var(--gold);font-weight:800;letter-spacing:.12em;font-size:12px;text-transform:uppercase">TR Poster Maker · next round</p>
+    <h1>Pick the <b>upgrades</b> to build next</h1>
+    <p class="lede" style="margin-top:8px">Thirteen ideas (three new from the 9 Nov live audit): six that make the tool faster for Guild Leaders and four that make the posters look more premium. Each shows today → after, web and phone. My top picks are marked. Choose Build now, Later or Skip, then press Submit.</p>
+  </header>
+
+  <h3>Make it faster</h3>
+
+  <section class="card rec" data-id="presets">
+    <div><h2>1. Weekly presets: "Next Hunt" in one tap <span class="tag">Top pick</span></h2>
+      <p class="why">Each favourite remembers its host, time, link and photo for the whole team, and fills in the next date automatically (The Hunt → next Tuesday 5 PM). A weekly poster takes about 20 seconds.</p>
+      <p class="cost">Effort: small · free</p><div class="choices" role="radiogroup"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="row"><span class="chip">Title</span><span class="chip">Date ?</span><span class="chip">Time ?</span></div><div class="blk"></div><div class="blk s"></div><div class="row"><span class="chip">Host ?</span><span class="chip">Photo ?</span></div><div class="bad">Retype every week</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip on">Next Hunt ▸ Tue Nov 17, 5 PM</span></div><div class="row"><span class="chip">Coach Sean ✓</span><span class="chip">photo ✓</span></div><div class="ok">Ready. Download.</div></div><div class="scr phone"><span class="chip on">Next Hunt</span><div class="blk g"></div><div class="ok">✓</div></div></div></div></div>
+  </section>
+
+  <section class="card rec" data-id="caption">
+    <div><h2>2. Caption writer + copy button <span class="tag">Top pick</span></h2>
+      <p class="why">Writes the Discord and Facebook caption in the format Steph and Jairus use ("Hi @everyone! See you tonight on THE COUNCIL…"), with the time, the links and no typos. One tap copies it.</p>
+      <p class="cost">Effort: small · free (template-based, no AI cost)</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="blk"></div><div class="bad">Poster here, caption typed by hand in Discord</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="cap">Hi @everyone! 👋 See you tonight at 8 PM on THE COUNCIL with Coach Iluso and Coach Sicilian Trader…</div><span class="chip on">Copy caption</span></div><div class="scr phone"><div class="cap">Hi @everyone!…</div><span class="chip on">Copy</span></div></div></div></div>
+  </section>
+
+  <section class="card rec" data-id="pack">
+    <div><h2>3. "All sizes" pack <span class="tag">Top pick</span></h2>
+      <p class="why">One button makes square, 4:5, story and the Discord cover together, so the FB post, the story and the Discord event all match.</p>
+      <p class="cost">Effort: small · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><span class="chip">1:1</span><div class="bad">Pick a size, download, repeat ×4</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip">1:1</span><span class="chip">4:5</span><span class="chip">9:16</span><span class="chip">Discord</span></div><span class="chip on">Download all 4</span></div><div class="scr phone"><span class="chip on">All 4</span></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="post">
+    <div><h2>4. Submit for posting → you approve → posts to the FB Page + Discord</h2>
+      <p class="why">Guild Leaders press "Submit for posting". You see it on the Access page and tap Approve, which is your go, and it goes to the Facebook Page and the Discord channel. The FB Group stays manual because Facebook blocks apps there.</p>
+      <p class="cost">Effort: medium · free · needs Meta app review for the Page</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="bad">Download → open FB → upload → write → post (×2 for Discord)</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip">Steph: The Hunt</span><span class="chip on">Approve</span><span class="chip">Edit</span></div><div class="ok">Posted to FB Page + #upcoming-events</div></div><div class="scr phone"><span class="chip on">Approve</span></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="adjust">
+    <div><h2>5. Fine-tune controls</h2>
+      <p class="why">Sliders to make the title bigger or smaller, move the photo's focus and zoom a speaker photo, all while staying inside the safe edges. Fixes the cases where a long name or a busy photo doesn't sit right.</p>
+      <p class="cost">Effort: small · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="bad">Auto layout only</div><div class="blk"></div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row">Title size <span class="blk g" style="width:50%;height:6px"></span></div><div class="row">Photo focus <span class="blk g" style="width:30%;height:6px"></span></div><div class="row">Speaker zoom <span class="blk g" style="width:65%;height:6px"></span></div></div><div class="scr phone"><span class="blk g" style="height:6px"></span><span class="blk" style="height:6px"></span></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="history">
+    <div><h2>6. Team history: reopen and duplicate</h2>
+      <p class="why">The last 30 posters made by anyone on the team, with who made them and when. Open one, change the date, done. Also stops two people making the same poster.</p>
+      <p class="cost">Effort: medium · free (stored on your Hostinger site)</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="bad">Drafts live only in one browser</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip">Council · Steph · Thu</span><span class="chip on">Duplicate</span></div><div class="row"><span class="chip">Hunt · Jairus · Tue</span></div></div><div class="scr phone"><span class="chip">Council</span><span class="chip">Hunt</span></div></div></div></div>
+  </section>
+
+  <h3>Make it look more premium</h3>
+
+  <section class="card rec" data-id="photos">
+    <div><h2>7. Real ZFT photo library per show <span class="tag">Top pick · in progress</span></h2>
+      <p class="why">The 23 realistic gold-lit photos Codex is painting now, as one-tap backdrops per show, all run through the ZFT grade so every poster feels like the same brand.</p>
+      <p class="cost">Effort: done once the photos land · free (your Codex plan)</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="mini" style="background:radial-gradient(circle at 35% 40%,#555 0 18%,#111 19%),radial-gradient(circle at 70% 40%,#555 0 18%,#111 19%);background-blend-mode:screen"><b>The Hunt</b></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After</small><div class="mini" style="background:radial-gradient(120% 90% at 75% 15%,rgba(255,180,0,.55),transparent 55%),linear-gradient(160deg,#2a2418,#0b0b0f 60%)"><b>The Hunt</b></div></div></div>
+  </section>
+
+  <section class="card rec" data-id="type">
+    <div><h2>8. One signature headline font for every series <span class="tag">Top pick</span></h2>
+      <p class="why">Today the shows mix four headline fonts. One bold, slightly slanted face echoes the ZFT wordmark across every poster, with each show keeping its own colour and art. The posters read as one family in the feed.</p>
+      <p class="cost">Effort: small · free (Google font, e.g. Big Shoulders Display or Archivo Black italic)</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr" style="font-size:13px;color:#fff;gap:2px"><span style="font:800 13px 'Plus Jakarta Sans'">THE COUNCIL</span><span style="font:400 13px Anton">MONDAY MARKET</span><span style="font:700 13px 'Plus Jakarta Sans';letter-spacing:.1em">CHARTS DECODED</span></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After</small><div class="scr" style="color:#fff;gap:2px"><span style="font:400 14px Anton;font-style:italic;transform:skewX(-8deg)">THE COUNCIL</span><span style="font:400 14px Anton;transform:skewX(-8deg)">MONDAY MARKET</span><span style="font:400 14px Anton;transform:skewX(-8deg);color:var(--gold)">CHARTS DECODED</span></div></div></div>
+  </section>
+
+  <section class="card" data-id="ui">
+    <div><h2>9. Cleaner tool layout: four steps and a pinned preview</h2>
+      <p class="why">Tabs for 1 Template · 2 Look · 3 Details · 4 Export instead of one long page. On phones the preview stays pinned at the top and the controls slide up from the bottom, like Canva.</p>
+      <p class="cost">Effort: medium · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="blk"></div><div class="blk"></div><div class="blk"></div><div class="blk"></div><div class="bad">Long scroll</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip on">1 Template</span><span class="chip">2 Look</span><span class="chip">3 Details</span><span class="chip">4 Export</span></div><div class="blk g" style="height:40px"></div></div><div class="scr phone"><div class="blk g" style="height:50px"></div><div class="blk" style="height:30px"></div></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="motion">
+    <div><h2>10. Premium motion presets + video export</h2>
+      <p class="why">Three motion styles (slow photo zoom, gold light sweep across the title, ticker run-in) and an MP4/WebM export next to the GIF. Video is sharper and much smaller than GIF on Facebook.</p>
+      <p class="cost">Effort: medium · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><span class="chip">GIF</span><div>One animation style</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip on">Light sweep</span><span class="chip">Slow zoom</span><span class="chip">Ticker</span></div><div class="row"><span class="chip">GIF</span><span class="chip on">Video</span></div></div><div class="scr phone"><span class="chip on">Video</span></div></div></div></div>
+  </section>
+
+  <h3>From the 9 Nov live audit</h3>
+
+  <section class="card rec" data-id="brandcheck">
+    <div><h2>11. Brand check before download <span class="tag">Top pick</span></h2>
+      <p class="why">One quick check before every download: text big enough to read on a phone, enough contrast on the chosen photo, logo present, date and time filled, nothing cut with "…". It shows a green tick or a one-line fix ("Title is long, shorten it or pick Story").</p>
+      <p class="cost">Effort: small · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><span class="chip on">Download PNG</span><div class="bad">Mistakes found after posting</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="ok">✓ Readable on phone</div><div class="ok">✓ Date + time</div><div class="bad">! Title cut: shorten it</div><span class="chip on">Download anyway</span></div><div class="scr phone"><div class="ok">✓ 4 of 5</div><span class="chip on">Fix</span></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="undo">
+    <div><h2>12. Undo, plus "my saved designs"</h2>
+      <p class="why">Undo/redo for the last 20 changes, and a Save button that keeps a named design ("Council – Nov 12") on the server, so a Guild Leader can switch phones or come back tomorrow.</p>
+      <p class="cost">Effort: small–medium · free</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="scr"><div class="bad">One draft per template, this browser only</div></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After · web + phone</small><div class="pair"><div class="scr"><div class="row"><span class="chip">↶ Undo</span><span class="chip">↷ Redo</span><span class="chip on">Save design</span></div><div class="row"><span class="chip">Council – Nov 12</span><span class="chip">Hunt – Nov 10</span></div></div><div class="scr phone"><span class="chip">↶</span><span class="chip on">Save</span></div></div></div></div>
+  </section>
+
+  <section class="card" data-id="photofocus">
+    <div><h2>13. Photo picker per show + "make my own photo"</h2>
+      <p class="why">Show the 3 photos for the chosen show first, with a focus dot you can drag (keep the binoculars in view). Plus an "Ask Codex for a new photo" request that drops a new on-brand photo into the library within a day.</p>
+      <p class="cost">Effort: medium · free (your Codex plan)</p><div class="choices"></div></div>
+    <div class="ba"><div class="pane"><small>Today</small><div class="mini" style="background:linear-gradient(160deg,#2a2418,#0b0b0f 60%)"><b>The Hunt</b></div></div>
+      <span class="arrow">→</span>
+      <div class="pane"><small>After</small><div class="mini" style="background:radial-gradient(40% 40% at 70% 40%,rgba(255,180,0,.55),transparent 60%),linear-gradient(160deg,#2a2418,#0b0b0f 60%)"><b>The Hunt</b><span style="position:absolute;left:68%;top:38%;width:12px;height:12px;border-radius:50%;background:#FFB400;box-shadow:0 0 0 3px rgba(0,0,0,.6)"></span></div></div></div>
+  </section>
+
+  <section style="display:grid;gap:8px"><label for="note" style="font-weight:700">Notes (optional)</label><textarea id="note" placeholder="Anything else you want changed or added"></textarea><p class="status">To dictate, tap the box and use your phone keyboard's mic.</p></section>
+
+  <div class="sum"><span id="count" class="status"></span><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="status" id="status" role="status"></span><button class="go" id="submit" type="button">Submit picks</button></div></div>
+</main>
+
+<script>
+const CARDS=[...document.querySelectorAll('.card')];
+CARDS.forEach(c=>{
+  const id=c.dataset.id, rec=c.classList.contains('rec');
+  const box=c.querySelector('.choices'); box.setAttribute('role','radiogroup'); box.setAttribute('aria-label', c.querySelector('h2').textContent);
+  for (const [v,l] of [['now','Build now'],['later','Later'],['skip','Skip']]){
+    const lab=document.createElement('label'); const i=document.createElement('input'); i.type='radio'; i.name='p_'+id; i.value=v; i.id='p_'+id+'_'+v; if((rec&&v==='now')||(!rec&&v==='later')) i.checked=true;
+    lab.append(i, document.createTextNode(l)); box.append(lab);
+  }
+});
+function picks(){ const o={}; CARDS.forEach(c=>{ o[c.dataset.id]=document.querySelector(`input[name="p_${c.dataset.id}"]:checked`).value; }); return o; }
+function count(){ const p=picks(); const n=Object.values(p).filter(v=>v==='now').length; document.getElementById('count').textContent=`${n} to build now · ${Object.values(p).filter(v=>v==='later').length} later`; }
+document.addEventListener('change', count); count();
+let db=null;
+(async()=>{ try{ if(window.claude&&window.claude.use) db=await window.claude.use('db'); }catch(e){}
+  if(db){ try{ const d=await db.doc('picks/latest').get(); if(d&&d.data){ for(const [k,v] of Object.entries(d.data.picks||{})){ const el=document.getElementById('p_'+k+'_'+v); if(el) el.checked=true; } if(d.data.note) document.getElementById('note').value=d.data.note; count(); document.getElementById('status').textContent='Picks on file ('+new Date(d.data.at).toLocaleString()+'). Change and submit again any time.'; } }catch(e){} } })();
+document.getElementById('submit').addEventListener('click', async ()=>{
+  const st=document.getElementById('status'); const data={picks:picks(), note:document.getElementById('note').value.trim(), at:new Date().toISOString()};
+  if(!db){ st.textContent='Saving isn\'t available here. Tell Claude in chat which ones to build.'; return; }
+  st.textContent='Saving…';
+  try{ await db.doc('picks/latest').set(data); await db.collection('picks/history/items').doc(String(Date.now())).set(data); st.textContent='Saved. Claude will build your "Build now" picks.'; }
+  catch(e){ st.textContent='Couldn\'t save ('+(e&&e.code||'error')+'). Tell Claude in chat instead.'; }
+});
+</script>
