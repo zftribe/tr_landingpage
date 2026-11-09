@@ -13,7 +13,8 @@
   const GOLD = "#FFB400";
   const BOX_PAD = 16;
   const DISPLAY = '"Plus Jakarta Sans", "Segoe UI", Arial, sans-serif';
-  const BODY = '"DM Sans", "Segoe UI", Arial, sans-serif';
+  const BODY0 = '"DM Sans", "Segoe UI", Arial, sans-serif';
+  let BODY = BODY0;   // cfg.bodyFont swaps it for one render
   const ANTON = 'Anton, Impact, "Arial Narrow", sans-serif';
   const ARCHIVO = '"Archivo Black", "Arial Black", Arial, sans-serif';
   const MARKER = '"Permanent Marker", "Comic Sans MS", cursive';
@@ -451,6 +452,8 @@
   /* "ZFT Slant": one bold, slightly slanted headline face for every series (cfg.font = "signature") */
   function styleFonts(tpl, style, cfg) {
     const f = styleFonts0(tpl, style);
+    // a chosen headline font (curated, Google Fonts by name, or an uploaded file): plain, no slant
+    if (cfg && cfg.titleFont && style !== "terminal") return Object.assign({}, f, { fam: `"${String(cfg.titleFont).replace(/["\\]/g, "")}", ${ARCHIVO}`, w: cfg.titleWeight || 800, ls: -0.01, script: false, slant: 0 });
     if (cfg && cfg.font === "signature" && style !== "terminal") return Object.assign({}, f, { fam: ARCHIVO, w: 400, ls: -0.005, script: false, slant: 0.12 });
     return f;
   }
@@ -583,6 +586,7 @@
     const inA = (i) => (animated ? ease((t - 0.15 - i * 0.14) / 0.55) : 1) * outA;
     const spk = (f.speakers || []).filter((x) => x && (x.name || x.photo)).slice(0, 3);
     const F = Object.assign({}, f, { speakers: spk });
+    BODY = cfg.bodyFont ? `"${String(cfg.bodyFont).replace(/["\\]/g, "")}", ${BODY0}` : BODY0;
     REP = opts.report || null; PH = { fx: f.focusX, fy: f.focusY, zoom: f.photoZoom, motion: cfg.motion };
     if (REP) Object.assign(REP, { cut: false, W, H, s });
 
@@ -752,7 +756,7 @@
     ctx.restore();
     ctx.letterSpacing = "0px";
     if (REP) REP.topic = !!blocks.find((b) => b.k === "topic");
-    REP = null; PH = {};
+    REP = null; PH = {}; BODY = BODY0;
     return canvas;
   }
 
