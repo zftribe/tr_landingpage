@@ -4,1414 +4,187 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TR Yield Tracker — Trading Republic</title>
+<meta name="description" content="Compare savings and earn rates across Philippine banks, digital banks, e-wallets and partner crypto exchanges. Caps, fine print, promo end dates and after-tax yields, each with its official source and the date we checked it.">
 <link rel="icon" href="../TR logo.png">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-/* ═══════════ VARIABLES ═══════════ */
-:root {
-  --bg: #0a0a0a;
-  --bg-card: #111111;
-  --bg-card-2: #161616;
-  --bg-card-hover: #1a1a1a;
-  --gold: #F9A825;
-  --gold-dim: rgba(249,168,37,0.15);
-  --gold-glow: rgba(249,168,37,0.08);
-  --green: #22c55e;
-  --green-bg: rgba(34,197,94,0.1);
-  --red: #ef4444;
-  --red-bg: rgba(239,68,68,0.1);
-  --white: #ffffff;
-  --text: #e0e0e0;
-  --text-dim: #888888;
-  --border: rgba(255,255,255,0.06);
-  --border-2: rgba(255,255,255,0.12);
-  --radius: 16px;
-  --radius-sm: 10px;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
-}
-
-/* ═══════════ RESET ═══════════ */
-*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
-body {
-  font-family: var(--font-body);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-a { color: var(--gold); text-decoration: none; }
-a:hover { text-decoration: underline; }
-img { display: block; max-width: 100%; }
-input, select, button { font-family: inherit; }
-
-/* ═══════════ LAYOUT ═══════════ */
-.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-.container-wide { max-width: 1400px; margin: 0 auto; padding: 0 24px; }
-.section { padding: 80px 0; }
-.text-center { text-align: center; }
-.gold { color: var(--gold); }
-.green { color: var(--green); }
-.red { color: var(--red); }
-
-/* ═══════════ TYPOGRAPHY ═══════════ */
-h1, h2, h3, h4 { font-family: var(--font-display); color: var(--white); font-weight: 700; line-height: 1.15; }
-h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); }
-h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
-h3 { font-size: 1.2rem; }
-.subtitle { font-size: 1.05rem; color: var(--text-dim); max-width: 600px; margin: 16px auto 0; line-height: 1.7; }
-
-/* ═══════════ NAV ═══════════ */
-.nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  padding: 16px 0;
-  background: rgba(10,10,10,0.8);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  transition: padding 0.3s;
-}
-.nav.scrolled { padding: 10px 0; }
-.nav-inner {
-  max-width: 1200px; margin: 0 auto; padding: 0 24px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.nav-brand { display: flex; align-items: center; gap: 12px; }
-.nav-brand img { height: 30px; }
-.nav-brand span {
-  font-family: var(--font-display); font-weight: 700; font-size: 0.85rem;
-  letter-spacing: 3px; color: var(--gold); text-transform: uppercase;
-}
-.nav-links { display: flex; gap: 28px; align-items: center; }
-.nav-links a {
-  color: var(--text-dim); font-size: 0.88rem; font-weight: 500;
-  transition: color 0.2s; text-decoration: none;
-}
-.nav-links a:hover { color: var(--white); }
-.nav-links a.active { color: var(--gold); }
-
-/* ═══════════ HERO ═══════════ */
-.hero {
-  padding: 140px 0 60px;
-  text-align: center;
-  background: radial-gradient(ellipse at 50% 0%, rgba(249,168,37,0.06) 0%, transparent 60%);
-}
-.hero-badge {
-  display: inline-flex; align-items: center; gap: 8px;
-  background: var(--gold-dim); color: var(--gold);
-  padding: 6px 16px; border-radius: 100px;
-  font-size: 0.8rem; font-weight: 600; letter-spacing: 1px;
-  text-transform: uppercase; margin-bottom: 24px;
-}
-.hero h1 { margin-bottom: 16px; }
-.hero h1 .gold { display: inline; }
-
-/* ═══════════ STATS ROW ═══════════ */
-.stats-row {
-  display: flex; justify-content: center; gap: 48px;
-  margin-top: 48px; flex-wrap: wrap;
-}
-.stat-item { text-align: center; }
-.stat-value {
-  font-family: var(--font-display); font-size: 2rem; font-weight: 800;
-  color: var(--white);
-}
-.stat-label { font-size: 0.78rem; color: var(--text-dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
-
-/* ═══════════ FILTERS ═══════════ */
-.filters {
-  display: flex; justify-content: center; gap: 8px;
-  margin-bottom: 32px; flex-wrap: wrap;
-}
-.filter-btn {
-  padding: 8px 20px; border-radius: 100px;
-  border: 1px solid var(--border-2);
-  background: transparent; color: var(--text-dim);
-  font-size: 0.85rem; font-weight: 500; cursor: pointer;
-  transition: all 0.25s;
-}
-.filter-btn:hover { border-color: var(--gold); color: var(--white); }
-.filter-btn.active {
-  background: var(--gold); color: #000; border-color: var(--gold); font-weight: 600;
-}
-
-/* ═══════════ SEARCH ═══════════ */
-.search-bar {
-  display: flex; align-items: center; gap: 12px;
-  max-width: 400px; margin: 0 auto 40px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-2);
-  border-radius: 100px; padding: 10px 20px;
-}
-.search-bar svg { flex-shrink: 0; color: var(--text-dim); }
-.search-bar input {
-  flex: 1; background: none; border: none; outline: none;
-  color: var(--white); font-size: 0.9rem;
-}
-.search-bar input::placeholder { color: var(--text-dim); }
-
-/* ═══════════ TABLE ═══════════ */
-.yield-table-wrap {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-  overflow: visible;
-}
-.yield-table {
-  width: 100%; border-collapse: collapse;
-  table-layout: fixed;
-}
-.yield-table thead th {
-  font-family: var(--font-display);
-  font-size: 0.68rem; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 1px;
-  color: var(--text-dim); padding: 12px 10px;
-  text-align: left; border-bottom: 1px solid var(--border-2);
-  white-space: nowrap; cursor: pointer;
-  transition: color 0.2s;
-  user-select: none;
-}
-.yield-table thead th:hover { color: var(--gold); }
-.yield-table thead th.sorted { color: var(--gold); }
-.yield-table thead th .sort-arrow { margin-left: 4px; font-size: 0.65rem; }
-.yield-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background 0.2s;
-}
-.yield-table tbody tr:last-child { border-bottom: none; }
-.yield-table tbody tr:hover { background: var(--bg-card-hover); }
-.yield-table td { padding: 12px 10px; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Column widths */
-.yield-table th:nth-child(1),
-.yield-table td:nth-child(1) { width: 36px; }
-.yield-table th:nth-child(2),
-.yield-table td:nth-child(2) { width: 18%; }
-.yield-table th:nth-child(3),
-.yield-table td:nth-child(3) { width: 12%; white-space: normal; }
-.yield-table th:nth-child(4),
-.yield-table td:nth-child(4) { width: 10%; }
-.yield-table th:nth-child(5),
-.yield-table td:nth-child(5) { width: 9%; }
-.yield-table th:nth-child(6),
-.yield-table td:nth-child(6) { width: 11%; }
-.yield-table th:nth-child(7),
-.yield-table td:nth-child(7) { width: 14%; white-space: normal; overflow: visible; text-overflow: unset; font-size: 0.75rem; }
-.yield-table th:nth-child(8),
-.yield-table td:nth-child(8) { width: 9%; }
-.yield-table th:nth-child(9),
-.yield-table td:nth-child(9) { width: 7%; text-align: center; }
-
-.provider-cell {
-  display: flex; align-items: center; gap: 12px;
-}
-.provider-logo {
-  width: 30px; height: 30px; border-radius: 8px;
-  background: var(--bg-card-2); display: flex; align-items: center;
-  justify-content: center; font-weight: 700; font-size: 0.72rem;
-  color: var(--gold); flex-shrink: 0;
-  border: 1px solid var(--border);
-  overflow: hidden;
-}
-.provider-logo img { width: 100%; height: 100%; object-fit: cover; }
-.provider-info { display: flex; flex-direction: column; }
-.provider-name { color: var(--white); font-weight: 600; font-size: 0.82rem; }
-.provider-type {
-  font-size: 0.72rem; color: var(--text-dim);
-  text-transform: uppercase; letter-spacing: 0.5px;
-}
-
-.apy-cell {
-  font-family: var(--font-display); font-weight: 700;
-  font-size: 1.1rem; color: var(--gold);
-}
-.trend-up { color: var(--green); }
-.trend-down { color: var(--red); }
-.trend-steady { color: var(--text-dim); }
-.trend-badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 4px 10px; border-radius: 100px;
-  font-size: 0.75rem; font-weight: 600;
-}
-.trend-badge.up { background: var(--green-bg); color: var(--green); }
-.trend-badge.down { background: var(--red-bg); color: var(--red); }
-.trend-badge.steady { background: rgba(255,255,255,0.05); color: var(--text-dim); }
-
-.lockup-badge {
-  padding: 3px 8px; border-radius: 100px;
-  font-size: 0.72rem; font-weight: 500;
-  background: rgba(255,255,255,0.05); color: var(--text-dim);
-  white-space: nowrap;
-}
-.lockup-badge.flexible { background: var(--green-bg); color: var(--green); }
-
-.min-deposit { color: var(--text); font-size: 0.88rem; }
-
-/* ═══════════ CALCULATOR ═══════════ */
-.calc-section { padding: 80px 0; }
-.calc-grid {
-  display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px;
-}
-.calc-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 36px;
-}
-.calc-panel h3 {
-  font-size: 1rem; margin-bottom: 28px;
-  text-transform: uppercase; letter-spacing: 2px;
-  color: var(--text-dim);
-}
-
-.calc-field { margin-bottom: 28px; }
-.calc-field label {
-  display: flex; justify-content: space-between; align-items: baseline;
-  font-size: 0.88rem; color: var(--text-dim); margin-bottom: 8px; font-weight: 500;
-}
-.calc-field label .val { color: var(--gold); font-weight: 600; }
-.calc-input {
-  width: 100%; padding: 14px 16px;
-  background: var(--bg); border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm); color: var(--white);
-  font-size: 1.1rem; font-weight: 600;
-  outline: none; transition: border-color 0.2s;
-}
-.calc-input:focus { border-color: var(--gold); }
-.calc-dropdown { position: relative; }
-.calc-dropdown-selected {
-  width: 100%; padding: 14px 16px;
-  background: var(--bg); border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm); color: var(--white);
-  font-size: 0.9rem; font-weight: 500;
-  cursor: pointer; transition: border-color 0.2s;
-}
-.calc-dropdown-selected::after {
-  content: '▾'; float: right; color: var(--text-dim);
-}
-.calc-dropdown-selected:hover, .calc-dropdown.open .calc-dropdown-selected {
-  border-color: var(--gold);
-}
-.calc-dropdown-menu {
-  position: absolute; top: 100%; left: 0; right: 0;
-  background: var(--bg-card); border: 1px solid var(--border-2);
-  border-radius: var(--radius-sm); margin-top: 4px;
-  z-index: 100; max-height: 300px; display: flex; flex-direction: column;
-}
-.calc-dropdown-search {
-  width: 100%; padding: 10px 14px; border: none;
-  border-bottom: 1px solid var(--border-2);
-  background: transparent; color: var(--white);
-  font-size: 0.85rem; outline: none;
-  box-sizing: border-box;
-}
-.calc-dropdown-search::placeholder { color: var(--text-dim); }
-.calc-dropdown-list {
-  overflow-y: auto; max-height: 240px;
-}
-.calc-dropdown-item {
-  padding: 10px 14px; cursor: pointer;
-  font-size: 0.82rem; color: var(--text);
-  transition: background 0.15s;
-}
-.calc-dropdown-item:hover { background: var(--bg-card-2); color: var(--white); }
-.calc-dropdown-item.active { color: var(--gold); }
-
-.calc-slider {
-  width: 100%; margin-top: 12px;
-  -webkit-appearance: none; appearance: none;
-  height: 4px; border-radius: 4px;
-  background: var(--border-2); outline: none;
-}
-.calc-slider::-webkit-slider-thumb {
-  -webkit-appearance: none; appearance: none;
-  width: 18px; height: 18px; border-radius: 50%;
-  background: var(--gold); cursor: pointer;
-  border: 3px solid var(--bg);
-  box-shadow: 0 0 10px rgba(249,168,37,0.4);
-}
-.duration-labels {
-  display: flex; justify-content: space-between;
-  font-size: 0.78rem; color: var(--text-dim); margin-top: 8px;
-}
-
-/* Results panel */
-.result-cards {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
-  margin-bottom: 24px;
-}
-.result-card {
-  padding: 20px; border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  background: var(--bg);
-}
-.result-card.highlight {
-  border-color: var(--gold);
-  background: var(--gold-glow);
-}
-.result-card-label {
-  font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px;
-  color: var(--text-dim); font-weight: 600; margin-bottom: 6px;
-}
-.result-card-value {
-  font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
-  color: var(--white);
-}
-.result-card.highlight .result-card-value { color: var(--gold); }
-.result-card-sub { font-size: 0.78rem; color: var(--text-dim); margin-top: 2px; }
-
-.breakdown-row {
-  display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 1px; background: var(--border);
-  border-radius: var(--radius-sm); overflow: hidden;
-  margin-bottom: 24px;
-}
-.breakdown-item {
-  padding: 16px; text-align: center;
-  background: var(--bg);
-}
-.breakdown-label {
-  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px;
-  color: var(--text-dim); font-weight: 600; margin-bottom: 4px;
-}
-.breakdown-value {
-  font-family: var(--font-display); font-size: 1.15rem; font-weight: 700;
-  color: var(--white);
-}
-
-/* Chart */
-.chart-wrap {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
-  position: relative;
-}
-.chart-canvas { width: 100%; height: 220px; }
-.chart-legend {
-  display: flex; gap: 20px; justify-content: flex-end;
-  margin-bottom: 12px; font-size: 0.78rem; color: var(--text-dim);
-}
-.chart-legend span { display: flex; align-items: center; gap: 6px; }
-.legend-line {
-  width: 20px; height: 3px; border-radius: 2px;
-}
-.legend-line.balance { background: var(--gold); }
-.legend-line.principal { background: var(--text-dim); border: 1px dashed var(--text-dim); height: 0; }
-.chart-note {
-  font-size: 0.72rem; color: var(--text-dim); margin-top: 16px;
-  text-align: center; font-style: italic;
-}
-
-/* ═══════════ TOP YIELDS ═══════════ */
-.top-yields {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
-  margin-top: 40px;
-}
-.top-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
-  transition: border-color 0.3s, transform 0.3s;
-  cursor: default;
-}
-.top-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-.top-card-rank {
-  font-family: var(--font-display); font-size: 0.7rem; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 2px;
-  color: var(--gold); margin-bottom: 16px;
-}
-.top-card-provider {
-  font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
-  color: var(--white); margin-bottom: 4px;
-}
-.top-card-type { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 16px; }
-.top-card-apy {
-  font-family: var(--font-display); font-size: 2rem; font-weight: 800;
-  color: var(--gold);
-}
-.top-card-apy span { font-size: 1rem; font-weight: 500; }
-
-/* ═══════════ DATA STATUS ═══════════ */
-.data-status {
-  text-align: center; padding: 20px;
-  font-size: 0.82rem; color: var(--text-dim);
-}
-.data-status a { color: var(--gold); }
-.loading-spinner {
-  width: 40px; height: 40px; border: 3px solid var(--border);
-  border-top-color: var(--gold); border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  margin: 40px auto;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.empty-state {
-  text-align: center; padding: 60px 20px; color: var(--text-dim);
-}
-.empty-state svg { margin: 0 auto 16px; opacity: 0.3; }
-
-/* ═══════════ FOOTER ═══════════ */
-.footer {
-  border-top: 1px solid var(--border);
-  padding: 40px 0; text-align: center;
-}
-.footer-brand {
-  display: flex; align-items: center; justify-content: center; gap: 10px;
-  margin-bottom: 12px;
-}
-.footer-brand img { height: 24px; }
-.footer-brand span {
-  font-family: var(--font-display); font-weight: 700; font-size: 0.75rem;
-  letter-spacing: 3px; color: var(--gold); text-transform: uppercase;
-}
-.footer p { font-size: 0.78rem; color: var(--text-dim); }
-.disclaimer {
-  max-width: 700px; margin: 16px auto 0;
-  font-size: 0.72rem; color: var(--text-dim);
-  line-height: 1.7; opacity: 0.6;
-}
-
-/* ═══════════ SCROLL REVEAL ═══════════ */
-.reveal {
-  opacity: 0; transform: translateY(30px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
-}
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-/* ═══════════ RESPONSIVE ═══════════ */
-@media (max-width: 960px) {
-  .calc-grid { grid-template-columns: 1fr; }
-  .top-yields { grid-template-columns: 1fr 1fr; }
-  .stats-row { gap: 32px; }
-}
-@media (max-width: 768px) {
-  .nav-links { display: none; }
-  .top-yields { grid-template-columns: 1fr; }
-  .result-cards { grid-template-columns: 1fr; }
-  .breakdown-row { grid-template-columns: repeat(2, 1fr); }
-  .yield-table { font-size: 0.75rem; }
-  .stats-row { gap: 24px; }
-  .stat-value { font-size: 1.5rem; }
-  .hero { padding: 120px 0 40px; }
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tracker.css">
 </head>
-<body>
+<body data-view="basic">
 
-<!-- ═══════════ NAV ═══════════ -->
 <nav class="nav" id="nav">
   <div class="nav-inner">
-    <a href="../index.html" class="nav-brand">
-      <img src="../TR logo.png" alt="TR">
-      <span>Trading Republic</span>
-    </a>
+    <a href="../" class="nav-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></a>
     <div class="nav-links">
-      <a href="#yields" class="active">Yields</a>
+      <a href="#finder">Finder</a>
+      <a href="#yields">All rates</a>
       <a href="#calculator">Calculator</a>
-      <a href="../index.html">Main Site</a>
+      <a href="../">Main site</a>
     </div>
   </div>
 </nav>
 
-<!-- ═══════════ HERO ═══════════ -->
-<section class="hero">
+<header class="hero">
   <div class="container">
-    <div class="hero-badge">Live Rates</div>
-    <h1 class="reveal">Track the Best <span class="gold">Yield Rates</span></h1>
-    <p class="subtitle reveal">Compare APY rates across traditional banks, digital banks, and crypto platforms. Find the highest returns for your money — all in one place.</p>
+    <div class="hero-badge" id="heroBadge">Checked against official pages</div>
+    <h1>Where should your money <span class="gold">earn</span>?</h1>
+    <p class="subtitle">Savings and earn rates from Philippine banks, digital banks, e-wallets and our partner crypto exchanges. Every rate shows its cap, its catches, whether it is a promo, and the day we checked it.</p>
+    <div class="stats-row" id="statsRow"></div>
+  </div>
+</header>
 
-    <div class="stats-row reveal" id="statsRow">
-      <div class="stat-item">
-        <div class="stat-value" id="statProviders">—</div>
-        <div class="stat-label">Providers</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="statHighest">—</div>
-        <div class="stat-label">Highest APY</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-value" id="statAverage">—</div>
-        <div class="stat-label">Average APY</div>
-      </div>
+<!-- Controls shared by every section -->
+<div class="controls" id="controls">
+  <div class="container-wide controls-inner">
+    <div class="seg" role="group" aria-label="View">
+      <button data-view="basic" aria-pressed="true">Basic</button>
+      <button data-view="advanced" aria-pressed="false">Advanced</button>
     </div>
+    <label class="switch" title="Philippine 20% final tax on bank interest">
+      <input type="checkbox" id="taxToggle" checked>
+      <span class="switch-ui" aria-hidden="true"></span>
+      <span>After <span class="long">PH </span>tax <b class="dim long" id="taxNote">(20%)</b></span>
+    </label>
+    <label class="switch adv-only" title="Subtract the latest PH inflation rate">
+      <input type="checkbox" id="realToggle">
+      <span class="switch-ui" aria-hidden="true"></span>
+      <span>After inflation <b class="dim long" id="inflNote"></b></span>
+    </label>
+  </div>
+</div>
+
+<main>
+<!-- ═══════════ FINDER (tech tree) ═══════════ -->
+<section class="section" id="finder">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">Finder</span>
+      <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
+      <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
+    </div>
+    <div class="tree" id="tree"></div>
+    <div class="tree-result" id="treeResult" hidden></div>
   </div>
 </section>
 
-<!-- ═══════════ TOP 3 ═══════════ -->
-<section class="section" style="padding-top:0">
-  <div class="container">
-    <div class="top-yields reveal" id="topYields">
-      <!-- Populated by JS -->
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ YIELD TABLE ═══════════ -->
-<section class="section" id="yields" style="padding-top:20px">
+<!-- ═══════════ ALL RATES ═══════════ -->
+<section class="section" id="yields">
   <div class="container-wide">
-    <div class="text-center" style="margin-bottom:40px">
-      <h2 class="reveal">All Yield Rates</h2>
-      <p class="subtitle reveal">Updated from our database. Click column headers to sort.</p>
+    <div class="sec-head">
+      <span class="eyebrow">All rates</span>
+      <h2>Every rate, with its <span class="gold">fine print</span></h2>
+      <p class="subtitle" id="ratesSub">Tap a row for the catches and the official source.</p>
     </div>
 
-    <div class="filters reveal" id="filters">
-      <button class="filter-btn active" data-filter="all">All</button>
-      <button class="filter-btn" data-filter="traditional">Traditional Banks</button>
-      <button class="filter-btn" data-filter="digital">Digital Banks</button>
-      <button class="filter-btn" data-filter="cex">CEX</button>
-      <button class="filter-btn" data-filter="dex">DEX</button>
-    </div>
-
-    <div class="search-bar reveal">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="text" id="searchInput" placeholder="Search providers...">
-    </div>
-
-    <div class="yield-table-wrap reveal">
-      <div id="tableLoading" class="loading-spinner"></div>
-      <table class="yield-table" id="yieldTable" style="display:none">
-        <thead>
-          <tr>
-            <th data-sort="rank"># <span class="sort-arrow"></span></th>
-            <th data-sort="provider">Provider <span class="sort-arrow"></span></th>
-            <th data-sort="product">Product <span class="sort-arrow"></span></th>
-            <th data-sort="rateCondition">Condition <span class="sort-arrow"></span></th>
-            <th data-sort="apy">Rate <span class="sort-arrow"></span></th>
-            <th data-sort="validity">Validity <span class="sort-arrow"></span></th>
-            <th data-sort="maxCap">Max Cap <span class="sort-arrow"></span></th>
-            <th data-sort="type">Category <span class="sort-arrow"></span></th>
-            <th>Details</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-        </tbody>
-      </table>
-      <div id="emptyState" class="empty-state" style="display:none">
-        <p id="emptyMsg">No providers match your search.</p>
+    <div class="filters" id="filters">
+      <div class="chips" data-key="cat" aria-label="Where">
+        <button data-v="all" aria-pressed="true">All</button>
+        <button data-v="traditional" aria-pressed="false">Banks</button>
+        <button data-v="digital" aria-pressed="false">Digital banks</button>
+        <button data-v="ewallet" aria-pressed="false">E-wallets</button>
+        <button data-v="government" aria-pressed="false">Government</button>
+        <button data-v="cex" aria-pressed="false">Crypto exchanges</button>
+        <button data-v="dex" aria-pressed="false" class="adv-only">DeFi</button>
+      </div>
+      <div class="chips" data-key="kind" aria-label="Promo or standard">
+        <button data-v="all" aria-pressed="true">Promo + standard</button>
+        <button data-v="standard" aria-pressed="false">Standard only</button>
+        <button data-v="promo" aria-pressed="false">Promos only</button>
+      </div>
+      <div class="chips" data-key="cap" aria-label="Cap">
+        <button data-v="all" aria-pressed="true">Any cap</button>
+        <button data-v="nocap" aria-pressed="false">No cap</button>
+        <button data-v="capped" aria-pressed="false">Capped</button>
+      </div>
+      <div class="chips adv-only" data-key="lock" aria-label="Lock-up">
+        <button data-v="all" aria-pressed="true">Any access</button>
+        <button data-v="flexible" aria-pressed="false">Withdraw anytime</button>
+        <button data-v="locked" aria-pressed="false">Locked term</button>
+      </div>
+      <div class="search-bar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="search" id="searchInput" placeholder="Search bank, exchange or product" aria-label="Search">
       </div>
     </div>
 
-    <div class="data-status" id="dataStatus"></div>
+    <div class="rates" id="rates"><div class="loading-spinner"></div></div>
+    <p class="rates-foot" id="ratesFoot"></p>
   </div>
 </section>
 
 <!-- ═══════════ CALCULATOR ═══════════ -->
-<section class="calc-section" id="calculator">
+<section class="section" id="calculator">
   <div class="container">
-    <div class="text-center" style="margin-bottom:48px">
-      <h2 class="reveal">Yield <span class="gold">Calculator</span></h2>
-      <p class="subtitle reveal">Estimate your future earnings based on current APY rates.</p>
+    <div class="sec-head">
+      <span class="eyebrow">Calculator</span>
+      <h2>What would it <span class="gold">earn</span>?</h2>
+      <p class="subtitle">Caps are applied: money above a cap earns the rate after the cap.</p>
     </div>
-
-    <div class="calc-grid reveal">
-      <!-- Inputs -->
+    <div class="calc-grid">
       <div class="calc-panel">
-        <h3>Parameters</h3>
-
         <div class="calc-field">
-          <label>Provider <span class="val" id="calcProviderLabel">—</span></label>
-          <div class="calc-dropdown" id="calcDropdown">
-            <div class="calc-dropdown-selected" id="calcDropdownBtn">Custom Rate</div>
-            <div class="calc-dropdown-menu" id="calcDropdownMenu" style="display:none">
-              <input type="text" class="calc-dropdown-search" id="calcProviderSearch" placeholder="Search providers...">
-              <div class="calc-dropdown-list" id="calcProviderList"></div>
-            </div>
-          </div>
-          <input type="hidden" id="calcProvider" value="custom">
-          <p class="calc-disclaimer" id="calcDisclaimer" style="display:none; font-size:0.75rem; color:var(--gold); margin-top:8px; line-height:1.5; opacity:0.85;"></p>
+          <label for="calcPick">Rate</label>
+          <select id="calcPick" class="calc-input"></select>
+          <p class="calc-hint" id="calcHint"></p>
         </div>
-
         <div class="calc-field">
-          <label>Initial Deposit <span class="val" id="calcDepositLabel">₱10,000</span></label>
-          <input type="number" class="calc-input" id="calcDeposit" value="10000" min="0" step="1000">
-          <input type="range" class="calc-slider" id="calcDepositSlider" min="1000" max="10000000" step="1000" value="10000">
+          <label for="calcDeposit">Amount <span class="val" id="calcDepositLabel"></span></label>
+          <input type="number" class="calc-input" id="calcDeposit" value="100000" min="0" step="1000" inputmode="numeric">
+          <input type="range" class="calc-slider" id="calcDepositSlider" min="1000" max="5000000" step="1000" value="100000" aria-label="Amount slider">
         </div>
-
         <div class="calc-field">
-          <label>APY (%) <span class="val" id="calcApyLabel">6%</span></label>
-          <input type="number" class="calc-input" id="calcApy" value="6" min="0" max="100" step="0.1">
-          <input type="range" class="calc-slider" id="calcApySlider" min="0.1" max="30" step="0.1" value="6">
-        </div>
-
-        <div class="calc-field">
-          <label>Duration <span class="val" id="calcDurationLabel">5 Years</span></label>
-          <input type="range" class="calc-slider" id="calcDuration" min="1" max="10" step="1" value="5">
-          <div class="duration-labels"><span>1Y</span><span>5Y</span><span>10Y</span></div>
+          <label for="calcYears">Years <span class="val" id="calcYearsLabel"></span></label>
+          <input type="range" class="calc-slider" id="calcYears" min="1" max="10" step="1" value="1">
         </div>
       </div>
-
-      <!-- Results -->
       <div class="calc-panel">
         <div class="result-cards">
-          <div class="result-card">
-            <div class="result-card-label">Projected Balance</div>
-            <div class="result-card-value" id="resultBalance">—</div>
-            <div class="result-card-sub" id="resultBalanceSub"></div>
-          </div>
-          <div class="result-card highlight">
-            <div class="result-card-label">Total Profit</div>
-            <div class="result-card-value" id="resultProfit">—</div>
-            <div class="result-card-sub">Earnings</div>
-          </div>
+          <div class="result-card"><div class="result-card-label">Balance at the end</div><div class="result-card-value" id="resBalance">—</div><div class="result-card-sub" id="resBalanceSub"></div></div>
+          <div class="result-card highlight"><div class="result-card-label">You earn</div><div class="result-card-value" id="resProfit">—</div><div class="result-card-sub" id="resProfitSub"></div></div>
         </div>
-
         <div class="breakdown-row">
-          <div class="breakdown-item">
-            <div class="breakdown-label">Daily</div>
-            <div class="breakdown-value" id="breakDaily">—</div>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Weekly</div>
-            <div class="breakdown-value" id="breakWeekly">—</div>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Monthly</div>
-            <div class="breakdown-value" id="breakMonthly">—</div>
-          </div>
-          <div class="breakdown-item">
-            <div class="breakdown-label">Annually</div>
-            <div class="breakdown-value" id="breakAnnually">—</div>
-          </div>
+          <div class="breakdown-item"><div class="breakdown-label">Per month</div><div class="breakdown-value" id="resMonth">—</div></div>
+          <div class="breakdown-item"><div class="breakdown-label">Per year</div><div class="breakdown-value" id="resYear">—</div></div>
+          <div class="breakdown-item"><div class="breakdown-label">Blended rate</div><div class="breakdown-value" id="resRate">—</div></div>
         </div>
-
-        <div class="chart-wrap">
-          <div class="chart-legend">
-            <span><span class="legend-line balance"></span> Total Balance</span>
-            <span><span class="legend-line principal"></span> Principal</span>
-          </div>
-          <canvas class="chart-canvas" id="yieldChart"></canvas>
-        </div>
-        <p class="chart-note">*Breakdown estimates based on Year 1 earnings. Totals based on annual compounding over duration.</p>
+        <p class="calc-note" id="calcNote"></p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════ FOOTER ═══════════ -->
+<!-- ═══════════ HOW WE CHECK ═══════════ -->
+<section class="section section-tight" id="method">
+  <div class="container">
+    <div class="method">
+      <div>
+        <h3>How we keep this honest</h3>
+        <ul>
+          <li><b>Official sources only.</b> Each rate links to the bank's or exchange's own page (or its public API). Rules come from the BIR, PDIC, BSP and PSA.</li>
+          <li><b>Checked on a schedule.</b> Philippine rates are re-checked at the end of each month, crypto rates every two weeks. A row older than that is marked <span class="badge stale">Needs re-check</span>.</li>
+          <li><b>Promos are labelled.</b> <span class="badge promo">Promo</span> means a time-limited rate with an end date. <span class="badge std">Standard</span> means the bank's ongoing rate, which can still change.</li>
+          <li><b>Not published?</b> If a provider only shows its rate inside the app, we say so instead of guessing.</li>
+        </ul>
+      </div>
+      <div id="rulesBox"></div>
+    </div>
+  </div>
+</section>
+</main>
+
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand">
-      <img src="../TR logo.png" alt="TR">
-      <span>Trading Republic</span>
-    </div>
+    <div class="footer-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></div>
     <p>TR Yield Tracker — Compare. Calculate. Compound.</p>
-    <p class="disclaimer">Disclaimer: Rates shown are sourced from publicly available data and our internal tracking. They may change without notice. This is not financial advice. Always do your own research before depositing funds with any platform.</p>
-    <p style="margin-top:16px;font-size:0.72rem;color:var(--text-dim)">Created by <a href="https://x.com/jayowtrades" target="_blank" style="color:var(--gold);text-decoration:none;font-weight:500">jayowtrades</a></p>
+    <div class="legal" id="legal">
+      <p><b>Not financial advice.</b> This page is education. Rates change without notice and may differ from what you see in the app. Always confirm the rate, cap and terms on the provider's own page before you deposit.</p>
+      <p><b>Partner links.</b> Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice.</p>
+      <p>We may earn a commission if you sign up. It doesn't change our review: we list the cons as well as the pros.</p>
+      <p><b>Crypto is not a bank deposit.</b> It is not PDIC-insured, prices and rates move, and an exchange can fail or freeze withdrawals. Rules differ by country. Check with your local regulator (in the Philippines, the SEC) that this exchange is allowed where you live before you sign up. Exchange accounts are for adults (18+).</p>
+    </div>
+    <p class="credit">By <a href="https://zeefreaks.io" target="_blank" rel="noopener">Zeefreaks</a> and <a href="https://x.com/jayowtrades" target="_blank" rel="noopener">jayowtrades</a></p>
   </div>
 </footer>
 
-<script>
-/* ═══════════════════════════════════════
-   GOOGLE SHEETS INTEGRATION — Sheet2
-   ═══════════════════════════════════════
-   A: Bank Name      B: Product        C: Category
-   D: Currency       E: Rate Type      F: Rate Condition
-   G: Rate           H: Validity       I: Max Cap
-   J: Rate after cap K: Source Link
-   ═══════════════════════════════════════ */
-
-const SHEET_ID = '13VVwpo2BraWlwHojoY-vqQtl2qIXjpUUolFnDBy-5zY';
-const SHEET_NAME = 'Sheet1';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
-
-// ═══════════ DATA ═══════════
-let allData = [];
-let filteredData = [];
-let currentSort = { key: 'apy', dir: 'desc' };
-let currentFilter = 'all';
-
-// ═══════════ FETCH FROM GOOGLE SHEETS ═══════════
-function mapCategory(cat) {
-  if (!cat) return 'digital';
-  const c = cat.toLowerCase().trim();
-  if (c.includes('traditional')) return 'traditional';
-  if (c.includes('digital'))     return 'digital';
-  if (c === 'cex' || c.includes('centralized')) return 'cex';
-  if (c === 'dex' || c.includes('defi') || c.includes('decentralized')) return 'dex';
-  if (c.includes('crypto')) return 'crypto';
-  return 'digital';
-}
-
-async function fetchSheetData() {
-  const cacheKey = 'trYieldData8';
-  const cacheTimeKey = 'trYieldData8Time';
-  const cached = localStorage.getItem(cacheKey);
-  const cachedTime = localStorage.getItem(cacheTimeKey);
-
-  if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < CACHE_DURATION) {
-    return JSON.parse(cached);
-  }
-
-  try {
-    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}&headers=1`;
-    const res = await fetch(url);
-    const text = await res.text();
-    const json = JSON.parse(text.match(/google\.visualization\.Query\.setResponse\((.+)\)/)[1]);
-
-    const rows = json.table.rows;
-    const data = rows.map(row => {
-      const c = row.c;
-      // G (index 6): Rate as decimal (0.035 = 3.5%)
-      let apy = parseFloat(c[6]?.v) || 0;
-      if (apy > 0 && apy < 1) apy = apy * 100;
-      // I (index 8): Max Cap as number
-      const maxCap = parseFloat(c[8]?.v) || 0;
-      // J (index 9): Rate after cap as decimal
-      let rateAfterCap = parseFloat(c[9]?.v) || 0;
-      if (rateAfterCap > 0 && rateAfterCap < 1) rateAfterCap = rateAfterCap * 100;
-
-      return {
-        provider: c[0]?.v || '',
-        product: c[1]?.v || '',
-        type: mapCategory(c[2]?.v),
-        currency: c[3]?.v || 'PHP',
-        rateType: c[4]?.v || '',
-        rateCondition: c[5]?.v || '',
-        apy: Math.round(apy * 100) / 100,
-        validity: c[7]?.v || '',
-        maxCap: maxCap,
-        rateAfterCap: Math.round(rateAfterCap * 100) / 100,
-        link: c[10]?.v || '',
-      };
-    }).filter(d => d.provider);
-
-    localStorage.setItem(cacheKey, JSON.stringify(data));
-    localStorage.setItem(cacheTimeKey, Date.now().toString());
-    return data;
-  } catch (err) {
-    console.error('Failed to fetch sheet data:', err);
-    if (cached) return JSON.parse(cached);
-    return [];
-  }
-}
-
-// ═══════════ LOGO MAPPING ═══════════
-const LOGO_MAP = {
-  'maribank': 'logos/maribank.png',
-  'gotyme': 'logos/gotyme.png',
-  'maya': 'logos/maya.png',
-  'cimb': 'logos/cimb.png',
-  'ownbank': 'logos/ownbank.png',
-  'uno': 'logos/uno.png',
-  'tonik': 'logos/tonik.png',
-  'bpi': 'logos/bpi.png',
-  'metrobank': 'logos/metrobank.png',
-  'rcbc': 'logos/rcbc.png',
-  'security bank': 'logos/securitybank.png',
-  'landbank': 'logos/landbank.png',
-  'bdo': 'logos/bdo.png',
-  'eastwest': 'logos/eastwest.png',
-  'unionbank': 'logos/unionbank.png',
-  'aub': 'logos/aub.png',
-  'china bank': 'logos/chinabank.png',
-  'nexo': 'logos/nexo.png',
-  'crypto.com': 'logos/cryptocom.png',
-  'binance': 'logos/binance.png',
-  'kraken': 'logos/kraken.png',
-  'aave': 'logos/aave.png',
-  'okx': 'logos/okx.png',
-  'youhodler': 'logos/youhodler.png',
-  'bybit': 'logos/bybit.png',
-  'bitget': 'logos/bitget.png',
-  'mexc': 'logos/mexc.png',
-  'gate': 'logos/gate.png',
-  'kamino': 'logos/kamino.png',
-  'jupiter': 'logos/jupiter.png',
-  'loopscale': 'logos/loopscale.png',
-  'compound': 'logos/compound.png',
-};
-
-// ═══════════ CEX DATA (snapshot — verify in-app) ═══════════
-// CEX rates: no public API works browser-side (Cloudflare blocks cross-origin); snapshot from product pages.
-const CEX_SNAPSHOT_DATE = '2026-04-30';
-const CEX_DATA = [
-  { provider: 'MEXC',    product: 'MEXC Savings — USDC (Promo)',  type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Promo',    rateCondition: 'Flexible', apy: 8.00, validity: 'Promo / campaign', maxCap: 0, maxCapText: 'Quota-limited',         rateAfterCap: 0, link: 'https://www.mexc.com/earn',      notes: 'Heavily promo-driven; treat rate as campaign-dependent. Verify exact APR + cap in-app.' },
-  { provider: 'MEXC',    product: 'MEXC Savings — USDT (Promo)',  type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Promo',    rateCondition: 'Flexible', apy: 8.00, validity: 'Promo / campaign', maxCap: 0, maxCapText: 'Quota-limited',         rateAfterCap: 0, link: 'https://www.mexc.com/earn',      notes: 'High promo APYs are typically capped and time-bound.' },
-  { provider: 'OKX',     product: 'OKX Earn — USDC',              type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Variable', rateCondition: 'Flexible', apy: 6.00, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered/capped',         rateAfterCap: 0, link: 'https://www.okx.com/earn/simple-earn',   notes: 'Higher tiers may require holding OKB, VIP volume, or limited promo enrollment.' },
-  { provider: 'Gate.io', product: 'Gate Simple Earn — USDC',      type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Variable', rateCondition: 'Flexible', apy: 5.85, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered/capped',         rateAfterCap: 0, link: 'https://www.gate.com/simple-earn',       notes: 'Rate varies by product; may be tiered and limited by quota.' },
-  { provider: 'Gate.io', product: 'Gate.io Earn — USDT (Locked)', type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Variable', rateCondition: 'Locked',   apy: 5.85, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered/capped',         rateAfterCap: 0, link: 'https://www.gate.com/simple-earn',       notes: 'Requires lockup term; early redemption may be unavailable or penalized.' },
-  { provider: 'OKX',     product: 'OKX Earn — USDT',              type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Variable', rateCondition: 'Flexible', apy: 4.00, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered/capped',         rateAfterCap: 0, link: 'https://www.okx.com/earn/simple-earn',   notes: 'USDT rates often tiered; confirm cap + effective blended APY.' },
-  { provider: 'Binance', product: 'Simple Earn — USDT',           type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Variable', rateCondition: 'Flexible', apy: 4.00, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered (first tranche)', rateAfterCap: 0, link: 'https://www.binance.com/en/simple-earn', notes: 'Boosted APY usually applies only to first tier.' },
-  { provider: 'Bybit',   product: 'Bybit Earn — USDC',            type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Fixed',    rateCondition: 'Flexible', apy: 3.80, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Capped per tier',       rateAfterCap: 0, link: 'https://www.bybit.com/en/earn/savings',  notes: 'Bonus APY may require platform tasks; promos vary by region.' },
-  { provider: 'Binance', product: 'Simple Earn — USDC',           type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Variable', rateCondition: 'Flexible', apy: 3.50, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Tiered (first tranche)', rateAfterCap: 0, link: 'https://www.binance.com/en/simple-earn', notes: 'Top APR often applies only to a small first tier.' },
-  { provider: 'Bybit',   product: 'Bybit Easy Earn — USDT',       type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Variable', rateCondition: 'Flexible', apy: 3.00, validity: 'Ongoing',         maxCap: 0, maxCapText: 'Capped per tier',       rateAfterCap: 0, link: 'https://www.bybit.com/en/earn/savings',  notes: 'Boosters/tasks may apply; region-dependent.' },
-  { provider: 'Bitget',  product: 'Bitget Simple Earn — USDC',    type: 'cex', currency: 'USD', stablecoin: 'USDC', rateType: 'Variable', rateCondition: 'Flexible', apy: 1.36, validity: 'Ongoing',         maxCap: 0, maxCapText: 'No featured cap',       rateAfterCap: 0, link: 'https://www.bitget.com/earn/savings',    notes: 'APR can vary by tier/VIP/promos.' },
-  { provider: 'Bitget',  product: 'Bitget Earn — USDT',           type: 'cex', currency: 'USD', stablecoin: 'USDT', rateType: 'Variable', rateCondition: 'Flexible', apy: 1.08, validity: 'Ongoing',         maxCap: 0, maxCapText: 'No featured cap',       rateAfterCap: 0, link: 'https://www.bitget.com/earn/savings',    notes: 'Promo/boost may require enrollment; tiers depend on balance.' },
-];
-
-// ═══════════ DEX TARGETS (resolved live from DefiLlama) ═══════════
-const DEX_TARGETS = [
-  { provider: 'Aave',      productName: 'Aave v3 Supply',      project: 'aave-v3',      symbol: 'USDC', chain: 'Ethereum', link: 'https://app.aave.com/' },
-  { provider: 'Aave',      productName: 'Aave v3 Supply',      project: 'aave-v3',      symbol: 'USDT', chain: 'Ethereum', link: 'https://app.aave.com/' },
-  { provider: 'Compound',  productName: 'Compound v3 Supply',  project: 'compound-v3',  symbol: 'USDC', chain: 'Ethereum', link: 'https://app.compound.finance/?market=usdc-mainnet' },
-  { provider: 'Compound',  productName: 'Compound v3 Supply',  project: 'compound-v3',  symbol: 'USDT', chain: 'Ethereum', link: 'https://app.compound.finance/?market=usdt-mainnet' },
-  { provider: 'Kamino',    productName: 'Kamino Lend',         project: 'kamino-lend',  symbol: 'USDC', chain: 'Solana',   link: 'https://app.kamino.finance/lending' },
-  { provider: 'Kamino',    productName: 'Kamino Lend',         project: 'kamino-lend',  symbol: 'USDT', chain: 'Solana',   link: 'https://app.kamino.finance/lending' },
-  { provider: 'Jupiter',   productName: 'Jupiter Lend',        project: 'jupiter-lend', symbol: 'USDC', chain: 'Solana',   link: 'https://jup.ag/lend' },
-  { provider: 'Jupiter',   productName: 'Jupiter Lend',        project: 'jupiter-lend', symbol: 'USDT', chain: 'Solana',   link: 'https://jup.ag/lend' },
-  { provider: 'Loopscale', productName: 'Loopscale Lending',   project: 'loopscale',    symbol: 'USDC', chain: 'Solana',   link: 'https://app.loopscale.com/' },
-  { provider: 'Loopscale', productName: 'Loopscale Lending',   project: 'loopscale',    symbol: 'USDT', chain: 'Solana',   link: 'https://app.loopscale.com/' },
-];
-
-// ═══════════ FETCH DEX DATA (live from DefiLlama) ═══════════
-async function fetchDexData() {
-  const cacheKey = 'trDexData2';
-  const cacheTimeKey = 'trDexData2Time';
-  const cached = localStorage.getItem(cacheKey);
-  const cachedTime = localStorage.getItem(cacheTimeKey);
-
-  if (cached && cachedTime && (Date.now() - parseInt(cachedTime)) < 30 * 60 * 1000) {
-    return JSON.parse(cached);
-  }
-
-  try {
-    const res = await fetch('https://yields.llama.fi/pools');
-    const json = await res.json();
-    const pools = json.data || [];
-
-    const result = DEX_TARGETS.map(t => {
-      const matches = pools
-        .filter(p => p.project === t.project && p.chain === t.chain && p.symbol === t.symbol)
-        .sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0));
-      const top = matches[0];
-      if (!top) return null;
-      const apy = Math.round((top.apy || 0) * 100) / 100;
-      const apyBase = top.apyBase != null ? Math.round(top.apyBase * 100) / 100 : null;
-      const apyReward = top.apyReward != null ? Math.round(top.apyReward * 100) / 100 : null;
-      const tvlM = (top.tvlUsd || 0) / 1e6;
-      const breakdown = (apyBase != null && apyReward != null && apyReward > 0)
-        ? ` (base ${apyBase.toFixed(2)}% + rewards ${apyReward.toFixed(2)}%)`
-        : '';
-      return {
-        provider: t.provider,
-        product: `${t.productName} — ${t.symbol} (${t.chain})`,
-        type: 'dex',
-        currency: 'USD',
-        stablecoin: t.symbol,
-        rateType: 'Variable',
-        rateCondition: 'Variable APY',
-        apy: apy,
-        validity: 'Live',
-        maxCap: 0,
-        maxCapText: tvlM >= 1 ? `TVL: $${tvlM.toFixed(1)}M` : `TVL: $${(tvlM * 1000).toFixed(0)}K`,
-        rateAfterCap: 0,
-        link: t.link,
-        notes: `Live from DefiLlama${breakdown}. APY varies with pool utilization and reward incentives.`,
-      };
-    }).filter(Boolean);
-
-    localStorage.setItem(cacheKey, JSON.stringify(result));
-    localStorage.setItem(cacheTimeKey, Date.now().toString());
-    return result;
-  } catch (err) {
-    console.error('Failed to fetch DefiLlama yields:', err);
-    if (cached) return JSON.parse(cached);
-    return [];
-  }
-}
-
-// ═══════════ HELPERS ═══════════
-function getCurrencySymbol(d) { return d && d.currency === 'USD' ? '$' : '₱'; }
-function getTypeLabel(t) {
-  if (t === 'traditional') return 'Trad. Bank';
-  if (t === 'digital')     return 'Digital Bank';
-  if (t === 'cex')         return 'CEX';
-  if (t === 'dex')         return 'DEX';
-  return 'Crypto';
-}
-
-function getLogoPath(providerName) {
-  const name = providerName.toLowerCase();
-  for (const [key, path] of Object.entries(LOGO_MAP)) {
-    if (name.includes(key)) return path;
-  }
-  return null;
-}
-
-// ═══════════ RENDER TABLE ═══════════
-function renderTable(data) {
-  const tbody = document.getElementById('tableBody');
-  const table = document.getElementById('yieldTable');
-  const loading = document.getElementById('tableLoading');
-  const empty = document.getElementById('emptyState');
-
-  loading.style.display = 'none';
-
-  if (data.length === 0) {
-    table.style.display = 'none';
-    empty.style.display = 'block';
-    return;
-  }
-
-  table.style.display = 'table';
-  empty.style.display = 'none';
-
-  tbody.innerHTML = data.map((d, i) => {
-    const initials = d.provider.split(/[\s.]+/).map(w => w[0]).filter(Boolean).join('').slice(0, 2).toUpperCase();
-    const logo = getLogoPath(d.provider);
-    const logoHTML = logo ? `<img src="${logo}" alt="${d.provider}">` : initials;
-    const typeLabel = getTypeLabel(d.type);
-    const ccy = getCurrencySymbol(d);
-    const providerLink = d.link ? `<a href="${d.link}" target="_blank" class="provider-name">${d.provider}</a>` : `<span class="provider-name">${d.provider}</span>`;
-    const apyDisplay = d.apy > 0 ? `${d.apy.toFixed(2)}%` : '<span style="color:var(--text-dim)">—</span>';
-    const capDisplay = d.maxCap > 0 ? `${ccy}${d.maxCap.toLocaleString()}` : (d.maxCapText || '—');
-    const condLc = (d.rateCondition || '').toLowerCase();
-    const condClass = (condLc.includes('fixed') || condLc.includes('flexible')) ? ' flexible' : '';
-    const catLabel = (d.type === 'cex' || d.type === 'dex') ? d.type.toUpperCase() : d.type;
-    const detailsCell = d.link
-      ? `<a href="${d.link}" target="_blank" style="color:var(--gold); font-size:0.75rem; text-decoration:none;">View ↗</a>`
-      : (d.notes ? `<span title="${(d.notes || '').replace(/"/g, '&quot;')}" style="color:var(--text-dim); font-size:0.75rem; cursor:help;">Info ⓘ</span>` : '—');
-
-    return `<tr>
-      <td style="color:var(--text-dim); font-size:0.78rem;">${i + 1}</td>
-      <td>
-        <div class="provider-cell">
-          <div class="provider-logo">${logoHTML}</div>
-          <div class="provider-info">
-            ${providerLink}
-            <span class="provider-type">${typeLabel}</span>
-          </div>
-        </div>
-      </td>
-      <td style="color:var(--text); font-size:0.82rem;">${d.product || '—'}</td>
-      <td><span class="lockup-badge${condClass}">${d.rateCondition || '—'}</span></td>
-      <td class="apy-cell">${apyDisplay}</td>
-      <td style="color:var(--text-dim); font-size:0.78rem;">${d.validity || '—'}</td>
-      <td style="color:var(--text-dim); font-size:0.75rem; white-space:normal; overflow:visible;">${capDisplay}</td>
-      <td style="color:var(--text-dim); font-size:0.78rem; text-transform:capitalize;">${catLabel}</td>
-      <td>${detailsCell}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ═══════════ SORTING ═══════════
-function sortData(data, key, dir) {
-  return [...data].sort((a, b) => {
-    let aVal = a[key], bVal = b[key];
-    // For numeric columns, ensure numeric comparison
-    if (key === 'apy' || key === 'maxCap') { aVal = Number(aVal) || 0; bVal = Number(bVal) || 0; }
-    else if (typeof aVal === 'string') {
-      aVal = aVal.toLowerCase(); bVal = (bVal || '').toString().toLowerCase();
-    }
-    if (aVal < bVal) return dir === 'asc' ? -1 : 1;
-    if (aVal > bVal) return dir === 'asc' ? 1 : -1;
-    return 0;
-  });
-}
-
-// ═══════════ TOP 3 CARDS ═══════════
-function renderTopCards(data) {
-  const top3 = [...data].filter(d => d.apy > 0).sort((a, b) => b.apy - a.apy).slice(0, 3);
-  const labels = ['Top Yield', '2nd Best', '3rd Best'];
-  document.getElementById('topYields').innerHTML = top3.map((d, i) => {
-    const typeLabel = d.type === 'traditional' ? 'Traditional Bank' :
-                      d.type === 'digital'     ? 'Digital Bank' :
-                      d.type === 'cex'         ? 'CEX' :
-                      d.type === 'dex'         ? 'DEX' : 'Crypto';
-    return `<div class="top-card">
-      <div class="top-card-rank">${labels[i]}</div>
-      <div class="top-card-provider">${d.provider}</div>
-      <div class="top-card-type">${typeLabel} · ${d.product || ''}</div>
-      <div class="top-card-apy">${d.apy.toFixed(2)}% <span>APY</span></div>
-    </div>`;
-  }).join('');
-}
-
-// ═══════════ STATS ═══════════
-function updateStats(data) {
-  document.getElementById('statProviders').textContent = data.length;
-  const withRate = data.filter(d => d.apy > 0);
-  if (withRate.length) {
-    const max = Math.max(...withRate.map(d => d.apy));
-    const avg = (withRate.reduce((s, d) => s + d.apy, 0) / withRate.length);
-    document.getElementById('statHighest').textContent = max.toFixed(2) + '%';
-    document.getElementById('statAverage').textContent = avg.toFixed(2) + '%';
-  }
-}
-
-// ═══════════ POPULATE CALCULATOR SELECT ═══════════
-let calcProviderMeta = {}; // store metadata for disclaimer display
-
-let calcProviderItems = [];
-
-function populateCalcProviders(data) {
-  const sorted = [...data].filter(d => d.apy > 0).sort((a, b) => a.provider.localeCompare(b.provider) || a.product.localeCompare(b.product));
-  calcProviderItems = [{key: 'custom', label: 'Custom Rate'}];
-  sorted.forEach((d, idx) => {
-    const key = 'p' + idx;
-    const isVariable = d.rateCondition && d.rateCondition.toLowerCase().includes('variable');
-    const label = isVariable
-      ? `${d.provider} (${d.product}) — up to ${d.apy}%`
-      : `${d.provider} ${d.product ? '(' + d.product + ')' : ''} — ${d.apy}%`;
-    calcProviderItems.push({key, label});
-    calcProviderMeta[key] = {
-      apy: d.apy,
-      isVariable: isVariable,
-      condition: d.rateCondition || '',
-      provider: d.provider,
-      product: d.product,
-      validity: d.validity || '',
-      maxCap: d.maxCap > 0 ? d.maxCap : 0,
-      maxCapText: d.maxCapText || '',
-      rateAfterCap: d.rateAfterCap || 0,
-      currency: d.currency || 'PHP',
-    };
-  });
-  renderCalcDropdown('');
-}
-
-function renderCalcDropdown(filter) {
-  const list = document.getElementById('calcProviderList');
-  const f = filter.toLowerCase();
-  const items = calcProviderItems.filter(i => i.label.toLowerCase().includes(f));
-  list.innerHTML = items.map(i =>
-    `<div class="calc-dropdown-item${document.getElementById('calcProvider').value === i.key ? ' active' : ''}" data-key="${i.key}">${i.label}</div>`
-  ).join('');
-}
-
-// ═══════════ CALCULATOR ═══════════
-function formatNum(n) {
-  if (n >= 1000000) return (n / 1000000).toFixed(2) + 'M';
-  if (n >= 100000) return (n / 1000).toFixed(1) + 'K';
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function updateCalc() {
-  const deposit = parseFloat(document.getElementById('calcDeposit').value) || 0;
-  const apy = parseFloat(document.getElementById('calcApy').value) || 0;
-  const years = parseInt(document.getElementById('calcDuration').value) || 1;
-  const rate = apy / 100;
-
-  // Check if selected provider has a max cap
-  const provKey = document.getElementById('calcProvider').value;
-  const meta = calcProviderMeta[provKey];
-  const maxCap = meta ? meta.maxCap : 0;
-  const rateAfterCap = meta ? meta.rateAfterCap / 100 : 0;
-  const ccy = meta && meta.currency === 'USD' ? '$' : '₱';
-
-  let balance, yearOneEarning;
-  if (maxCap > 0 && deposit > maxCap) {
-    // Split: amount up to cap earns main rate, excess earns rate after cap
-    const cappedBal = maxCap * Math.pow(1 + rate, years);
-    const excessBal = (deposit - maxCap) * Math.pow(1 + rateAfterCap, years);
-    balance = cappedBal + excessBal;
-    yearOneEarning = (maxCap * rate) + ((deposit - maxCap) * rateAfterCap);
-  } else {
-    balance = deposit * Math.pow(1 + rate, years);
-    yearOneEarning = deposit * rate;
-  }
-  const profit = balance - deposit;
-
-  document.getElementById('resultBalance').textContent = ccy + formatNum(balance);
-  document.getElementById('resultBalanceSub').textContent = `After ${years} Year${years > 1 ? 's' : ''}`;
-  document.getElementById('resultProfit').textContent = '+' + ccy + formatNum(profit);
-
-  document.getElementById('breakDaily').textContent = ccy + formatNum(yearOneEarning / 365);
-  document.getElementById('breakWeekly').textContent = ccy + formatNum(yearOneEarning / 52);
-  document.getElementById('breakMonthly').textContent = ccy + formatNum(yearOneEarning / 12);
-  document.getElementById('breakAnnually').textContent = ccy + formatNum(yearOneEarning);
-
-  document.getElementById('calcDepositLabel').textContent = ccy + deposit.toLocaleString();
-  document.getElementById('calcApyLabel').textContent = apy + '%';
-  document.getElementById('calcDurationLabel').textContent = years + ' Year' + (years > 1 ? 's' : '');
-
-  drawChart(deposit, rate, years);
-}
-
-// ═══════════ CHART ═══════════
-function drawChart(deposit, rate, years) {
-  const canvas = document.getElementById('yieldChart');
-  const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
-  canvas.width = rect.width * dpr;
-  canvas.height = rect.height * dpr;
-  ctx.scale(dpr, dpr);
-  const W = rect.width, H = rect.height;
-
-  ctx.clearRect(0, 0, W, H);
-
-  // Data points
-  const points = [];
-  for (let y = 0; y <= years; y++) {
-    points.push({ year: y, balance: deposit * Math.pow(1 + rate, y) });
-  }
-
-  const maxVal = Math.max(...points.map(p => p.balance)) * 1.1;
-  const minVal = 0;
-  const padL = 50, padR = 20, padT = 10, padB = 30;
-  const chartW = W - padL - padR;
-  const chartH = H - padT - padB;
-
-  const toX = (i) => padL + (i / years) * chartW;
-  const toY = (v) => padT + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
-
-  // Grid lines
-  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-  ctx.lineWidth = 1;
-  const gridLines = 5;
-  for (let i = 0; i <= gridLines; i++) {
-    const y = padT + (i / gridLines) * chartH;
-    ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
-    const val = maxVal - (i / gridLines) * (maxVal - minVal);
-    ctx.fillStyle = '#666';
-    ctx.font = "11px 'DM Sans'";
-    ctx.textAlign = 'right';
-    ctx.fillText(formatNum(val), padL - 8, y + 4);
-  }
-
-  // X labels
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#666';
-  for (let i = 0; i <= years; i++) {
-    ctx.fillText('Year ' + i, toX(i), H - 6);
-  }
-
-  // Principal line (dashed)
-  ctx.setLineDash([6, 4]);
-  ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(toX(0), toY(deposit));
-  ctx.lineTo(toX(years), toY(deposit));
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Balance area fill
-  const grad = ctx.createLinearGradient(0, toY(maxVal), 0, toY(0));
-  grad.addColorStop(0, 'rgba(249,168,37,0.25)');
-  grad.addColorStop(1, 'rgba(249,168,37,0)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.moveTo(toX(0), toY(points[0].balance));
-  points.forEach((p, i) => ctx.lineTo(toX(i), toY(p.balance)));
-  ctx.lineTo(toX(years), toY(0));
-  ctx.lineTo(toX(0), toY(0));
-  ctx.closePath();
-  ctx.fill();
-
-  // Balance line
-  ctx.strokeStyle = '#F9A825';
-  ctx.lineWidth = 3;
-  ctx.lineJoin = 'round';
-  ctx.beginPath();
-  points.forEach((p, i) => {
-    if (i === 0) ctx.moveTo(toX(i), toY(p.balance));
-    else ctx.lineTo(toX(i), toY(p.balance));
-  });
-  ctx.stroke();
-
-  // Dots
-  points.forEach((p, i) => {
-    ctx.beginPath();
-    ctx.arc(toX(i), toY(p.balance), 5, 0, Math.PI * 2);
-    ctx.fillStyle = '#F9A825';
-    ctx.fill();
-    ctx.strokeStyle = '#0a0a0a';
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-
-  // Store for hover
-  canvas._chartPoints = points.map((p, i) => ({ x: toX(i), y: toY(p.balance), balance: p.balance, year: p.year }));
-}
-
-// ═══════════ CHART TOOLTIP ═══════════
-(function() {
-  const canvas = document.getElementById('yieldChart');
-  const tooltip = document.createElement('div');
-  tooltip.style.cssText = "position:absolute;background:rgba(0,0,0,0.9);border:1px solid #F9A825;color:#fff;padding:10px 16px;border-radius:8px;font-size:0.9rem;font-family:'DM Sans';pointer-events:none;display:none;z-index:50;white-space:nowrap;";
-  canvas.parentElement.style.position = 'relative';
-  canvas.parentElement.appendChild(tooltip);
-
-  canvas.addEventListener('mousemove', (e) => {
-    if (!canvas._chartPoints) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    let hit = null;
-    for (const pt of canvas._chartPoints) {
-      const dx = mx - pt.x, dy = my - pt.y;
-      if (dx * dx + dy * dy < 400) { hit = pt; break; }
-    }
-    if (hit) {
-      tooltip.textContent = `Year ${hit.year}: ₱${formatNum(hit.balance)}`;
-      tooltip.style.display = 'block';
-      tooltip.style.left = (hit.x - tooltip.offsetWidth / 2) + 'px';
-      tooltip.style.top = (hit.y - 36) + 'px';
-      canvas.style.cursor = 'pointer';
-    } else {
-      tooltip.style.display = 'none';
-      canvas.style.cursor = 'default';
-    }
-  });
-  canvas.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
-})();
-
-// ═══════════ FILTER & SEARCH ═══════════
-function applyFilterAndSearch() {
-  const emptyMsg = document.getElementById('emptyMsg');
-  emptyMsg.textContent = 'No providers match your search.';
-  const search = document.getElementById('searchInput').value.toLowerCase();
-  filteredData = allData.filter(d => {
-    const matchFilter = currentFilter === 'all' || d.type === currentFilter;
-    const matchSearch = !search || d.provider.toLowerCase().includes(search) || (d.product && d.product.toLowerCase().includes(search));
-    return matchFilter && matchSearch;
-  });
-  filteredData = sortData(filteredData, currentSort.key, currentSort.dir);
-  renderTable(filteredData);
-}
-
-// ═══════════ EVENT LISTENERS ═══════════
-function setupEvents() {
-  // Filters
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentFilter = btn.dataset.filter;
-      applyFilterAndSearch();
-    });
-  });
-
-  // Search
-  document.getElementById('searchInput').addEventListener('input', applyFilterAndSearch);
-
-  // Sort
-  document.querySelectorAll('.yield-table thead th[data-sort]').forEach(th => {
-    th.addEventListener('click', () => {
-      const key = th.dataset.sort;
-      if (currentSort.key === key) {
-        currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
-      } else {
-        currentSort = { key, dir: key === 'apy' ? 'desc' : 'asc' };
-      }
-      document.querySelectorAll('.yield-table thead th').forEach(t => t.classList.remove('sorted'));
-      th.classList.add('sorted');
-      th.querySelector('.sort-arrow').textContent = currentSort.dir === 'asc' ? '↑' : '↓';
-      applyFilterAndSearch();
-    });
-  });
-
-  // Calculator inputs
-  const calcDeposit = document.getElementById('calcDeposit');
-  const calcDepositSlider = document.getElementById('calcDepositSlider');
-  const calcApy = document.getElementById('calcApy');
-  const calcApySlider = document.getElementById('calcApySlider');
-  const calcDuration = document.getElementById('calcDuration');
-
-  calcDeposit.addEventListener('input', () => { calcDepositSlider.value = calcDeposit.value; updateCalc(); });
-  calcDepositSlider.addEventListener('input', () => { calcDeposit.value = calcDepositSlider.value; updateCalc(); });
-  calcApy.addEventListener('input', () => { calcApySlider.value = calcApy.value; updateCalc(); });
-  calcApySlider.addEventListener('input', () => { calcApy.value = calcApySlider.value; updateCalc(); });
-  calcDuration.addEventListener('input', updateCalc);
-
-  // Custom searchable dropdown
-  const ddBtn = document.getElementById('calcDropdownBtn');
-  const ddMenu = document.getElementById('calcDropdownMenu');
-  const ddSearch = document.getElementById('calcProviderSearch');
-  const ddList = document.getElementById('calcProviderList');
-  const calcProvider = document.getElementById('calcProvider');
-
-  ddBtn.addEventListener('click', () => {
-    const open = ddMenu.style.display === 'none';
-    ddMenu.style.display = open ? 'flex' : 'none';
-    document.getElementById('calcDropdown').classList.toggle('open', open);
-    if (open) { ddSearch.value = ''; renderCalcDropdown(''); ddSearch.focus(); }
-  });
-
-  ddSearch.addEventListener('input', () => renderCalcDropdown(ddSearch.value));
-
-  ddList.addEventListener('click', (e) => {
-    const item = e.target.closest('.calc-dropdown-item');
-    if (!item) return;
-    const key = item.dataset.key;
-    calcProvider.value = key;
-    ddMenu.style.display = 'none';
-    document.getElementById('calcDropdown').classList.remove('open');
-
-    const disclaimer = document.getElementById('calcDisclaimer');
-    if (key !== 'custom' && calcProviderMeta[key]) {
-      const meta = calcProviderMeta[key];
-      const ccy = meta.currency === 'USD' ? '$' : '₱';
-      ddBtn.textContent = `${meta.provider} (${meta.product}) — ${meta.apy}%`;
-      calcApy.value = meta.apy;
-      calcApySlider.value = meta.apy;
-      document.getElementById('calcProviderLabel').textContent = `${meta.provider} (${meta.product})`;
-      const warnings = [];
-      if (meta.isVariable) {
-        warnings.push(`⚠ Variable rate — up to ${meta.apy}% (${meta.condition}). Actual rate may be lower depending on conditions${meta.validity ? ' · ' + meta.validity : ''}.`);
-      }
-      if (meta.maxCap > 0) {
-        warnings.push(`⚠ Max cap: ${ccy}${meta.maxCap.toLocaleString()}. Deposits above this earn ${meta.rateAfterCap > 0 ? meta.rateAfterCap.toFixed(2) + '%' : 'a lower rate'}.`);
-      } else if (meta.maxCapText) {
-        warnings.push(`⚠ Cap: ${meta.maxCapText}.`);
-      }
-      if (warnings.length) {
-        disclaimer.textContent = warnings.join(' ');
-        disclaimer.style.display = 'block';
-      } else {
-        disclaimer.style.display = 'none';
-      }
-    } else {
-      ddBtn.textContent = 'Custom Rate';
-      document.getElementById('calcProviderLabel').textContent = 'Custom';
-      disclaimer.style.display = 'none';
-    }
-    updateCalc();
-  });
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('#calcDropdown')) {
-      ddMenu.style.display = 'none';
-      document.getElementById('calcDropdown').classList.remove('open');
-    }
-  });
-
-  // Nav scroll
-  window.addEventListener('scroll', () => {
-    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
-  });
-
-  // Chart resize
-  window.addEventListener('resize', updateCalc);
-}
-
-// ═══════════ SCROLL REVEAL ═══════════
-function setupReveals() {
-  const obs = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-}
-
-// ═══════════ INIT ═══════════
-async function init() {
-  setupEvents();
-  setupReveals();
-
-  const [sheetData, dexData] = await Promise.all([fetchSheetData(), fetchDexData()]);
-  // Tag sheet data with PHP currency if missing (banks default; CEX rows in sheet should set "USD")
-  sheetData.forEach(d => { if (!d.currency || d.currency === 'PHP') d.currency = (d.type === 'cex' || d.type === 'dex') ? 'USD' : 'PHP'; });
-  // Sheet is authoritative: only fall back to hardcoded CEX if the sheet has no CEX rows yet
-  const sheetHasCEX = sheetData.some(d => d.type === 'cex');
-  const cexEntries = sheetHasCEX ? [] : CEX_DATA;
-  allData = [...sheetData, ...cexEntries, ...dexData];
-  filteredData = sortData(allData, 'apy', 'desc');
-
-  renderTable(filteredData);
-  renderTopCards(allData);
-  updateStats(allData);
-  populateCalcProviders(allData);
-  updateCalc();
-
-  document.getElementById('dataStatus').innerHTML = '';
-}
-
-init();
-</script>
+<script src="tracker.js"></script>
 </body>
 </html>

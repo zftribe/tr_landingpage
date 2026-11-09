@@ -1,0 +1,180 @@
+{
+  "maya-bank-maya-savings-boosted-nov-2026-promo": {
+    "rateAfterPromo": 3,
+    "rateAfterCap": 3,
+    "strings": true,
+    "_why": "Base Maya Savings rate 3.0% (verified row). Page shows 3% and 3.5% for balances above the cap; we use the lower one.",
+    "finePrint": "Conditions apply. The top 13% to 15% tiers are only for select users (Maya loan, credit card or payroll), and any boost applies only to the first ₱100,000, for the month you qualify. Most users get a lower tier. Money above ₱100,000 earns the base rate."
+  },
+  "cimb-bank-ph-upsave-gsave-earn-more-promo-up-to-4-15": {
+    "rateAfterPromo": 2.3,
+    "_why": "UpSave/GSave base 2.30% (verified row)."
+  },
+  "okx-simple-earn-usdt-flexible-new-user-bonus": {
+    "promoDays": 180,
+    "rateAfterPromo": 4,
+    "_why": "Bonus lasts 180 days per user (OKX help article), then the normal USDT rate."
+  },
+  "okx-simple-earn-usdc-flexible-new-user-bonus": {
+    "promoDays": 180,
+    "rateAfterPromo": 4.5,
+    "_why": "Same, USDC."
+  },
+  "okx-simple-earn-btc-flexible-new-user-bonus": {
+    "promoDays": 180,
+    "rateAfterPromo": 0.5
+  },
+  "okx-simple-earn-eth-flexible-new-user-bonus": {
+    "promoDays": 180,
+    "rateAfterPromo": 1
+  },
+  "okx-flash-earn-hold-to-earn-usdc": {
+    "rateAfterPromo": 4.5
+  },
+  "bitget-simple-earn-flexible-usdt-promo": {
+    "rateAfterPromo": 4,
+    "_why": "Rate above the cap per notice; standard rate unpublished."
+  },
+  "bitget-simple-earn-flexible-usdc-promo": {
+    "rateAfterPromo": 3.5
+  },
+  "gate-simple-earn-fixed-usdt-7-days-vip2-14-boost": {
+    "rateAfterPromo": 3.7
+  },
+  "gate-simple-earn-fixed-usdt-30-days-vip2-14-boost": {
+    "rateAfterPromo": 3.9
+  },
+  "gate-idle-earn-usdt-net-deposit-boost-50-000-usdt-tier": {
+    "rateAfterPromo": 3.16,
+    "_why": "Gate flexible USDT rate (API)."
+  },
+  "mexc-savings-flexible-usdt-boost-product-1": {
+    "tiers": [
+      [
+        1000,
+        4
+      ],
+      [
+        10000,
+        5
+      ],
+      [
+        50000,
+        5.3
+      ],
+      [
+        100000,
+        6
+      ],
+      [
+        110000,
+        10
+      ],
+      [
+        null,
+        1.6
+      ]
+    ],
+    "cap": null,
+    "rateAfterCap": null,
+    "capText": "Tiered: 4% to 1,000 USDT, 5% to 10,000, 5.3% to 50,000, 6% to 100,000, 10% to 110,000, then 1.6%",
+    "_why": "Bands from MEXC's tieredSubsidyApr + 0.1 base (research evidence)."
+  },
+  "mexc-savings-flexible-usdt-boost-product-2": {
+    "tiers": [
+      [
+        200,
+        6
+      ],
+      [
+        500,
+        2.5
+      ],
+      [
+        null,
+        0.3
+      ]
+    ],
+    "cap": null,
+    "rateAfterCap": null,
+    "capText": "Tiered: 6% to 200 USDT, 2.5% to 500, then 0.3%"
+  },
+  "maya-bank-personal-goals-tiered": {
+    "tiers": [
+      [
+        20000,
+        4
+      ],
+      [
+        40000,
+        4.5
+      ],
+      [
+        60000,
+        5
+      ],
+      [
+        80000,
+        6.5
+      ],
+      [
+        100000,
+        8
+      ],
+      [
+        null,
+        0
+      ]
+    ],
+    "upTo": true,
+    "capText": "Tiered per ₱20,000: 4%, 4.5%, 5%, 6.5%, 8%. Nothing above ₱100,000 per goal",
+    "_why": "Tiers from the official page (research row)."
+  },
+  "pag-ibig-fund-mp2-savings-2025-dividend": {
+    "verified": true,
+    "taxExempt": true,
+    "taxNote": "Tax-free (DOF: Pag-IBIG MP2 dividends stay tax-exempt under CMEPA)",
+    "pdic": false,
+    "source": "https://www.pna.gov.ph/articles/1270003",
+    "evidence": "MP2 Savings rate climbed to 7.12 percent (2025 dividend, PNA)",
+    "finePrint": "Not a bank deposit and not PDIC-insured. 7.12% is the 2025 dividend, not a promise: Pag-IBIG declares a new rate each year from its earnings. Money is locked for 5 years; early withdrawal only for allowed reasons and may cut the dividend. Tax-free.",
+    "lockup": "5 years",
+    "_why": "pagibigfund.gov.ph is behind reCAPTCHA; PNA (government news agency) reports the official announcement."
+  },
+  "security-bank-money-builder-balance-php5-000-to-php99-999": {
+    "minDeposit": 5000,
+    "maxDeposit": 99999,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "security-bank-money-builder-balance-php100-000-to-php999-999": {
+    "minDeposit": 100000,
+    "maxDeposit": 999999,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "security-bank-money-builder-balance-php1m-to-php4-99m": {
+    "minDeposit": 1000000,
+    "maxDeposit": 4999999,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "security-bank-money-builder-balance-php5m-to-php9-99m": {
+    "minDeposit": 5000000,
+    "maxDeposit": 9999999,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "security-bank-money-builder-balance-php10m-to-php19-99m": {
+    "minDeposit": 10000000,
+    "maxDeposit": 19999999,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "security-bank-money-builder-balance-php20m-and-up": {
+    "minDeposit": 20000000,
+    "maxDeposit": null,
+    "_why": "Whole balance earns the band rate; finder only shows the band your amount falls in."
+  },
+  "landbank-optisaver-plus-php-500-000-and-up": {
+    "minDeposit": 500000,
+    "upTo": true,
+    "capText": "Tiered 1% to 4% from ₱500,000; below that 0.05%",
+    "_why": "Official poster: 0.05% below 500k; 1–4% tiered from 500k. Exact tier cut-offs not published in text."
+  }
+}

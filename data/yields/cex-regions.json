@@ -1,0 +1,32 @@
+[
+ {
+  "provider": "OKX",
+  "secPhAdvisory": "Named as not SEC-registered in the Philippine SEC advisory of early Aug 2025 (10 platforms listed).",
+  "source": "https://www.philstar.com/business/2025/08/06/2463539/10-crypto-platforms-targeted-sec-crackdown-over-lack-registration",
+  "note": "Checked via a news report quoting the SEC table; sec.gov.ph itself returned a Cloudflare 403 block, so the primary page was not read."
+ },
+ {
+  "provider": "MEXC",
+  "secPhAdvisory": "Named as not SEC-registered in the same Aug 2025 advisory.",
+  "source": "https://www.philstar.com/business/2025/08/06/2463539/10-crypto-platforms-targeted-sec-crackdown-over-lack-registration",
+  "note": "Checked via a news report quoting the SEC table; sec.gov.ph itself returned a Cloudflare 403 block, so the primary page was not read."
+ },
+ {
+  "provider": "Bitget",
+  "secPhAdvisory": "Named as not SEC-registered in the same Aug 2025 advisory.",
+  "source": "https://www.philstar.com/business/2025/08/06/2463539/10-crypto-platforms-targeted-sec-crackdown-over-lack-registration",
+  "note": "Checked via a news report quoting the SEC table; sec.gov.ph itself returned a Cloudflare 403 block, so the primary page was not read."
+ },
+ {
+  "provider": "Bybit",
+  "secPhAdvisory": "Named as not SEC-registered in the same Aug 2025 advisory.",
+  "source": "https://www.philstar.com/business/2025/08/06/2463539/10-crypto-platforms-targeted-sec-crackdown-over-lack-registration",
+  "note": "Checked via a news report quoting the SEC table; sec.gov.ph itself returned a Cloudflare 403 block, so the primary page was not read."
+ },
+ {
+  "provider": "Gate",
+  "secPhAdvisory": "Not among the 10 platforms named in the Aug 2025 advisory (article read; Gate not mentioned). A later SEC list reported 25 Aug 2025 added Blofin, CoinW, DigiFinex, LBank and Pionex; I did not read it in full, so a later naming cannot be ruled out. Gate's own promo terms also say the UK and some other regions are restricted.",
+  "source": "https://www.philstar.com/business/2025/08/06/2463539/10-crypto-platforms-targeted-sec-crackdown-over-lack-registration",
+  "note": "Checked via a news report quoting the SEC table; sec.gov.ph itself returned a Cloudflare 403 block, so the primary page was not read."
+ }
+]
