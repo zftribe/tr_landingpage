@@ -11,6 +11,8 @@ const checkOnly = process.argv.includes('--check')
 const sources = ['digital.json', 'traditional.json', 'usd.json', 'cex.json'].map((f) => ({ f, rows: read(f) || [] }))
 const rules = read('rules.json') || {}
 rules.fx = read('fx.json') || null
+rules.fxBoard = read('fx-board.json') || null // banks' published USD buying/selling rates (George, 10 Nov)
+const bankKey = (s) => String(s || '').toLowerCase().replace(/\b(unibank|bank|of the philippines|philippines|savings|digital|inc\.?|corp\.?|the)\b/g, '').replace(/[^a-z]/g, '')
 const overrides = read('overrides.json') || {}
 const history = read('history.json') || {}
 const regions = read('cex-regions.json') || []
@@ -66,6 +68,10 @@ for (const { f, rows: list } of sources) {
     const h = history[id] || []
     const now = r.rate != null ? [{ d: r.checkedOn, r: r.rate }] : []
     r.history = [...h.filter((p) => p.d !== r.checkedOn), ...now].sort((a, b) => (a.d < b.d ? -1 : 1)).slice(-12)
+    if (r.currency === 'USD' && r.category !== 'cex' && rules.fxBoard) {
+      const bd = (rules.fxBoard.banks || []).find((x) => bankKey(x.provider) && (bankKey(x.provider) === bankKey(r.provider) || bankKey(r.provider).startsWith(bankKey(x.provider)) || bankKey(x.provider).startsWith(bankKey(r.provider))))
+      if (bd && bd.buy > 0 && bd.sell > 0) Object.assign(r, { fxBuy: bd.buy, fxSell: bd.sell, fxAsOf: bd.asOf || rules.fxBoard.checkedOn, fxSource: bd.source, fxBasis: bd.basis })
+    }
     for (const k of ['evidence', 'note', 'maxBalance', 'verified']) if (r[k] == null || r[k] === '') delete r[k]
     rows.push(r)
   }

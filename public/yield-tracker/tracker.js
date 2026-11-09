@@ -264,6 +264,7 @@ function rowHTML(r) {
         ${r.cons ? `<h4>Cons to know</h4><p>${esc(r.cons)}</p>` : ''}
         <div class="more-actions">
           ${cmpBtn(r)}
+          ${isUsdBank(r) ? `<a class="btn" href="#fx-check" data-fx="${esc(r.id)}">Peso round trip</a>` : ''}
           ${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}
           ${p ? fnLink(p) : ''}
         </div>
@@ -350,12 +351,57 @@ const TREE = [
     ['no', '🧘', 'No strings', 'Just park it'],
   ] },
 ];
+/* ── Dollar round trip (George, 10 Nov): ₱ → $ at the bank's selling rate, earn, $ → ₱ at its buying rate ── */
+const MID = () => FX();
+const hasBoard = (r) => isUsdBank(r) && r.fxBuy > 0 && r.fxSell > 0;
+const usdNet = (r, pesos) => { const y = yearRate(r, pesos); return y == null ? null : taxable(r) ? y * (1 - TAX() / 100) : y; };
+function roundTrip(r, pesos, months) {
+  if (!hasBoard(r) || !(pesos > 0)) return null;
+  const usd = pesos / r.fxSell, nr = usdNet(r, pesos) || 0;
+  const intUsd = usd * nr / 100 * months / 12;              // simple interest, no compounding
+  const cost = pesos - usd * r.fxBuy;                      // what the two conversions alone cost
+  const intPhp = intUsd * r.fxBuy;
+  const perMonth = usd * r.fxBuy * nr / 100 / 12;
+  return { usd, nr, cost, costPct: cost / pesos * 100, intPhp, net: intPhp - cost, be: perMonth > 0 ? cost / perMonth : Infinity };
+}
+const beText = (m) => (!isFinite(m) ? 'never, at this rate' : m < 1 ? 'under a month' : 'about ' + Math.ceil(m) + ' month' + (Math.ceil(m) === 1 ? '' : 's'));
+const fxBoardRows = () => ((DATA.rules && DATA.rules.fxBoard && DATA.rules.fxBoard.banks) || []);
+function renderFx() {
+  const box = $('#fxOut'); if (!box) return;
+  const pesos = Number($('#fxAmt').value) || 0, months = Number($('#fxMonths').value) || 12;
+  const r = ROWS.find((x) => x.id === $('#fxPick').value);
+  if (!r) { box.innerHTML = '<p class="fx-verdict none">Pick a bank dollar account above.</p>'; return; }
+  const x = roundTrip(r, pesos, months);
+  if (!x) { box.innerHTML = '<p class="fx-verdict none">' + esc(r.provider) + ' does not publish its dollar buying and selling rates, so we can\'t work out the exchange cost. Ask the bank for its rate before you convert.</p>'; return; }
+  const sign = (n) => (n >= 0 ? '+' : '−') + money(Math.abs(n));
+  const tiles = [['Exchange round trip costs', money(x.cost), x.costPct.toFixed(2) + '% of your pesos'], ['Interest after tax, ' + months + ' mo', money(x.intPhp), pct2(x.nr) + ' a year in dollars'], ['Break-even', beText(x.be), 'of interest to cover the spread'], ['Net after ' + months + ' months', sign(x.net), x.net >= 0 ? 'gain' : 'loss']];
+  const ladder = [3, 6, 12, 24, 36].map((m) => { const y = roundTrip(r, pesos, m); return '<li class="' + (y.net >= 0 ? 'up' : 'down') + '"><b>' + m + ' mo</b><span>' + sign(y.net) + '</span></li>'; }).join('');
+  box.innerHTML = '<div class="fx-tiles">' + tiles.map((q, i) => '<div class="st' + (i === 3 ? (x.net >= 0 ? ' st-real' : ' st-loss') : '') + '"><small>' + q[0] + '</small><b>' + q[1] + '</b><span>' + q[2] + '</span></div>').join('') + '</div>' +
+    '<p class="fx-verdict ' + (x.net >= 0 ? 'up' : 'down') + '">' + (isFinite(x.be) ? 'You need ' + beText(x.be) + ' of interest just to cover the exchange spread. ' : 'At this rate the interest never covers the exchange spread. ') +
+    'Holding ' + months + ' months: ' + (x.net >= 0 ? 'about <b>' + money(x.net) + ' net gain</b>.' : 'you\'d lose about <b>' + money(-x.net) + ' net</b>.') + '</p>' +
+    '<ul class="fx-ladder" aria-label="Net result by holding time">' + ladder + '</ul>' +
+    '<p class="fx-note">' + esc(r.provider) + ' sells dollars at ₱' + r.fxSell.toFixed(2) + ' and buys them back at ₱' + r.fxBuy.toFixed(2) + ' (' + esc(r.fxBasis || 'board rate') + ', checked ' + fmtDate(r.fxAsOf) + (r.fxSource ? ', <a href="' + esc(r.fxSource) + '" target="_blank" rel="noopener">official page ↗</a>' : '') + '). <b>This assumes the exchange rate itself does not move.</b> If the peso weakens you gain more; if it strengthens you can lose more. It is not a forecast. Simple interest, 20% PH tax taken off the dollar interest.</p>';
+}
+function fillFx() {
+  const sel = $('#fxPick'); if (!sel) return;
+  const opts = ROWS.filter((r) => isUsdBank(r) && rankable(r) && !locked(r)).concat(ROWS.filter((r) => isUsdBank(r) && rankable(r) && locked(r)));
+  sel.innerHTML = opts.map((r) => '<option value="' + esc(r.id) + '">' + esc(r.provider) + ' · ' + esc(r.product) + ' — ' + pct2(r.rate) + (hasBoard(r) ? '' : ' (exchange rate not published)') + '</option>').join('') || '<option value="">No bank dollar rates yet</option>';
+  const best = opts.filter(hasBoard).sort((a, b) => roundTrip(b, 100000, 12).net - roundTrip(a, 100000, 12).net)[0];
+  if (best) sel.value = best.id;
+  const bd = fxBoardRows(), mid = MID(), tb = $('#fxBoard');
+  if (tb) tb.innerHTML = bd.length ? '<table class="cmp-table fx-table"><thead><tr><th>Bank</th><th>Sells $ at</th><th>Buys $ at</th><th>Spread vs BSP</th><th>Round trip on $1,000</th></tr></thead><tbody>' +
+    bd.slice().sort((a, b) => (a.sell && b.sell ? (a.sell - a.buy) - (b.sell - b.buy) : a.sell ? -1 : 1)).map((b) => b.buy && b.sell
+      ? '<tr><td>' + esc(b.provider) + (b.category === 'remittance' ? ' <small>(not a bank)</small>' : '') + '</td><td>₱' + b.sell.toFixed(2) + '</td><td>₱' + b.buy.toFixed(2) + '</td><td>' + (mid ? '+' + ((b.sell - mid) / mid * 100).toFixed(2) + '% / −' + ((mid - b.buy) / mid * 100).toFixed(2) + '%' : '—') + '</td><td><b>' + money((b.sell - b.buy) * 1000) + '</b></td></tr>'
+      : '<tr><td>' + esc(b.provider) + '</td><td colspan="4" class="dim">Not published</td></tr>').join('') + '</tbody></table><p class="fx-note">Board rates checked ' + fmtDate((DATA.rules.fxBoard || {}).checkedOn) + '. BSP reference rate ₱' + (mid || '—') + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + ') is the midpoint. Banks change these rates during the day; your branch or app may differ.</p>' : '';
+}
+
 /* ── Comparator + best match (George, 10 Nov) ── */
 const CMP = { ids: [], ccy: 'php', amount: 100000, promo: true, tasks: true, insured: false, flex: false, open: false };
 const CMP_MAX = 3;
 const cmpBtn = (r) => (!usable(r) || r.pastReturn ? '' : `<button type="button" class="cmp-btn" data-cmp="${esc(r.id)}" aria-pressed="${CMP.ids.includes(r.id)}">${CMP.ids.includes(r.id) ? '✓ Comparing' : '+ Compare'}</button>`);
 const riskOf = (r) => r.pdic ? ['Low', 'PDIC-insured up to ₱1M per depositor, per bank'] : r.category === 'government' ? ['Low', 'Backed by the agency, not PDIC'] : r.category === 'cex' ? ['Higher', 'Exchange risk; not insured'] : r.category === 'dex' ? ['Highest', 'Smart-contract risk; not insured'] : ['Medium', 'Not a bank deposit'];
-function cmpEarn(r, pesos) { const y = yearRate(r, pesos); const n = r.rate == null ? null : (taxable(r) ? y * (1 - TAX() / 100) : y); return n == null ? null : { n, earn: pesos * n / 100 }; }
+function cmpEarn(r, pesos) {
+  if (CMP.ccy === 'php' && isUsdBank(r)) { const x = roundTrip(r, pesos, 12); return x ? { n: x.net / pesos * 100, earn: x.net, rt: x } : null; } const y = yearRate(r, pesos); const n = r.rate == null ? null : (taxable(r) ? y * (1 - TAX() / 100) : y); return n == null ? null : { n, earn: pesos * n / 100 }; }
 function syncCmp() {
   document.querySelectorAll('[data-cmp]').forEach((b) => { const on = CMP.ids.includes(b.dataset.cmp); b.setAttribute('aria-pressed', String(on)); b.textContent = on ? '✓ Comparing' : '+ Compare'; });
   const tray = $('#cmpTray'); if (!tray) return;
@@ -382,14 +428,15 @@ function renderCmp() {
     const u = units(r, pesos);
     if (r.minDeposit && u != null && u < r.minDeposit) why.push('below the ' + sym(r) + Number(r.minDeposit).toLocaleString('en-PH') + ' minimum');
     if (r.maxDeposit && u != null && u > r.maxDeposit) why.push('above this band');
+    if (CMP.ccy === 'php' && isUsdBank(r) && !hasBoard(r)) why.push('bank does not publish its exchange rate, so the conversion cost is unknown');
     return { r, e, out: why };
   });
-  const ok = res.filter((x) => !x.out.length && x.e).sort((a, b) => b.e.earn - a.e.earn);
+  const ok = res.filter((x) => !x.out.length && x.e && x.e.earn > 0).sort((a, b) => b.e.earn - a.e.earn);
   const best = ok[0], second = ok[1];
   const tie = best && second && Math.abs(best.e.earn - second.e.earn) <= Math.max(1, best.e.earn * 0.02);
   const what = rows.every(taxable) ? 'after-tax earnings' : rows.some(taxable) ? 'earnings after the PH tax on bank interest' : 'earnings';
   const scope = [CMP.insured ? 'insured options' : 'the options you picked', !CMP.promo ? 'without promos' : '', !CMP.tasks ? 'with no tasks' : '', CMP.flex ? 'that you can withdraw anytime' : ''].filter(Boolean).join(' ');
-  const caveat = (x) => [x.r.kind === 'promo' ? (x.r.promoEnds ? 'promo ends ' + fmtDate(x.r.promoEnds) : 'promo can end anytime') : '', !x.r.pdic && x.r.category !== 'government' ? 'not insured' : '', locked(x.r) ? 'locked for ' + x.r.lockup : '', x.r.upTo ? '"up to" rate: you may get less' : '', x.r.newUsersOnly ? 'new users only' : '', x.r.strings && !x.r.newUsersOnly ? 'needs tasks' : ''].filter(Boolean).join(' · ');
+  const caveat = (x) => [x.r.kind === 'promo' ? (x.r.promoEnds ? 'promo ends ' + fmtDate(x.r.promoEnds) : 'promo can end anytime') : '', !x.r.pdic && x.r.category !== 'government' ? 'not insured' : '', locked(x.r) ? 'locked for ' + x.r.lockup : '', x.r.upTo ? '"up to" rate: you may get less' : '', x.r.newUsersOnly ? 'new users only' : '', CMP.ccy === 'php' && (x.r.category === 'cex' || x.r.category === 'dex') ? 'peso-to-crypto conversion cost not counted' : '', x.e && x.e.rt ? 'exchange spread of ' + money(x.e.rt.cost) + ' already taken off' : '', x.r.strings && !x.r.newUsersOnly ? 'needs tasks' : ''].filter(Boolean).join(' · ');
   const verdict = !best ? '<p class="cmp-verdict none">No best match: none of these fits your choices. Try allowing promos or tasks, or turn off "insured only" or "withdraw anytime".</p>'
     : tie ? `<p class="cmp-verdict"><b>Tie:</b> ${esc(best.r.provider)} and ${esc(second.r.provider)} earn about the same (${show(best.e.earn)} vs ${show(second.e.earn)}) on ${show(pesos)} over 12 months among ${scope}. Pick on access and risk.</p>`
     : `<p class="cmp-verdict"><b>Best match: ${esc(best.r.provider)} · ${esc(best.r.product)}</b>: highest ${what} on ${show(pesos)} over 12 months among ${scope} (${show(best.e.earn)}).${caveat(best) ? ' <span class="cmp-cav">Keep in mind: ' + esc(caveat(best)) + '.</span>' : ''}</p>`;
@@ -399,7 +446,8 @@ function renderCmp() {
     line('Currency', (x) => esc(x.r.currency)) +
     line('Rate', (x) => (x.r.upTo ? 'up to ' : '') + pct2(x.r.rate) + ' ' + (isPeso(x.r) || isUsdBank(x.r) ? 'p.a.' : esc(x.r.rateBasis || 'APR'))) +
     line('After tax', (x) => taxable(x.r) ? pct2(x.r.rate * (1 - TAX() / 100)) : x.r.taxExempt ? 'tax-free' : pct2(x.r.rate) + ' <small>no PH tax applied</small>') +
-    line('Earns in 12 months', (x) => x.e ? '<b>' + show(x.e.earn) + '</b>' + (x.r.kind === 'promo' && (x.r.promoEnds || x.r.promoDays) ? '<small>promo counted only until it ends</small>' : '') : '—') +
+    line('Earns in 12 months', (x) => x.e ? '<b>' + (x.e.earn < 0 ? '−' + show(-x.e.earn) : show(x.e.earn)) + '</b>' + (x.e.rt ? '<small>after the exchange round trip</small>' : '') + (x.r.kind === 'promo' && (x.r.promoEnds || x.r.promoDays) ? '<small>promo counted only until it ends</small>' : '') : '—') +
+    (CMP.ccy === 'php' && res.some((x) => isUsdBank(x.r)) ? line('Exchange round trip', (x) => isUsdBank(x.r) ? (x.e && x.e.rt ? money(x.e.rt.cost) + ' <small>' + x.e.rt.costPct.toFixed(2) + '% · ₱→$→₱ at the bank\'s rates</small>' : 'Not published') : isPeso(x.r) ? 'None' : '<small>not counted</small>') + line('Break-even', (x) => x.e && x.e.rt ? beText(x.e.rt.be) : '—') : '') +
     line('Cap', (x) => capText(x.r)) +
     line('Minimum', (x) => x.r.minDeposit ? sym(x.r) + Number(x.r.minDeposit).toLocaleString('en-PH') + (sym(x.r) ? '' : ' ' + x.r.currency) : '—') +
     line('Access', (x) => esc(locked(x.r) ? x.r.lockup : 'Withdraw anytime')) +
@@ -410,10 +458,11 @@ function renderCmp() {
     line('Fits your choices', (x) => x.out.length ? '<span class="cmp-out">No: ' + esc(x.out.join(', ')) + '</span>' : '<span class="cmp-in">Yes</span>') +
     line('Checked', (x) => fmtDate(x.r.checkedOn)) +
     '</tbody></table></div>' +
-    '<p class="cmp-note">' + (rows.some((r) => !isPeso(r)) || usd ? 'Dollar and peso amounts are converted at the BSP rate of ₱' + fx + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + '). ' : '') + 'Best match is based only on your inputs and the rates we checked, after the 20% PH tax on bank interest (crypto is not adjusted for tax). Partners get no boost. This is a comparison, not advice; rates can change any time.</p>';
+    '<p class="cmp-note">' + (rows.some((r) => !isPeso(r)) || usd ? 'Dollar and peso amounts are converted at the BSP rate of ₱' + fx + ' per $1 (' + fmtDate((DATA.rules.fx || {}).asOf) + '). ' : '') + (CMP.ccy === 'php' && res.some((x) => isUsdBank(x.r)) ? 'Dollar accounts started from pesos count the bank\'s own buy/sell spread and assume the exchange rate does not move. ' : '') + 'Best match is based only on your inputs and the rates we checked, after the 20% PH tax on bank interest (crypto is not adjusted for tax). Partners get no boost. This is a comparison, not advice; rates can change any time.</p>';
 }
 function wireCmp() {
   document.addEventListener('click', (e) => {
+    const fxl = e.target.closest('[data-fx]'); if (fxl) { $('#fxPick').value = fxl.dataset.fx; renderFx(); return; }
     const b = e.target.closest('[data-cmp]');
     if (b) { e.preventDefault(); e.stopPropagation(); const id = b.dataset.cmp, i = CMP.ids.indexOf(id);
       if (i >= 0) CMP.ids.splice(i, 1); else if (CMP.ids.length < CMP_MAX) CMP.ids.push(id); else { $('#cmpNames').textContent = 'You can compare up to 3. Remove one first.'; return; }
@@ -484,6 +533,7 @@ function renderPicks() {
       <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${isUsdBank(r) ? `<div class="why">Paid in US dollars into a PH bank. 20% final tax already taken off.</div>` : ''}${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
+      ${isUsdBank(r) && T.ccy === 'usd' ? (() => { const q = roundTrip(r, amt, 12); return q ? `<div class="why fx-why">Starting with pesos? The exchange round trip here costs about ${money(q.cost)} (${q.costPct.toFixed(2)}%). Break-even: ${beText(q.be)}. <a href="#fx-check" data-fx="${esc(r.id)}">Check it</a></div>` : `<div class="why fx-why">This bank does not publish its exchange rate. Ask for it before converting pesos.</div>`; })() : ''}
       <div class="actions">${cmpBtn(r)}<a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
@@ -674,13 +724,14 @@ async function loadDefi() {
 }
 async function init() {
   wireCmp();
+  ['fxAmt', 'fxMonths', 'fxPick'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', renderFx); });
   setupFilters();
   wire();
   document.body.dataset.view = S.view; $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
+  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi(); fillFx(); renderFx();
   const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.

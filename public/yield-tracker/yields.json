@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-09T06:16:52.723Z",
+ "generated": "2026-11-09T18:53:21.657Z",
  "checked": {
   "ph": "2026-11-09",
   "crypto": "2026-11-09"
@@ -259,7 +259,8 @@
    "name": "BSP daily peso per US dollar rate",
    "source": "https://www.bsp.gov.ph/statistics/external/day99_data.aspx",
    "checkedOn": "2026-11-09"
-  }
+  },
+  "fxBoard": null
  },
  "partners": {
   "Maya": {

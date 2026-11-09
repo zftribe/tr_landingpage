@@ -175,6 +175,25 @@
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
+<section class="section" id="fx-check">
+  <div class="container-wide">
+    <div class="sec-head">
+      <span class="eyebrow">Dollar round trip</span>
+      <h2>Does a dollar account pay <span class="gold">after the exchange</span>?</h2>
+      <p class="subtitle">Your bank sells you dollars at one rate and buys them back at a lower one. See how long the dollar interest takes to cover that gap.</p>
+    </div>
+    <div class="fx-card">
+      <div class="fx-form">
+        <label class="sf"><span>Pesos to convert</span><input id="fxAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+        <label class="sf sf-wide"><span>Bank dollar account</span><select id="fxPick"></select></label>
+        <label class="sf"><span>How long you hold</span><select id="fxMonths"><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">2 years</option><option value="36">3 years</option><option value="60">5 years</option></select></label>
+      </div>
+      <div id="fxOut" role="status" aria-live="polite"></div>
+    </div>
+    <details class="fx-board-wrap"><summary>Every bank's dollar buying and selling rate</summary><div class="cmp-scroll" id="fxBoard"></div></details>
+  </div>
+</section>
+
 <section class="section" id="inflation-check">
   <div class="container">
     <div class="sec-head">

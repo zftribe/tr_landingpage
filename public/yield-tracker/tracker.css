@@ -444,3 +444,24 @@ body:has(.cmp-tray:not([hidden])) { padding-bottom: 64px; }
 @media (max-width: 720px) { .cmp-names { flex-basis: 100%; order: 3; } .cmp-tray .btn { flex: 1; } .cmp-amt input { width: 100px; } }
 .cmp-panel { scroll-margin-top: 140px; }
 .cmp-panel { min-width: 0; max-width: 100%; } .cmp-panel > * { min-width: 0; }
+
+/* Dollar round trip (round 4) */
+.fx-card { background: var(--bg-card); border: 1px solid var(--border-2); border-radius: var(--radius); padding: 18px; display: grid; gap: 14px; min-width: 0; }
+.fx-form { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 12px; }
+.fx-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.fx-tiles .st { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; gap: 4px; }
+.fx-tiles .st small { color: var(--text-dim); font-size: .72rem; text-transform: uppercase; letter-spacing: .5px; }
+.fx-tiles .st b { font-size: 1.15rem; color: var(--white); }
+.fx-tiles .st span { font-size: .74rem; color: var(--text-dim); }
+.fx-tiles .st-real { border-color: rgba(34,197,94,.45); } .fx-tiles .st-real b { color: var(--green); }
+.fx-tiles .st-loss { border-color: rgba(239,68,68,.45); } .fx-tiles .st-loss b { color: var(--red); }
+.fx-verdict { margin: 0; padding: 12px 14px; border-radius: 12px; font-size: .92rem; line-height: 1.55; background: var(--bg-card-2); border: 1px solid var(--border-2); }
+.fx-verdict.up { background: var(--green-bg); border-color: rgba(34,197,94,.4); } .fx-verdict.down { background: rgba(239,68,68,.08); border-color: rgba(239,68,68,.4); }
+.fx-ladder { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.fx-ladder li { display: flex; gap: 8px; padding: 6px 12px; border-radius: 100px; border: 1px solid var(--border-2); font-size: .82rem; }
+.fx-ladder li.up span { color: var(--green); } .fx-ladder li.down span { color: var(--red); }
+.fx-note { font-size: .74rem; color: var(--text-dim); margin: 0; line-height: 1.6; }
+.fx-board-wrap { margin-top: 14px; } .fx-board-wrap summary { cursor: pointer; color: var(--gold); font-weight: 600; padding: 8px 0; }
+.fx-board-wrap .fx-note { margin-top: 8px; }
+.fx-why a { color: var(--gold); }
+@media (max-width: 720px) { .fx-form { grid-template-columns: 1fr; } .fx-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
