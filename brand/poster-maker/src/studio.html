@@ -165,7 +165,7 @@ textarea{min-height:64px;resize:vertical}
       <div class="f"><label>Backdrop photo</label>
         <div class="tpls" id="photoLib" style="grid-template-columns:repeat(auto-fill,minmax(72px,1fr))"></div>
         <div class="row"><button class="btn" type="button" id="bgBtn">Upload a photo</button><button class="x" type="button" id="bgClear" hidden>No photo</button></div>
-        <div class="row" role="radiogroup" aria-label="Photo colour"><button class="chipbtn" type="button" data-grade="zft">ZFT grade<small>dark + theme colour + grain</small></button><button class="chipbtn" type="button" data-grade="natural">Natural<small>original colours</small></button></div>
+        <div class="row" role="radiogroup" aria-label="Photo colour"><button class="chipbtn" type="button" data-grade="zft">Dark theme<small>moody, tinted to the colour theme</small></button><button class="chipbtn" type="button" data-grade="natural">Original theme<small>the photo's own colours</small></button></div>
         <input type="file" id="bgFile" accept="image/*" hidden>
       </div>
     </div>
@@ -252,7 +252,7 @@ function buildTemplates(){
   for (const t of TP.TEMPLATES){
     const w = document.createElement("div"); w.className="tw"; w.dataset.wrap=t.id;
     const b = document.createElement("button"); b.className="tpl"; b.type="button"; b.dataset.id=t.id; b.setAttribute("aria-pressed","false");
-    const c = document.createElement("canvas"); c.width = 1080; c.height = 1080; c.setAttribute("aria-hidden","true");
+    const c = document.createElement("canvas"); c.width = 324; c.height = 324; c.setAttribute("aria-hidden","true");
     b.append(c); const n=document.createElement("span"); n.textContent=t.name; const sm=document.createElement("small"); sm.textContent=t.blurb; b.append(n,sm);
     b.addEventListener("click",()=>selectTemplate(t.id));
     const x = document.createElement("button"); x.type="button"; x.className="tplx"; x.textContent="×"; x.setAttribute("aria-label","Remove "+t.name);
@@ -260,7 +260,7 @@ function buildTemplates(){
     w.append(b, x);
     (t.fav ? $("favs") : $("bases")).append(w);
   }
-  $("moreBtn").addEventListener("click", ()=>{ showAll=!showAll; store("showAll", showAll); layoutTemplates(); });
+  $("moreBtn").addEventListener("click", ()=>{ showAll=!showAll; store("showAll", showAll); layoutTemplates(); drawThumbs(); });
 }
 function askRemove(w, t, trigger){
   if (w.querySelector(".confirm")) return;
@@ -307,12 +307,21 @@ function layoutTemplates(){
     for (const t of hid){ const r=document.createElement("button"); r.type="button"; r.textContent="↺ "+t.name; r.setAttribute("aria-label","Restore "+t.name);
       r.addEventListener("click", async ()=>{ r.disabled = true; if(await saveHidden(t.id,false)){ layoutTemplates(); const tb=document.querySelector(`[data-wrap="${t.id}"] .tpl`); if(tb && !tb.closest("[hidden]")) tb.focus(); else $("moreBtn").focus(); } else r.disabled=false; }); rem.append(r); } }
 }
+/* thumbnails: small (324 px), drawn a few per frame so clicks stay instant; collapsed ones wait until shown */
+let thumbGen = 0;
+function thumbKey(){ return state.style+"|"+state.theme+"|"+state.grade; }
+function drawThumb(b){
+  const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
+  const dp = defaultPhoto(t.id); if (dp) { f.bgPhoto = TP.IMG["ph_"+dp]; f.grade = state.grade; }
+  TP.render(b.querySelector("canvas"), t, f, cfg(), "square", {scale: 0.3});
+  b.dataset.key = thumbKey();
+}
 function drawThumbs(){
-  document.querySelectorAll(".tpl[data-id]").forEach(b=>{
-    const t = byId[b.dataset.id]; const f = freshFields(t.id); if (f.partner) f.partnerImg = TP.IMG["p_"+f.partner];
-    const dp = defaultPhoto(t.id); if (dp) { f.bgPhoto = TP.IMG["ph_"+dp]; f.grade = state.grade; }
-    TP.render(b.querySelector("canvas"), t, f, cfg(), "square");
-  });
+  const gen = ++thumbGen, key = thumbKey();
+  const list = [...document.querySelectorAll(".tpl[data-id]")].filter(b=>!b.closest("[hidden]") && b.dataset.key !== key);
+  let i = 0;
+  const step = ()=>{ if (gen !== thumbGen) return; const t0 = performance.now(); while (i < list.length && performance.now() - t0 < 10) drawThumb(list[i++]); if (i < list.length) requestAnimationFrame(step); };
+  requestAnimationFrame(step);
 }
 function selectTemplate(id){
   saveDraft();
@@ -369,14 +378,14 @@ function photosFor(id){ const own = PHOTOS.filter(k=>k.startsWith(id+"-")); cons
 function buildPhotoLib(){
   const lib=$("photoLib"); lib.textContent="";
   const list = photosFor(state.tpl);
-  if (!list.length){ const p=document.createElement("p"); p.className="note"; p.style.gridColumn="1/-1"; p.textContent="The ZFT photo library is on its way. Until then, upload your own photo: the ZFT grade turns it into the house look."; lib.append(p); }
+  if (!list.length){ const p=document.createElement("p"); p.className="note"; p.style.gridColumn="1/-1"; p.textContent="The ZFT photo library is on its way. Until then, upload your own photo: Dark theme turns it into the house look."; lib.append(p); }
   for (const k of list){ const b=document.createElement("button"); b.type="button"; b.className="tpl"; b.setAttribute("aria-pressed", String(state.photoKey===k && !state.bgPhoto)); b.setAttribute("aria-label","Photo "+k);
     const im=document.createElement("img"); im.src=ASSETS["ph_"+k]; im.alt=""; im.style.cssText="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:7px;display:block";
     b.append(im); b.addEventListener("click",()=>{ state.photoKey = state.photoKey===k ? "" : k; state.f.photoKey = state.photoKey; state.bgPhoto=null; saveDraft(); buildPhotoLib(); markGrade(); draw(); }); lib.append(b); }
   $("bgClear").hidden = !(state.bgPhoto || state.photoKey);
 }
 function markGrade(){ document.querySelectorAll("[data-grade]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.grade===state.grade))); }
-document.querySelectorAll("[data-grade]").forEach(b=>b.addEventListener("click",()=>{ state.grade=b.dataset.grade; store("grade",state.grade); markGrade(); draw(); }));
+document.querySelectorAll("[data-grade]").forEach(b=>b.addEventListener("click",()=>{ state.grade=b.dataset.grade; store("grade",state.grade); markGrade(); draw(); drawThumbs(); }));
 
 /* ---------- speakers ---------- */
 let spkTarget = 0;
@@ -411,12 +420,13 @@ function buildSizes(){
 }
 function markSize(){ document.querySelectorAll("[data-size]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.size===state.size))); const s=TP.SIZES[state.size]; $("sizeNote").textContent = `${s.w} × ${s.h} px`; }
 let raf=0, queued=false, playStart=0;
-function draw(){ if ($("play").checked) return; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size); }
+function previewScale(anim){ const m=$("main"), W=TP.SIZES[state.size].w, H=TP.SIZES[state.size].h; const box=m.parentElement.clientWidth || 560; const css=Math.min(box-28, (Math.min(window.innerHeight*0.7,640))*W/H); return Math.max(0.3, Math.min(1, css*(window.devicePixelRatio||1)/W * (anim?0.85:1))); }
+function draw(){ if ($("play").checked) return; TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {scale: previewScale(false)}); }
 function queueDraw(){ if(queued) return; queued=true; requestAnimationFrame(()=>{ queued=false; draw(); saveDraft(); }); }
 function loop(now){
   if (!$("play").checked) { raf=0; draw(); return; }
   const dur = +$("gifDur").value; const t = ((now - playStart)/1000) % dur;
-  TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {t, dur});
+  TP.render($("main"), byId[state.tpl], currentFields(), cfg(), state.size, {t, dur, scale: previewScale(true)});
   raf = requestAnimationFrame(loop);
 }
 $("play").addEventListener("change", ()=>{ if ($("play").checked){ playStart=performance.now(); if(!raf) raf=requestAnimationFrame(loop); } else draw(); });
@@ -474,7 +484,7 @@ const TOUR = [
   { sel: "#styles", ph: "#styles .chipbtn", title: "3 · Pick a look", text: "Choose a style, then a colour theme below it. The preview updates straight away." },
   { sel: "#title", up: ".card", ph: "#title", phUp: ".f", title: "4 · Fill in the details", text: "Title, topic, date and time (Philippine time), where it happens and the Discord channel." },
   { sel: "#partner", up: ".f", title: "5 · Partner logo", text: "For a collab, pick the partner here. Only official logos from our library are listed." },
-  { sel: "#photoLib", up: ".f", ph: "#bgBtn", title: "6 · Backdrop photo", text: "Pick a photo or upload your own. The ZFT grade makes any photo match the brand." },
+  { sel: "#photoLib", up: ".f", ph: "#bgBtn", title: "6 · Backdrop photo", text: "Pick a photo or upload your own. Dark theme makes any photo match the brand." },
   { sel: "#addSpk", up: ".card", ph: "#addSpk", title: "7 · Hosts and speakers", text: "Add up to 3. Tap the circle to upload a head-and-shoulders photo." },
   { sel: "#sizes", title: "8 · Choose the size", text: "Square or 4:5 for FB/IG posts, 9:16 for stories, and a cover for Discord events." },
   { sel: "#main", up: ".canvaswrap", title: "9 · Check the preview", text: "This is exactly what you'll download. Tick \"Play animation\" to see it move." },
@@ -577,6 +587,7 @@ function maybeAutoTour(){
   if (!done) setTimeout(startTour, 600);
 }
 $("tourBtn").addEventListener("click", startTour);
+let rz=0; window.addEventListener("resize", ()=>{ clearTimeout(rz); rz=setTimeout(draw, 150); });
 
 /* ---------- boot ---------- */
 (async()=>{

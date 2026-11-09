@@ -71,6 +71,7 @@
     return { px: minPx, lines: lines.map((l) => ellipsize(ctx, l, maxW)) };
   }
   function avgColor(ctx, x, y, w, h) {
+    const k = ctx.getTransform().a || 1; x *= k; y *= k; w *= k; h *= k;
     try { const d = ctx.getImageData(Math.max(0, x | 0), Math.max(0, y | 0), Math.max(1, w | 0), Math.max(1, h | 0)).data; let r = 0, g = 0, b = 0, n = 0; for (let i = 0; i < d.length; i += 16) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; } return [r / n, g / n, b / n]; } catch (e) { return [20, 20, 24]; }
   }
   function coverImg(ctx, img, x, y, w, h, fx, fy, zoom) {
@@ -400,7 +401,7 @@
     const x0 = align === "left" ? x : x - w / 2;
     const [r, g, b] = avgColor(ctx, x0, y, w, h), L = lum(r, g, b);
     ctx.save(); rr(ctx, x0, y, w, h, h / 2); ctx.clip();
-    ctx.filter = `blur(${Math.round(px * 0.8)}px)`; ctx.drawImage(canvas, x0 - 30, y - 30, w + 60, h + 60, x0 - 30, y - 30, w + 60, h + 60); ctx.filter = "none";
+    const sk = ctx.getTransform().a || 1; ctx.filter = `blur(${Math.max(1, Math.round(px * 0.8 * sk))}px)`; ctx.drawImage(canvas, (x0 - 30) * sk, (y - 30) * sk, (w + 60) * sk, (h + 60) * sk, x0 - 30, y - 30, w + 60, h + 60); ctx.filter = "none";
     const k = L > 0.55 ? -0.25 : 0.35, mix = (c) => Math.round(k > 0 ? c + (255 - c) * k : c * (1 + k));
     ctx.fillStyle = `rgba(${mix(r)},${mix(g)},${mix(b)},0.42)`; ctx.fillRect(x0, y, w, h); ctx.restore();
     rr(ctx, x0, y, w, h, h / 2); ctx.strokeStyle = L > 0.55 ? "rgba(0,0,0,0.18)" : "rgba(255,255,255,0.28)"; ctx.lineWidth = 1.5; ctx.stroke();
@@ -548,9 +549,10 @@
     opts = opts || {};
     const cfg = normCfg(cfgIn);
     const S = SIZES[sizeKey] || SIZES.square, W = S.w, H = S.h;
-    if (canvas.width !== W || canvas.height !== H) { canvas.width = W; canvas.height = H; }
+    const K = opts.scale || 1, CW = Math.round(W * K), CH = Math.round(H * K);
+    if (canvas.width !== CW || canvas.height !== CH) { canvas.width = CW; canvas.height = CH; }
     const ctx = canvas.getContext("2d");
-    ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.filter = "none"; ctx.shadowBlur = 0;
+    ctx.setTransform(K, 0, 0, K, 0, 0); ctx.globalAlpha = 1; ctx.filter = "none"; ctx.shadowBlur = 0;
     const wide = sizeKey === "discord", tall = sizeKey === "story";
     const s = wide ? H / 560 : Math.min(W, H) / 1080;
     const P = palette(tpl, cfg);
