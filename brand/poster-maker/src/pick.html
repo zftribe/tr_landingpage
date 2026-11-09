@@ -1,0 +1,200 @@
+<title>Poster Maker Look Pick</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>
+/* Layout: a before/after grid (rows = today, A, B, C; columns = the five recurring sessions), then a web + phone preview of the tool and a pick form. */
+:root{
+  --bg:#f6f5f1; --panel:#ffffff; --ink:#15151b; --muted:#5d5d6b; --line:#e3e1da; --gold:#c98a00; --gold-soft:#fff3d1; --pick:#15151b;
+  --display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif; --body:"DM Sans","Segoe UI",Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#0b0b0f;--panel:#15151d;--ink:#f5f5f7;--muted:#9a9aab;--line:#272733;--gold:#FFB400;--gold-soft:#2a2108;--pick:#FFB400;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b0b0f;--panel:#15151d;--ink:#f5f5f7;--muted:#9a9aab;--line:#272733;--gold:#FFB400;--gold-soft:#2a2108;--pick:#FFB400;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:36px}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(26px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+h2{font-family:var(--display);font-weight:800;font-size:22px;margin:0 0 6px}
+p{margin:0}
+.lede{color:var(--muted);max-width:68ch;margin-top:8px}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+table.grid{border-collapse:collapse;min-width:980px;width:100%}
+.grid th,.grid td{padding:12px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+.grid thead th{font-family:var(--display);font-size:14px;font-weight:700;background:var(--panel);position:sticky;top:0}
+.grid tr:last-child td,.grid tr:last-child th{border-bottom:0}
+.rowhead{width:150px;font-size:13px}
+.rowhead b{display:block;font-family:var(--display);font-size:16px}
+.rowhead span{color:var(--muted)}
+.rec{display:inline-block;margin-top:6px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#111;border-radius:99px;padding:2px 8px}
+.cell img,.cell canvas{width:100%;max-width:100%;display:block;border-radius:8px;background:#000}
+.cell canvas{aspect-ratio:1/1}
+.cell .cap{font-size:12px;color:var(--muted);margin-top:6px}
+tr.today td{background:color-mix(in srgb,var(--panel) 85%,var(--line))}
+tr.sel th,tr.sel td{background:var(--gold-soft)}
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.note b{font-family:var(--display)}
+.devices{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+@media (max-width:820px){.devices{grid-template-columns:minmax(0,1fr)}}
+.desk{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.desk .bar{display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.desk .bar i{width:10px;height:10px;border-radius:50%;background:var(--line)}
+.desk .body{display:grid;grid-template-columns:200px minmax(0,1fr) 190px;gap:14px;padding:14px}
+@media (max-width:640px){.desk .body{grid-template-columns:minmax(0,1fr)}}
+.mini{font-size:12px;color:var(--muted)}
+.mini .f{border:1px solid var(--line);border-radius:8px;padding:6px 8px;margin-top:6px;color:var(--ink);background:var(--bg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .t{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.mini .t span{border:1px solid var(--line);border-radius:99px;padding:2px 8px}
+.mini .t span.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn{display:inline-block;margin-top:10px;background:var(--gold);color:#111;font-weight:800;border-radius:10px;padding:8px 12px;font-size:13px}
+.phone{width:100%;max-width:300px;justify-self:center;border:10px solid #111;border-radius:36px;background:var(--panel);overflow:hidden}
+.phone .in{padding:14px 12px 18px;display:grid;gap:10px}
+.phone canvas,.desk canvas{width:100%;display:block;border-radius:8px;aspect-ratio:1/1}
+form.pick{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.opts label{border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;display:grid;gap:2px}
+.opts label:has(input:checked){border-color:var(--pick);background:var(--gold-soft)}
+.opts input{accent-color:var(--gold)}
+.opts b{font-family:var(--display)}
+.opts small{color:var(--muted)}
+textarea{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;background:var(--bg);color:var(--ink);box-sizing:border-box}
+button{font:inherit;font-weight:800;background:var(--ink);color:var(--bg);border:0;border-radius:10px;padding:12px 18px;cursor:pointer;justify-self:start}
+button:focus-visible,.opts label:focus-within{outline:3px solid var(--gold);outline-offset:2px}
+.status{font-size:13px;color:var(--muted)}
+.tip{font-size:12px;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Trading Republic · Poster Maker</div>
+    <h1>Pick the look for the new event posters</h1>
+    <p class="lede">The top row shows today's posters from #upcoming-events. Below are three ways the new templates could look. Each one is drawn live by the poster engine with sample details. Pick one at the bottom and press Submit.</p>
+  </header>
+
+  <section>
+    <div class="scroll"><table class="grid" id="grid"><thead><tr><th class="rowhead"></th></tr></thead><tbody></tbody></table></div>
+    <p class="tip" style="margin-top:8px">Swipe the table sideways on a phone. Sample names and dates are examples only.</p>
+  </section>
+
+  <section class="notes">
+    <div class="note"><b>Before: what posters do today</b><p>Each show already has its own look, made by hand. Most posters leave out the date and time (they're only in the Discord message), the logo spot moves around, and sizes vary (5:4, square, 16:9).</p></div>
+    <div class="note"><b>After: same in every template</b><p>Date and time in PH time, host photo and name, ZFT + TR marks top right, a partner slot, and the adaptive footer pill. Text stays at least 16 px inside every box. One click exports square, 4:5, story or a Discord cover.</p></div>
+    <div class="note"><b>Also in the tool</b><p>12 base templates for anything new: announcement, guest speaker, workshop, giveaway, partner collab, milestone, holiday, urgent notice, trading campaign, winners, schedule change and coming soon.</p></div>
+  </section>
+
+  <section>
+    <h2>How staff will use it: web and phone</h2>
+    <p class="lede" style="margin-bottom:14px">Pick a template, fill the fields, watch the preview, download the PNG. Shown with the look you select below.</p>
+    <div class="devices">
+      <div class="desk" aria-label="Web version">
+        <div class="bar"><i></i><i></i><i></i></div>
+        <div class="body">
+          <div class="mini"><b style="color:var(--ink)">Favourites</b>
+            <div class="t"><span class="on">The Hunt</span><span>The Council</span><span>Monthly Meetup</span><span>Charts Decoded</span><span>MMU</span></div>
+            <b style="color:var(--ink);display:block;margin-top:12px">Base templates</b>
+            <div class="t"><span>Announcement</span><span>Guest speaker</span><span>Giveaway</span><span>+9</span></div>
+          </div>
+          <canvas id="deskCanvas" width="1080" height="1080" aria-label="Poster preview"></canvas>
+          <div class="mini"><b style="color:var(--ink)">Details</b>
+            <div class="f">The Hunt</div><div class="f">Tue · Nov 10 · 5 PM PH time</div><div class="f">Coach Sean · photo.jpg</div><div class="f">#upcoming-events</div><div class="f">Partner: none</div>
+            <div class="t"><span class="on">1:1</span><span>4:5</span><span>9:16</span><span>Discord</span></div>
+            <span class="btn">Download PNG</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone" aria-label="Phone version">
+        <div class="in">
+          <div class="mini"><div class="t"><span class="on">The Hunt</span><span>Council</span><span>Meetup</span></div></div>
+          <canvas id="phoneCanvas" width="1080" height="1080" aria-label="Poster preview on phone"></canvas>
+          <div class="mini"><div class="f">Title: The Hunt</div><div class="f">Date: Nov 10 · 5:00 PM</div><div class="f">Host: Coach Sean</div><span class="btn">Download PNG</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <form class="pick" id="pick">
+    <h2>Your pick</h2>
+    <div class="opts" role="radiogroup" aria-label="Poster look">
+      <label><span><input type="radio" name="look" id="look-A" value="A" checked> <b>A · Series looks</b> <span class="rec">Recommended</span></span><small>Each show keeps the identity members already know (Hunt monochrome, Council dark hall, Meetup gold brush, Charts Decoded green, MMU orange glow), tidied into one system.</small></label>
+      <label><span><input type="radio" name="look" id="look-B" value="B"> <b>B · House gold</b></span><small>One Trading Republic look on everything: black, gold, Plus Jakarta Sans. The most consistent, but every show looks alike.</small></label>
+      <label><span><input type="radio" name="look" id="look-C" value="C"> <b>C · Bold blocks</b></span><small>One strong colour per show with a big host photo. Loud and easy to spot in a feed, but further from today's style.</small></label>
+    </div>
+    <label for="note" style="font-weight:700">Notes (optional)</label>
+    <textarea id="note" placeholder="Anything to change, like 'A, but use the gold brush on MMU too'"></textarea>
+    <p class="tip">To dictate, tap the box and use your phone keyboard's mic.</p>
+    <button type="submit" id="submit">Submit pick</button>
+    <p class="status" id="status" role="status"></p>
+  </form>
+</div>
+
+<script>/*POSTERS_JS*/</script>
+<script>
+const ASSETS = /*ASSETS_JSON*/;
+const BEFORE = /*BEFORE_JSON*/;
+const FAV = ["hunt","council","meetup","charts","mmu"];
+const LOOKS = [["A","Series looks",true],["B","House gold",false],["C","Bold blocks",false]];
+const TP = window.TRPoster;
+const tplById = Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+
+function buildGrid(){
+  const head = document.querySelector("#grid thead tr");
+  for (const id of FAV){ const th=document.createElement("th"); th.textContent=tplById[id].name; head.appendChild(th); }
+  const body = document.querySelector("#grid tbody");
+  const tr0 = document.createElement("tr"); tr0.className="today";
+  tr0.innerHTML = '<th class="rowhead"><b>Today</b><span>On Discord now</span></th>';
+  for (const id of FAV){ const td=document.createElement("td"); td.className="cell"; td.innerHTML=`<img alt="Today's ${tplById[id].name} poster" src="${BEFORE[id]}"><div class="cap">${id==="mmu"?"16:9 photo":"5:4 or square"}</div>`; tr0.appendChild(td); }
+  body.appendChild(tr0);
+  for (const [k,name,rec] of LOOKS){
+    const tr=document.createElement("tr"); tr.dataset.look=k;
+    tr.innerHTML = `<th class="rowhead"><b>${k} · ${name}</b><span>New template</span>${rec?'<br><span class="rec">Recommended</span>':''}</th>`;
+    for (const id of FAV){ const td=document.createElement("td"); td.className="cell"; const c=document.createElement("canvas"); c.dataset.tpl=id; c.dataset.look=k; c.setAttribute("aria-label",`${tplById[id].name}, look ${k}`); td.appendChild(c); tr.appendChild(td); }
+    body.appendChild(tr);
+  }
+}
+function fieldsFor(id){
+  const f = Object.assign({}, tplById[id].fields);
+  if (f.partner && TP.IMG["p_"+f.partner]) f.partnerImg = TP.IMG["p_"+f.partner];
+  return f;
+}
+function drawAll(){
+  document.querySelectorAll("canvas[data-tpl]").forEach(c=>TP.render(c, tplById[c.dataset.tpl], fieldsFor(c.dataset.tpl), c.dataset.look, "square"));
+  drawDevices();
+}
+function currentLook(){ return document.querySelector('input[name="look"]:checked').value; }
+function drawDevices(){
+  const k=currentLook();
+  TP.render(document.getElementById("deskCanvas"), tplById.hunt, fieldsFor("hunt"), k, "square");
+  TP.render(document.getElementById("phoneCanvas"), tplById.hunt, fieldsFor("hunt"), k, "square");
+  document.querySelectorAll("#grid tbody tr[data-look]").forEach(tr=>tr.classList.toggle("sel", tr.dataset.look===k));
+}
+document.querySelectorAll('input[name="look"]').forEach(r=>r.addEventListener("change", drawDevices));
+
+let db=null, user=null;
+(async()=>{
+  buildGrid();
+  await TP.loadFonts();
+  await TP.loadAssets(ASSETS);
+  drawAll();
+  if (window.claude && window.claude.use){
+    try{ db = await window.claude.use("db"); user = await window.claude.use("user"); }catch(e){}
+    if (db){
+      try{
+        const prev = await db.doc("picks/latest").get();
+        if (prev && prev.data){ const d=prev.data; const el=document.getElementById("look-"+d.look); if(el){el.checked=true; drawDevices();} if(d.note) document.getElementById("note").value=d.note; document.getElementById("status").textContent="Pick on file: "+d.look+" (sent "+new Date(d.at).toLocaleString()+"). You can change it and submit again."; }
+      }catch(e){}
+    }
+  }
+})();
+document.getElementById("pick").addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const st=document.getElementById("status");
+  const data={look:currentLook(), note:document.getElementById("note").value.trim(), at:new Date().toISOString()};
+  if(!db){ st.textContent="Saving isn't available in this view. Tell Claude in chat: look "+data.look+(data.note?" ("+data.note+")":"")+"."; return; }
+  st.textContent="Saving…";
+  try{
+    await db.doc("picks/latest").set(data);
+    await db.collection("picks/history/items").doc(String(Date.now())).set(data);
+    st.textContent="Saved: look "+data.look+". Claude will build the Poster Maker in this look.";
+  }catch(err){ st.textContent="Couldn't save ("+(err&&err.code||"error")+"). Tell Claude in chat: look "+data.look+"."; }
+});
+</script>

@@ -1,0 +1,369 @@
+<title>Poster Maker: Colour, Fonts, Zoom</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=Bebas+Neue&family=Bricolage+Grotesque:wght@800&family=DM+Sans:wght@400;500;600;700;800&family=IBM+Plex+Sans:wght@500;700&family=Inter:wght@500;700;800&family=JetBrains+Mono:wght@700&family=Manrope:wght@500;700;800&family=Montserrat:wght@900&family=Oswald:wght@700&family=Permanent+Marker&family=Playfair+Display:wght@900&family=Plus+Jakarta+Sans:wght@500;700;800&family=Poppins:wght@800&family=Russo+One&family=Space+Grotesk:wght@700&family=Unbounded:wght@800&family=Work+Sans:wght@500;700&display=swap">
+<style>
+/* Layout: a before/after review page for three Poster Maker upgrades George asked for on 10 Nov (custom colour, fonts, profile-picture zoom).
+   Top: Web/Phone switch. Each upgrade = a card: "Today" strip, then the working "After" control beside a live poster drawn by the real engine.
+   Bottom: picks with one question per upgrade and Submit. Black + gold, matched to the tool. */
+:root{--bg:#0b0b0f;--panel:#13131a;--panel2:#1a1a23;--line:#262632;--ink:#f5f5f7;--muted:#9a9aab;--gold:#FFB400;--gold-soft:rgba(255,180,0,.12);--ok:#3ddc84;--bad:#ffcf6b;
+  --display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif;--body:"DM Sans","Segoe UI",Arial,sans-serif;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1{font:800 clamp(24px,3.6vw,34px)/1.1 var(--display);margin:0} h1 b{color:var(--gold)}
+h2{font:800 18px var(--display);margin:0} h3{font:800 14px var(--display);margin:0}
+p{margin:0} .muted{color:var(--muted)} .lede{color:var(--muted);max-width:76ch}
+.kick{color:var(--gold);font-weight:800;letter-spacing:.12em;font-size:12px;text-transform:uppercase}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:3px;background:var(--panel2)}
+.seg button{all:unset;cursor:pointer;padding:6px 14px;border-radius:99px;font-weight:800;font-size:13px}
+.seg button[aria-pressed="true"]{background:var(--gold);color:#111}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:14px}
+.today{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--muted)}
+.today b{color:var(--ink)}
+.tag{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:99px;padding:2px 8px}
+.tag.before{background:#2a2a35;color:#cfcfda} .tag.after{background:var(--gold);color:#111}
+.demo{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,360px);gap:18px;align-items:start}
+.phone .demo{grid-template-columns:minmax(0,1fr)}
+.shell{transition:max-width .2s}
+.phone .shell{max-width:375px;margin:0 auto;border:10px solid #000;border-radius:34px;padding:12px;background:#0e0e14}
+@media (max-width:820px){.demo{grid-template-columns:minmax(0,1fr)}}
+.poster{background:repeating-conic-gradient(#15151c 0 25%,#1b1b23 0 50%) 0 0/18px 18px;border:1px solid var(--line);border-radius:12px;padding:10px;display:grid;gap:6px}
+.poster canvas{width:100%;border-radius:6px;display:block}
+.poster small{color:var(--muted);font-size:11px}
+.chip{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:6px 11px;font-weight:700;font-size:12.5px;background:var(--panel2)}
+.chip[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
+.chip i{width:18px;height:18px;border-radius:50%;display:block;border:1px solid rgba(255,255,255,.25)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.btn{all:unset;cursor:pointer;font-weight:800;border-radius:10px;padding:9px 13px;background:var(--panel2);border:1px solid var(--line);text-align:center}
+.btn.gold{background:var(--gold);color:#111;border-color:var(--gold)}
+input[type=text],textarea,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:8px 10px;min-width:0;box-sizing:border-box}
+input[type=range]{accent-color:var(--gold);width:100%}
+/* colour picker */
+.picker{display:grid;gap:10px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px;max-width:340px}
+.sv{position:relative;height:170px;border-radius:10px;touch-action:none;cursor:crosshair;background-image:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,transparent)}
+.sv i{position:absolute;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 2px rgba(0,0,0,.5);pointer-events:none}
+.hue{-webkit-appearance:none;appearance:none;height:14px;border-radius:99px;background:linear-gradient(to right,#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);outline-offset:3px}
+.hue::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:#fff;border:2px solid #111;box-shadow:0 0 0 1px #fff}
+.hue::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #111}
+.hexrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;align-items:center}
+.swatch{width:38px;height:38px;border-radius:9px;border:1px solid rgba(255,255,255,.2)}
+.hexrow input{font:700 14px "JetBrains Mono",monospace;text-transform:uppercase;width:100%}
+.contrast{font-size:12px} .contrast .ok{color:var(--ok)} .contrast .bad{color:var(--bad)}
+/* fonts */
+.fonts{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:300px;overflow:auto;padding-right:4px}
+.fontbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--panel2);display:grid;gap:2px}
+.fontbtn span{font-size:22px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fontbtn small{font:600 11px var(--body);color:var(--muted)}
+.fontbtn[aria-pressed="true"]{border-color:var(--gold);background:var(--gold-soft)}
+.addfont{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px}
+/* cropper */
+.crop{position:relative;width:min(100%,320px);aspect-ratio:1/1;border-radius:12px;overflow:hidden;touch-action:none;cursor:grab;background:#000;border:2px solid var(--gold)}
+.crop:active{cursor:grabbing}
+.crop canvas{width:100%;height:100%;display:block}
+.crop .grid{position:absolute;inset:0;pointer-events:none;background:linear-gradient(to right,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%),linear-gradient(to bottom,transparent 33.2%,rgba(255,255,255,.35) 33.3%,transparent 33.5%,transparent 66.5%,rgba(255,255,255,.35) 66.6%,transparent 66.8%)}
+.crop .hint{position:absolute;left:8px;bottom:8px;font-size:11px;font-weight:700;background:rgba(0,0,0,.6);border-radius:99px;padding:3px 9px}
+.zoomrow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;max-width:320px}
+/* picks */
+form.pick{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:16px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px} legend{font:800 15px var(--display);margin-bottom:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.opts label{border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.opts label:has(input:checked){border-color:var(--gold);background:var(--gold-soft)}
+.opts label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.opts b{font-family:var(--display)} .opts small{color:var(--muted)} .opts input{accent-color:var(--gold)}
+.rec{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#111;border-radius:99px;padding:1px 7px;margin-left:4px}
+textarea{width:100%;min-height:64px}
+.status{font-size:13px;color:var(--muted)}
+button:focus-visible,.chip:focus-visible,.fontbtn:focus-visible,.crop:focus-visible,.sv:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+
+<main class="wrap" id="top">
+  <header style="display:grid;gap:8px"><p class="kick">TR Poster Maker · your 10 Nov requests</p>
+    <h1>Exact colours, any font, <b>zoom like a profile picture</b></h1>
+    <p class="lede">Each card shows the tool <b>today</b>, then the new control working for real beside a live poster. Try them. Switch to <b>Phone</b> to see the phone version. Your picks are at the bottom.</p>
+    <div class="seg" role="group" aria-label="Show as"><button type="button" data-view="web" aria-pressed="true">Web</button><button type="button" data-view="phone" aria-pressed="false">Phone</button></div>
+  </header>
+
+  <section class="card" aria-labelledby="h1c">
+    <h2 id="h1c">1 · Colour theme: pick the exact colour</h2>
+    <div class="today"><span class="tag before">Today</span> Only the 11 preset themes: <span class="row" id="todaySw"></span></div>
+    <div class="shell"><div class="demo">
+      <div style="display:grid;gap:10px">
+        <span class="tag after" style="justify-self:start">After</span>
+        <div class="row" id="themeChips"></div>
+        <div class="picker" aria-label="Custom colour">
+          <div class="sv" id="sv" tabindex="0" role="slider" aria-label="Saturation and brightness. Arrow keys adjust."><i id="svDot"></i></div>
+          <input type="range" class="hue" id="hue" min="0" max="360" value="205" aria-label="Hue">
+          <div class="hexrow"><div class="swatch" id="sw"></div><input type="text" id="hex" maxlength="7" aria-label="HEX colour" spellcheck="false"><button class="btn" type="button" id="copyHex" aria-label="Copy HEX">Copy</button></div>
+          <p class="contrast" id="contrast" aria-live="polite"></p>
+          <button class="btn gold" type="button" id="saveSw">Save as my swatch</button>
+        </div>
+        <p class="muted" style="font-size:12px">Saved swatches sit next to the preset themes for you. Light colours are fine: the tool keeps a dark background and picks black or white text on solid blocks, and shows the contrast.</p>
+      </div>
+      <div class="poster"><canvas id="pc1"></canvas><div class="row"><button class="chip" type="button" data-p1="signature" aria-pressed="true">Signature</button><button class="chip" type="button" data-p1="bold" aria-pressed="false">Bold blocks</button></div></div>
+    </div></div>
+  </section>
+
+  <section class="card" aria-labelledby="h2c">
+    <h2 id="h2c">2 · Fonts: choose, or add your own</h2>
+    <div class="today"><span class="tag before">Today</span> Two choices only: <b>ZFT Slant</b> or <b>each show's own font</b>.</div>
+    <div class="shell"><div class="demo">
+      <div style="display:grid;gap:10px">
+        <span class="tag after" style="justify-self:start">After</span>
+        <div class="row" role="group" aria-label="Font for"><button class="chip" type="button" data-ff="title" aria-pressed="true">Headline</button><button class="chip" type="button" data-ff="body" aria-pressed="false">Body text</button></div>
+        <div class="fonts" id="fonts" role="group" aria-label="Fonts"></div>
+        <div class="addfont">
+          <h3>Add a font</h3>
+          <div class="row"><input type="text" id="gfName" placeholder="Any Google Font name, e.g. Righteous" style="flex:1;min-width:180px"><button class="btn" type="button" id="gfAdd">Add</button></div>
+          <div class="row"><button class="btn" type="button" id="upBtn">Upload .ttf / .otf / .woff2</button><input type="file" id="upFile" accept=".ttf,.otf,.woff,.woff2" hidden></div>
+          <p class="muted" id="fontNote" style="font-size:12px" aria-live="polite">Only free Google Fonts or fonts you own. Uploaded fonts stay in this browser.</p>
+        </div>
+      </div>
+      <div class="poster"><canvas id="pc2"></canvas><small id="fontInfo"></small></div>
+    </div></div>
+  </section>
+
+  <section class="card" aria-labelledby="h3c">
+    <h2 id="h3c">3 · Photo: zoom and move it inside the frame</h2>
+    <div class="today"><span class="tag before">Today</span> A zoom slider up to 160% in Fine-tune, plus a small gold dot to set the focus.</div>
+    <div class="shell"><div class="demo">
+      <div style="display:grid;gap:10px">
+        <span class="tag after" style="justify-self:start">After</span>
+        <div class="crop" id="crop" tabindex="0" aria-label="Photo frame. Drag to move, scroll or pinch to zoom; arrow keys move, + and − zoom."><canvas id="cropC" width="640" height="640"></canvas><div class="grid"></div><span class="hint">Drag · scroll or pinch to zoom</span></div>
+        <div class="zoomrow"><span aria-hidden="true">−</span><input type="range" id="zr" min="100" max="300" step="1" value="100" aria-label="Photo zoom"><span aria-hidden="true">+</span></div>
+        <div class="row"><button class="btn" type="button" id="cropReset">Reset</button><span class="muted" id="zv" style="font-size:12px"></span></div>
+        <p class="muted" style="font-size:12px">Works like setting a profile picture. It lives in the Photo stage, so you see the photo by itself while you frame it, and the poster beside it updates as you go. Zoom goes up to 300%.</p>
+      </div>
+      <div class="poster"><canvas id="pc3"></canvas><small>The frame above is this poster's photo area.</small></div>
+    </div></div>
+  </section>
+
+  <form class="pick" id="pick">
+    <h2>Your picks</h2>
+    <fieldset><legend>1. Custom colour changes…</legend><div class="opts">
+      <label><span><input type="radio" name="colour" value="A" checked> <b>A · The accent</b><span class="rec">Recommended</span></span><small>Your colour becomes the accent and the Bold-blocks colour; the background stays dark in the same hue, so text stays readable.</small></label>
+      <label><span><input type="radio" name="colour" value="B"> <b>B · Accent and background</b></span><small>Two pickers: one for the background, one for the accent. More freedom, more risk of hard-to-read posters (the contrast warning still shows).</small></label>
+    </div></fieldset>
+    <fieldset><legend>2. Fonts you upload are kept…</legend><div class="opts">
+      <label><span><input type="radio" name="fonts" value="A" checked> <b>A · In that browser only</b><span class="rec">Recommended</span></span><small>Quick and private. Another computer won't have it, so a saved design shows a fallback font there.</small></label>
+      <label><span><input type="radio" name="fonts" value="B"> <b>B · For the whole team</b></span><small>Admins upload a font once and every Guild Leader gets it. Only for fonts we own the rights to.</small></label>
+    </div></fieldset>
+    <fieldset><legend>3. Each upgrade</legend><div class="opts">
+      <label><span><input type="checkbox" name="ok" value="colour" checked> <b>Build the colour picker</b></span><small>Square, hue slider, HEX with copy, saved swatches, contrast check.</small></label>
+      <label><span><input type="checkbox" name="ok" value="fonts" checked> <b>Build the font picker</b></span><small>18 curated free fonts, add by name, upload your own.</small></label>
+      <label><span><input type="checkbox" name="ok" value="zoom" checked> <b>Build the in-frame zoom</b></span><small>Drag, scroll or pinch, slider to 300%, Reset.</small></label>
+    </div></fieldset>
+    <label for="note" style="font-weight:700">Notes (optional)</label>
+    <textarea id="note" placeholder="Fonts to add or drop, a colour you always use, anything else"></textarea>
+    <p class="status">To dictate, tap the box and use your phone keyboard's mic.</p>
+    <button class="btn gold" type="submit" style="justify-self:start">Submit picks</button>
+    <p class="status" id="status" role="status"></p>
+  </form>
+</main>
+
+<script>/*POSTERS_JS*/</script>
+<script>
+const ASSETS = /*ASSETS_JSON*/;
+const TP = window.TRPoster, by = Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t])), $=id=>document.getElementById(id);
+function esc(s){ return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+/* ---------- colour maths ---------- */
+function hsv2rgb(h,s,v){ const f=(n)=>{ const k=(n+h/60)%6; return v - v*s*Math.max(0,Math.min(k,4-k,1)); }; return [f(5),f(3),f(1)].map(x=>Math.round(x*255)); }
+function rgb2hsv(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn; let h=0; if(d){ h = mx===r ? ((g-b)/d)%6 : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; if(h<0) h+=360; } return [h, mx?d/mx:0, mx]; }
+const toHex=(r,g,b)=>"#"+[r,g,b].map(x=>x.toString(16).padStart(2,"0")).join("").toUpperCase();
+const fromHex=(h)=>{ const m=/^#?([0-9a-f]{6}|[0-9a-f]{3})$/i.exec(h.trim()); if(!m) return null; let x=m[1]; if(x.length===3) x=x.split("").map(c=>c+c).join(""); const n=parseInt(x,16); return [n>>16&255,n>>8&255,n&255]; };
+function relLum(r,g,b){ const f=c=>{ c/=255; return c<=0.03928?c/12.92:Math.pow((c+0.055)/1.055,2.4); }; return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b); }
+const ratio=(a,b)=>(Math.max(a,b)+0.05)/(Math.min(a,b)+0.05);
+function hsl(h,s,l){ s/=100; l/=100; const k=n=>(n+h/30)%12, a=s*Math.min(l,1-l), f=n=>l-a*Math.max(-1,Math.min(k(n)-3,9-k(n),1)); return toHex(...[f(0),f(8),f(4)].map(x=>Math.round(x*255))); }
+/* one colour → a full theme: dark background in the same hue, the colour as accent and block, black or white text on the block */
+function themeFrom(hex){ const [r,g,b]=fromHex(hex); const [h,s]=rgb2hsv(r,g,b); const sat=Math.round(Math.min(60, s*100));
+  const L=relLum(r,g,b), blockInk = ratio(L,1) >= ratio(L,0) ? "#ffffff" : "#111111";
+  return { name:"My colour", bg:hsl(h,sat,6), bg2:hsl(h,sat,15), ink:"#ffffff", sub:hsl(h,Math.min(sat,30),86), accent:hex, block:hex, blockInk }; }
+/* ---------- view switch ---------- */
+document.querySelectorAll("[data-view]").forEach(b=>b.addEventListener("click",()=>{ document.querySelectorAll("[data-view]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); document.body.classList.toggle("phone", b.dataset.view==="phone"); requestAnimationFrame(drawAll); }));
+/* ---------- posters ---------- */
+const base = (id)=>{ const f=JSON.parse(JSON.stringify(by[id].fields)); f.title=f.title||by[id].name; return f; };
+const S = { theme:"custom", hex:"#7DC4FA", style1:"signature", titleFont:"", titleWeight:800, bodyFont:"", ff:"title", zoom:1, fx:0.5, fy:0.45 };
+function scaleFor(c){ return Math.max(0.25, Math.min(1, (c.parentElement.clientWidth||360)*(window.devicePixelRatio||1)/1080)); }
+function draw1(){ TP.THEMES.custom = themeFrom(S.hex); const f=base("council"); f.bgPhoto=TP.IMG["ph_council-1"]; f.grade="zft"; TP.render($("pc1"), by.council, f, {style:S.style1, theme:S.theme, font:"signature"}, "square", {scale:scaleFor($("pc1"))}); }
+function draw2(){ const f=base("hunt"); f.bgPhoto=TP.IMG["ph_hunt-1"]; f.grade="zft"; TP.render($("pc2"), by.hunt, f, {style:"signature", theme:"show", font:"signature", titleFont:S.titleFont||undefined, titleWeight:S.titleWeight, bodyFont:S.bodyFont||undefined}, "square", {scale:scaleFor($("pc2"))});
+  $("fontInfo").textContent = `Headline: ${S.titleFont||"ZFT Slant"} · Body: ${S.bodyFont||"DM Sans"}`; }
+function draw3(){ const f=base("charts"); f.bgPhoto=TP.IMG["ph_charts-1"]; f.grade="zft"; f.photoZoom=S.zoom; f.focusX=S.fx; f.focusY=S.fy; TP.render($("pc3"), by.charts, f, {style:"signature", theme:"show", font:"signature"}, "square", {scale:scaleFor($("pc3"))}); drawCrop(); }
+function drawAll(){ draw1(); draw2(); draw3(); }
+/* ---------- 1 · colour picker ---------- */
+let hsv=[205,0.5,0.98];
+function setFromHsv(push){ const [r,g,b]=hsv2rgb(...hsv); S.hex=toHex(r,g,b); $("sw").style.background=S.hex; if(push!==false) $("hex").value=S.hex;
+  $("sv").style.backgroundColor = toHex(...hsv2rgb(hsv[0],1,1)); $("svDot").style.left=(hsv[1]*100)+"%"; $("svDot").style.top=((1-hsv[2])*100)+"%"; $("hue").value=Math.round(hsv[0]);
+  $("sv").setAttribute("aria-valuetext", `${S.hex}, saturation ${Math.round(hsv[1]*100)}%, brightness ${Math.round(hsv[2]*100)}%`);
+  const t=themeFrom(S.hex), L=relLum(...fromHex(S.hex)); const onBg=ratio(L, relLum(...fromHex(t.bg))), onBlock=ratio(L, t.blockInk==="#ffffff"?1:0);
+  $("contrast").innerHTML = `<span class="${onBg>=3?"ok":"bad"}">${onBg>=3?"✓":"⚠"} Accent on background ${onBg.toFixed(1)} : 1</span> · <span class="ok">✓ ${t.blockInk==="#ffffff"?"White":"Black"} text on blocks ${onBlock.toFixed(1)} : 1</span>` + (onBg<3?"<br><span class='bad'>Too dark to stand out: the tool will brighten small text, or pick a lighter colour.</span>":"");
+  S.theme="custom"; markThemes(); draw1(); }
+(function sv(){ const el=$("sv"); let down=false; const set=(e)=>{ const r=el.getBoundingClientRect(); hsv[1]=Math.min(1,Math.max(0,(e.clientX-r.left)/r.width)); hsv[2]=1-Math.min(1,Math.max(0,(e.clientY-r.top)/r.height)); setFromHsv(); };
+  el.addEventListener("pointerdown",e=>{ down=true; el.setPointerCapture(e.pointerId); set(e); }); el.addEventListener("pointermove",e=>{ if(down) set(e); }); el.addEventListener("pointerup",()=>down=false);
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[-.03,0],ArrowRight:[.03,0],ArrowUp:[0,.03],ArrowDown:[0,-.03]}[e.key]; if(!k) return; e.preventDefault(); hsv[1]=Math.min(1,Math.max(0,hsv[1]+k[0])); hsv[2]=Math.min(1,Math.max(0,hsv[2]+k[1])); setFromHsv(); }); })();
+$("hue").addEventListener("input",()=>{ hsv[0]=+$("hue").value; setFromHsv(); });
+$("hex").addEventListener("input",()=>{ const c=fromHex($("hex").value); if(!c) return; hsv=rgb2hsv(...c); setFromHsv(false); });
+$("hex").addEventListener("paste",()=>setTimeout(()=>{ const c=fromHex($("hex").value); if(c){ hsv=rgb2hsv(...c); setFromHsv(); } }));
+$("copyHex").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(S.hex); $("copyHex").textContent="Copied ✓"; }catch(e){ $("hex").select(); $("copyHex").textContent="Ctrl+C"; } setTimeout(()=>$("copyHex").textContent="Copy",1800); });
+let mySw=[]; try{ mySw=JSON.parse(localStorage.getItem("trpm:swatches")||"[]"); }catch(e){}
+$("saveSw").addEventListener("click",()=>{ if(!mySw.includes(S.hex)) mySw.unshift(S.hex); mySw=mySw.slice(0,8); try{ localStorage.setItem("trpm:swatches",JSON.stringify(mySw)); }catch(e){} buildThemes(); });
+function buildThemes(){ const box=$("themeChips"); box.textContent="";
+  const mk=(k,label,bg,click)=>{ const b=document.createElement("button"); b.type="button"; b.className="chip"; b.dataset.th=k; const i=document.createElement("i"); i.style.background=bg; b.append(i, document.createTextNode(label)); b.addEventListener("click",click); box.append(b); };
+  for (const k of ["show","gold","midnight","emerald"]) { const t=TP.THEMES[k]; mk(k,t.name, k==="show"?"conic-gradient(#e9d3a6 0 25%,#5dff9e 0 50%,#FFB400 0 75%,#ff9a2e 0)":`linear-gradient(135deg,${t.bg} 50%,${t.accent} 50%)`, ()=>{ S.theme=k; markThemes(); draw1(); }); }
+  for (const h of mySw) mk("sw:"+h, h, h, ()=>{ hsv=rgb2hsv(...fromHex(h)); setFromHsv(); });
+  mk("custom","＋ Custom", "conic-gradient(red,yellow,lime,cyan,blue,magenta,red)", ()=>{ setFromHsv(); $("sv").focus(); });
+  markThemes(); }
+function markThemes(){ document.querySelectorAll("[data-th]").forEach(b=>b.setAttribute("aria-pressed", String(b.dataset.th===S.theme || (S.theme==="custom" && (b.dataset.th==="sw:"+S.hex || (b.dataset.th==="custom" && !mySw.includes(S.hex))))))); }
+document.querySelectorAll("[data-p1]").forEach(b=>b.addEventListener("click",()=>{ S.style1=b.dataset.p1; document.querySelectorAll("[data-p1]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw1(); }));
+(function today(){ const box=$("todaySw"); for (const [k,t] of Object.entries(TP.THEMES)) { if(k==="custom") continue; const i=document.createElement("i"); i.title=t.name; i.style.cssText=`width:16px;height:16px;border-radius:50%;display:inline-block;border:1px solid rgba(255,255,255,.2);background:${k==="show"?"conic-gradient(#e9d3a6 0 25%,#5dff9e 0 50%,#FFB400 0 75%,#ff9a2e 0)":t.accent}`; box.append(i); } })();
+/* ---------- 2 · fonts ---------- */
+const FONTS = [
+  ["ZFT Slant","",800,"title","Today's default"],["Anton","Anton",400,"title","Tall and loud"],["Bebas Neue","Bebas Neue",400,"title","Clean caps"],["Archivo Black","Archivo Black",400,"title","Heavy, wide"],
+  ["Montserrat","Montserrat",900,"title","Geometric black"],["Poppins","Poppins",800,"both","Round and friendly"],["Oswald","Oswald",700,"title","Condensed"],["Russo One","Russo One",400,"title","Sporty, techy"],
+  ["Unbounded","Unbounded",800,"title","Wide and modern"],["Bricolage Grotesque","Bricolage Grotesque",800,"title","Editorial character"],["Space Grotesk","Space Grotesk",700,"both","Tech / data"],["Playfair Display","Playfair Display",900,"title","Classy serif"],
+  ["DM Sans","",700,"body","Today's body"],["Inter","Inter",700,"body","Very readable"],["Manrope","Manrope",700,"body","Soft, modern"],["Plus Jakarta Sans","Plus Jakarta Sans",800,"both","The tool's own"],["Work Sans","Work Sans",700,"body","Plain and clear"],["IBM Plex Sans","IBM Plex Sans",700,"body","Serious, technical"],
+];
+let extra=[];
+function buildFonts(){ const box=$("fonts"); box.textContent="";
+  for (const [label,fam,w,use,note] of FONTS.concat(extra)) { if (S.ff==="title" && use==="body") continue; if (S.ff==="body" && use==="title") continue;
+    const b=document.createElement("button"); b.type="button"; b.className="fontbtn"; const sp=document.createElement("span"); sp.textContent = S.ff==="title" ? "THE HUNT" : "Learn the setup";
+    sp.style.fontFamily = fam ? `"${fam}", sans-serif` : (label==="ZFT Slant" ? '"Archivo Black", sans-serif' : '"DM Sans", sans-serif'); sp.style.fontWeight=w; if(label==="ZFT Slant") sp.style.fontStyle="italic";
+    const sm=document.createElement("small"); sm.textContent=`${label} · ${note}`; b.append(sp,sm); b.setAttribute("aria-label", `${label}: ${note}`);
+    const cur = S.ff==="title" ? S.titleFont : S.bodyFont; b.setAttribute("aria-pressed", String((cur||"")===fam));
+    b.addEventListener("click", async ()=>{ if (fam) { try{ await document.fonts.load(`${w} 40px "${fam}"`); }catch(e){} } if (S.ff==="title"){ S.titleFont=fam; S.titleWeight=w; } else S.bodyFont=fam; buildFonts(); draw2(); });
+    box.append(b); } }
+document.querySelectorAll("[data-ff]").forEach(b=>b.addEventListener("click",()=>{ S.ff=b.dataset.ff; document.querySelectorAll("[data-ff]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); buildFonts(); }));
+$("gfAdd").addEventListener("click", async ()=>{ const name=$("gfName").value.trim().replace(/[^A-Za-z0-9 ]/g,"").slice(0,40); const note=$("fontNote"); if(!name){ note.textContent="Type a font name from fonts.google.com."; return; }
+  note.textContent=`Loading ${name}…`; const link=document.createElement("link"); link.rel="stylesheet"; link.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,"+")}:wght@400;700;800&display=swap`;
+  const ok = await new Promise(r=>{ link.onload=()=>r(true); link.onerror=()=>r(false); document.head.append(link); setTimeout(()=>r(false),8000); });
+  let loaded=false; if(ok){ try{ const f=await document.fonts.load(`700 40px "${name}"`); loaded=f.length>0; }catch(e){} }
+  if(!loaded){ note.textContent=`Couldn't find “${name}” on Google Fonts. Check the spelling on fonts.google.com.`; link.remove(); return; }
+  extra.unshift([name,name,700,"both","Added from Google Fonts"]); note.textContent=`Added ${name}. It's at the top of the list.`; $("gfName").value=""; buildFonts(); });
+$("upBtn").addEventListener("click",()=>$("upFile").click());
+$("upFile").addEventListener("change", async (e)=>{ const file=e.target.files[0]; e.target.value=""; if(!file) return; const note=$("fontNote");
+  if (file.size>5*1048576){ note.textContent="That font file is over 5 MB."; return; }
+  const name=("Mine "+file.name.replace(/\.[^.]+$/,"")).replace(/[^A-Za-z0-9 _-]/g,"").slice(0,40);
+  try{ const ff=new FontFace(name, await file.arrayBuffer()); await ff.load(); document.fonts.add(ff); extra.unshift([name,name,400,"both","Uploaded (this browser)"]); note.textContent=`Added ${file.name}. Only use fonts you own or that are free.`; buildFonts(); }
+  catch(err){ note.textContent="That file isn't a font this browser can read. Try .ttf, .otf or .woff2."; } });
+/* ---------- 3 · in-frame zoom (profile-picture style) ---------- */
+let photo=null; const cc=$("cropC"), cx=cc.getContext("2d");
+function geo(){ const W=cc.width, H=cc.height, z=1.02*S.zoom, s=Math.max(W/photo.width, H/photo.height)*z; return {W,H,iw:photo.width*s, ih:photo.height*s}; }
+function drawCrop(){ if(!photo) return; const {W,H,iw,ih}=geo(); cx.clearRect(0,0,W,H); cx.drawImage(photo, (W-iw)*S.fx, (H-ih)*S.fy, iw, ih); $("zv").textContent=`Zoom ${Math.round(S.zoom*100)}%`; $("zr").value=Math.round(S.zoom*100); }
+let rq=0; function queue(){ if(rq) return; rq=requestAnimationFrame(()=>{ rq=0; draw3(); }); }
+function pan(dx,dy){ const {W,H,iw,ih}=geo(), k=W/cc.clientWidth; if(iw>W) S.fx=Math.min(1,Math.max(0,S.fx - dx*k/(iw-W))); if(ih>H) S.fy=Math.min(1,Math.max(0,S.fy - dy*k/(ih-H))); queue(); }
+function zoomTo(z){ S.zoom=Math.min(3,Math.max(1,z)); queue(); }
+(function crop(){ const el=$("crop"), pts=new Map(); let pinch=0, pz=1;
+  el.addEventListener("pointerdown",e=>{ el.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); if(pts.size===2){ const [a,b]=[...pts.values()]; pinch=Math.hypot(a.x-b.x,a.y-b.y); pz=S.zoom; } });
+  el.addEventListener("pointermove",e=>{ const p=pts.get(e.pointerId); if(!p) return; const n={x:e.clientX,y:e.clientY};
+    if(pts.size===2){ pts.set(e.pointerId,n); const [a,b]=[...pts.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y); if(pinch) zoomTo(pz*d/pinch); }
+    else { pan(n.x-p.x, n.y-p.y); pts.set(e.pointerId,n); } });
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) pinch=0; }; el.addEventListener("pointerup",up); el.addEventListener("pointercancel",up);
+  el.addEventListener("wheel",e=>{ e.preventDefault(); zoomTo(S.zoom*Math.exp(-e.deltaY*0.0015)); },{passive:false});
+  el.addEventListener("keydown",e=>{ const k={ArrowLeft:[12,0],ArrowRight:[-12,0],ArrowUp:[0,12],ArrowDown:[0,-12]}[e.key]; if(k){ e.preventDefault(); pan(...k); } if(e.key==="+"||e.key==="="){ e.preventDefault(); zoomTo(S.zoom*1.1); } if(e.key==="-"){ e.preventDefault(); zoomTo(S.zoom/1.1); } }); })();
+$("zr").addEventListener("input",()=>zoomTo(+$("zr").value/100));
+$("cropReset").addEventListener("click",()=>{ S.zoom=1; S.fx=0.5; S.fy=0.45; draw3(); });
+/* ---------- boot + picks ---------- */
+let db=null;
+(async()=>{ await TP.loadFonts(); await TP.loadAssets(ASSETS); photo=TP.IMG["ph_charts-1"];
+  hsv=rgb2hsv(...fromHex(S.hex)); buildThemes(); buildFonts(); $("hex").value=S.hex; setFromHsv(); drawAll();
+  window.addEventListener("resize",()=>{ clearTimeout(window._rz); window._rz=setTimeout(drawAll,150); });
+  try{ if(window.claude&&window.claude.use) db=await window.claude.use("db"); }catch(e){}
+  if(db){ try{ const d=await db.doc("picks/latest").get(); if(d&&d.data){ const x=d.data; for(const k of ["colour","fonts"]){ const el=document.querySelector(`input[name="${k}"][value="${x[k]}"]`); if(el) el.checked=true; } if(x.ok) document.querySelectorAll('input[name="ok"]').forEach(c=>c.checked=x.ok.includes(c.value)); if(x.note) $("note").value=x.note; $("status").textContent="Picks on file. Change and submit again any time."; } }catch(e){} }
+})();
+$("pick").addEventListener("submit", async e=>{ e.preventDefault(); const st=$("status");
+  const data={colour:document.querySelector('input[name="colour"]:checked').value, fonts:document.querySelector('input[name="fonts"]:checked').value, ok:[...document.querySelectorAll('input[name="ok"]:checked')].map(c=>c.value), note:$("note").value.trim(), at:new Date().toISOString()};
+  if(!db){ st.textContent="Saving isn't available here. Tell Claude in chat."; return; }
+  st.textContent="Saving…"; try{ await db.doc("picks/latest").set(data); st.textContent="Saved. Claude will build your picks."; }catch(err){ st.textContent="Couldn't save. Tell Claude in chat instead."; } });
+</script>
+
+<!-- Photo viewer drop-in (George, 9 Nov 2026). Paste this block just before </body> in any artifact.
+     Click any picture (60 px or wider, not inside a link) to open it fit to screen.
+     ‹ › buttons, arrow keys or a swipe switch between all the page's pictures (or those inside the same [data-gallery]).
+     The mouse wheel zooms toward the pointer; drag to move; double-click zooms in or back to fit; Esc or a dark-area click closes.
+     Opt a picture out with data-nozoom (on the image or any parent). Pictures that are controls (pickers, sliders,
+     pressed buttons) must be opted out, so a click still selects them. Uses its own pv- class names, so it never clashes with the page. -->
+<style>
+#pv-box{position:fixed;inset:0;z-index:2147483000;background:rgb(8 10 14 / .96);color:#fff;user-select:none;touch-action:none;font:14px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif}
+#pv-box[hidden]{display:none}
+.pv-stage{position:absolute;inset:0;overflow:hidden;display:flex;align-items:center;justify-content:center;padding:calc(56px + env(safe-area-inset-top,0px)) max(56px,env(safe-area-inset-right,0px)) calc(40px + env(safe-area-inset-bottom,0px)) max(56px,env(safe-area-inset-left,0px));box-sizing:border-box;cursor:zoom-in}
+.pv-stage.zoomed{cursor:grab}.pv-stage.drag{cursor:grabbing}
+#pv-img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;flex:none;object-fit:contain;border-radius:6px;transform-origin:0 0;will-change:transform}
+.pv-top{position:absolute;top:0;left:0;right:0;display:flex;align-items:center;gap:12px;padding:calc(10px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px));background:linear-gradient(rgb(0 0 0 / .6),transparent)}
+#pv-cap{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+#pv-count{font-variant-numeric:tabular-nums;opacity:.8;font-size:12.5px}
+.pv-btn{font:inherit;border:0;border-radius:999px;background:rgb(255 255 255 / .16);color:#fff;min-width:40px;height:40px;padding:0 12px;cursor:pointer;display:grid;place-items:center;font-size:16px}
+.pv-btn:hover,.pv-btn:focus-visible{background:rgb(255 255 255 / .3);outline:none}
+.pv-nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;font-size:28px;line-height:1;padding:0}
+.pv-prev{left:max(8px,env(safe-area-inset-left,0px))}.pv-next{right:max(8px,env(safe-area-inset-right,0px))}
+.pv-nav[hidden],#pv-fit[hidden]{display:none}
+.pv-hint{position:absolute;left:0;right:0;bottom:calc(10px + env(safe-area-inset-bottom,0px));text-align:center;font-size:12.5px;opacity:.7}
+@media (max-width:600px),(pointer:coarse){.pv-hint{display:none}.pv-stage{padding-left:8px;padding-right:8px}}
+img.pv-zoomable{cursor:zoom-in}
+</style>
+<div id="pv-box" hidden role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <div class="pv-stage" id="pv-stage"><img id="pv-img" alt="" draggable="false"></div>
+  <div class="pv-top"><span id="pv-cap"></span><span id="pv-count"></span><button type="button" class="pv-btn" id="pv-fit" hidden>Fit to screen</button><button type="button" class="pv-btn" id="pv-close" aria-label="Close">✕</button></div>
+  <button type="button" class="pv-btn pv-nav pv-prev" id="pv-prev" aria-label="Previous picture">‹</button>
+  <button type="button" class="pv-btn pv-nav pv-next" id="pv-next" aria-label="Next picture">›</button>
+  <div class="pv-hint">Scroll to zoom · drag to move · double-click to fit · ← → to switch · Esc to close</div>
+</div>
+<script>
+(() => {
+  const q = id => document.getElementById(id);
+  const box = q('pv-box'), stage = q('pv-stage'), img = q('pv-img');
+  let list = [], i = 0, s = 1, x = 0, y = 0, drag = null, tx = null, back = null;
+  const ok = el => el && el.tagName === 'IMG' && !el.closest('#pv-box') && !el.hasAttribute('data-nozoom') && !el.closest('a[href],[data-nozoom],[role=slider],[role=radio],[role=option],[aria-pressed]')
+    && el.getBoundingClientRect().width >= 60;
+  // Mark pictures so they show the zoom cursor (new ones too, as the page redraws).
+  const mark = () => document.querySelectorAll('img:not(.pv-zoomable)').forEach(el => { if (ok(el)) el.classList.add('pv-zoomable'); });
+  new MutationObserver(mark).observe(document.body, { childList: true, subtree: true }); addEventListener('load', mark); mark();
+  const apply = () => { img.style.transform = `translate(${x}px,${y}px) scale(${s})`; stage.classList.toggle('zoomed', s > 1); q('pv-fit').hidden = s === 1; };
+  const reset = () => { s = 1; x = 0; y = 0; apply(); };
+  const zoomAt = (cx, cy, ns) => {
+    ns = Math.min(8, Math.max(1, ns)); if (ns === 1) { reset(); return; }
+    const r = img.getBoundingClientRect(), bx = r.left - x, by = r.top - y, px = cx - bx, py = cy - by;
+    x = px - (px - x) * ns / s; y = py - (py - y) * ns / s; s = ns; apply();
+  };
+  const show = k => {
+    i = (k + list.length) % list.length; reset();
+    const el = list[i]; img.src = el.currentSrc || el.src; img.alt = el.alt || '';
+    const cap = el.alt || el.closest('figure')?.querySelector('figcaption')?.textContent || el.title || '';
+    q('pv-cap').textContent = cap.trim();
+    q('pv-count').textContent = list.length > 1 ? `${i + 1} / ${list.length}` : '';
+    q('pv-prev').hidden = q('pv-next').hidden = list.length < 2;
+  };
+  const close = () => { box.hidden = true; img.removeAttribute('src'); document.documentElement.style.overflow = ''; back?.focus?.(); };
+  // Capture phase, so a picture inside a page's own button opens here instead of the old viewer.
+  document.addEventListener('click', e => {
+    const el = e.target.closest?.('img'); if (!ok(el)) return;
+    e.preventDefault(); e.stopPropagation();
+    const scope = el.closest('[data-gallery]') || document;
+    list = [...scope.querySelectorAll('img')].filter(ok);
+    back = document.activeElement; box.hidden = false; document.documentElement.style.overflow = 'hidden';
+    show(Math.max(0, list.indexOf(el))); q('pv-close').focus();
+  }, true);
+  stage.addEventListener('wheel', e => { e.preventDefault(); zoomAt(e.clientX, e.clientY, s * (e.deltaY < 0 ? 1.2 : 1 / 1.2)); }, { passive: false });
+  stage.addEventListener('dblclick', e => { if (s > 1) reset(); else zoomAt(e.clientX, e.clientY, 2.5); });
+  stage.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch') return;
+    if (s > 1) { drag = { sx: e.clientX - x, sy: e.clientY - y }; stage.classList.add('drag'); stage.setPointerCapture(e.pointerId); }
+    else if (e.target === stage) close();
+  });
+  stage.addEventListener('pointermove', e => { if (!drag) return; x = e.clientX - drag.sx; y = e.clientY - drag.sy; apply(); });
+  stage.addEventListener('pointerup', () => { drag = null; stage.classList.remove('drag'); });
+  stage.addEventListener('touchstart', e => { if (e.touches.length === 1) tx = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', e => { if (tx === null || s > 1) return; const dx = e.changedTouches[0].clientX - tx; tx = null; if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1)); }, { passive: true });
+  q('pv-prev').onclick = () => show(i - 1); q('pv-next').onclick = () => show(i + 1);
+  q('pv-close').onclick = close; q('pv-fit').onclick = reset;
+  document.addEventListener('keydown', e => {
+    if (box.hidden) return;
+    if (e.key === 'Escape') close();
+    else if (e.key === 'ArrowRight') show(i + 1);
+    else if (e.key === 'ArrowLeft') show(i - 1);
+    else if (e.key === '+' || e.key === '=') { const r = stage.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, s * 1.25); }
+    else if (e.key === '-') { const r = stage.getBoundingClientRect(); zoomAt(r.left + r.width / 2, r.top + r.height / 2, s / 1.25); }
+    else if (e.key === '0') reset();
+    else return;
+    e.preventDefault(); e.stopPropagation();
+  }, true);
+})();
+</script>

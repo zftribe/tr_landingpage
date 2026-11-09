@@ -1,0 +1,174 @@
+<title>Poster Builder Stages Preview</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo+Black&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@700&family=Permanent+Marker&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap">
+<style>
+/* Layout: a preview of the new stage-by-stage builder. Web mock (stage panel left + live poster right + stage bar under the panel) and phone mock side by side, with a stage switcher so George can click through all six stages, then the posting questions and Submit. */
+:root{--bg:#0b0b0f;--panel:#13131a;--panel2:#1a1a23;--line:#262632;--ink:#f5f5f7;--muted:#9a9aab;--gold:#FFB400;--gold-soft:rgba(255,180,0,.12);--ok:#3ddc84;--bad:#ff6b6b;--display:"Plus Jakarta Sans","Segoe UI",Arial,sans-serif;--body:"DM Sans","Segoe UI",Arial,sans-serif;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font:14px/1.45 var(--body)}
+.wrap{max-width:1240px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:22px}
+h1{font:800 clamp(24px,3.6vw,36px)/1.1 var(--display);margin:0}
+h1 b{color:var(--gold)}
+h2{font:800 17px var(--display);margin:0}
+p{margin:0}
+.lede{color:var(--muted);max-width:75ch}
+.switch{display:flex;gap:6px;flex-wrap:wrap}
+.switch button{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-weight:700;font-size:13px;background:var(--panel2)}
+.switch button[aria-pressed="true"]{background:var(--gold);color:#111;border-color:var(--gold)}
+.switch button:focus-visible,.navbtn:focus-visible,.chip:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.mocks{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
+@media (max-width:980px){.mocks{grid-template-columns:minmax(0,1fr)}}
+.label{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:800;margin-bottom:6px}
+/* web mock */
+.web{border:1px solid var(--line);border-radius:14px;background:#0e0e14;overflow:hidden}
+.web .top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.web .top b{font:800 15px var(--display);color:var(--ink)} .web .top b i{font-style:normal;color:var(--gold)}
+.web .body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;padding:14px}
+@media (max-width:700px){.web .body{grid-template-columns:minmax(0,1fr)}}
+.stagebox{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:10px;align-content:start;min-height:360px}
+.stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.stagehead small{color:var(--gold);font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.tile{border:1px solid var(--line);border-radius:9px;padding:6px;font-size:11px;font-weight:700;display:grid;gap:4px;background:var(--panel2)}
+.tile.on{border-color:var(--gold);background:var(--gold-soft)}
+.tile canvas{width:100%;aspect-ratio:1/1;border-radius:6px;display:block}
+.field{border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:var(--bg);font-size:12px;color:var(--ink)}
+.field small{display:block;color:var(--muted);font-size:10px}
+.chip{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;background:var(--panel2)}
+.chip.on{background:var(--gold);color:#111;border-color:var(--gold)}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .muted{color:var(--muted)}
+.stagebar{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:10px;margin-top:4px}
+.steps{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.step{border-radius:8px;padding:6px 4px;text-align:center;font-size:10.5px;font-weight:800;border:1px solid var(--line);background:var(--panel2);color:var(--muted);cursor:pointer}
+.step.done{color:var(--ink)} .step.done::before{content:"✓ ";color:var(--ok)}
+.step.cur{background:var(--gold);color:#111;border-color:var(--gold)}
+.navs{display:flex;justify-content:space-between;gap:8px}
+.navbtn{all:unset;cursor:pointer;border-radius:9px;padding:8px 14px;font-weight:800;font-size:13px;border:1px solid var(--line)}
+.navbtn.gold{background:var(--gold);color:#111;border-color:var(--gold)}
+.previewbox{background:repeating-conic-gradient(#15151c 0 25%,#1b1b23 0 50%) 0 0/18px 18px;border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;gap:8px;align-content:start;position:sticky;top:12px}
+.previewbox canvas{width:100%;border-radius:6px;display:block}
+.previewbox .meta{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.cap{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;font-size:11.5px;white-space:pre-wrap}
+.confirm{border:1px solid rgba(255,180,0,.5);border-radius:10px;padding:10px;background:var(--gold-soft);display:grid;gap:6px;font-size:12px}
+/* phone mock */
+.phone{border:10px solid #000;border-radius:34px;background:#0e0e14;overflow:hidden;max-width:320px;justify-self:center;width:100%}
+.phone .pin{padding:8px;background:#101016;border-bottom:1px solid var(--line);display:grid;grid-template-columns:84px minmax(0,1fr);gap:8px;align-items:center}
+.phone .pin canvas{width:84px;border-radius:5px}
+.phone .pin span{font-size:11px;color:var(--muted)} .phone .pin b{display:block;color:var(--ink);font-size:12px}
+.phone .pstage{padding:10px;display:grid;gap:8px;min-height:340px;align-content:start}
+.phone .pbar{border-top:1px solid var(--line);padding:8px;display:grid;gap:6px;background:#101016}
+.phone .steps{grid-template-columns:repeat(6,minmax(0,1fr))}
+.phone .step{font-size:9px;padding:5px 2px}
+/* picks */
+form.pick{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:16px}
+fieldset{border:0;padding:0;margin:0;display:grid;gap:8px}
+legend{font:800 15px var(--display);margin-bottom:6px}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.opts label{border:2px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;display:grid;gap:2px}
+.opts label:has(input:checked){border-color:var(--gold);background:var(--gold-soft)}
+.opts label:has(input:focus-visible){outline:2px solid var(--gold);outline-offset:2px}
+.opts b{font-family:var(--display)} .opts small{color:var(--muted)}
+.rec{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--gold);color:#111;border-radius:99px;padding:1px 7px;margin-left:4px}
+.opts input{accent-color:var(--gold)}
+textarea{width:100%;box-sizing:border-box;min-height:70px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit}
+button.go{all:unset;cursor:pointer;background:var(--gold);color:#111;font-weight:800;border-radius:10px;padding:11px 18px;justify-self:start}
+button.go:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.status{font-size:13px;color:var(--muted)}
+</style>
+
+<main class="wrap">
+  <header><p style="color:var(--gold);font-weight:800;letter-spacing:.12em;font-size:12px;text-transform:uppercase">TR Poster Maker · next version</p>
+    <h1>The new <b>stage-by-stage builder</b></h1>
+    <p class="lede" style="margin-top:8px">Left: the stage you're on. Right: the poster as built so far, updating with every pick. Under the stage: a bar to go Back, Next, or jump straight to any stage to refine it without redoing the rest. Click the stages below to walk through it. The poster is drawn by the real engine.</p></header>
+
+  <div class="switch" role="group" aria-label="Show stage" id="switch"></div>
+
+  <div class="mocks">
+    <div><div class="label">Web</div>
+      <div class="web" aria-label="Web version mock-up">
+        <div class="top"><b>TR <i>Poster Maker</i></b><span class="row"><span class="chip">↶ Undo</span><span class="chip">↷ Redo</span><span class="chip">My designs</span><span>Steph · Discord</span></span></div>
+        <div class="body">
+          <section class="stagebox"><div class="stagehead"><h2 id="wTitle"></h2><small id="wNum"></small></div><div id="wBody"></div>
+            <div class="stagebar"><div class="steps" id="wSteps"></div><div class="navs"><span class="navbtn" id="wBack">← Back</span><span class="navbtn gold" id="wNext">Next →</span></div></div>
+          </section>
+          <section class="previewbox"><canvas id="wCanvas" aria-label="Live poster preview"></canvas><div class="meta"><span id="wMeta">Square · 1080 × 1080</span><span class="ok" id="wCheck">✓ Brand check</span></div></section>
+        </div>
+      </div></div>
+    <div><div class="label">Phone</div>
+      <div class="phone" aria-label="Phone version mock-up">
+        <div class="pin"><canvas id="pCanvas" aria-label="Mini poster preview"></canvas><span><b>Preview</b>Tap to view full size. It updates as you go.</span></div>
+        <div class="pstage"><div class="stagehead"><h2 id="pTitle" style="font-size:15px"></h2><small id="pNum"></small></div><div id="pBody"></div></div>
+        <div class="pbar"><div class="steps" id="pSteps"></div><div class="navs"><span class="navbtn">←</span><span class="navbtn gold">Next →</span></div></div>
+      </div></div>
+  </div>
+
+  <form class="pick" id="pick">
+    <h2>Your picks for posting and the builder</h2>
+    <fieldset><legend>1. Is this stage order right?</legend><div class="opts">
+      <label><span><input type="radio" name="order" value="A" checked> <b>A · As shown</b><span class="rec">Recommended</span></span><small>Template → Look → Details → Photo &amp; speakers → Fine-tune → Generate &amp; share</small></label>
+      <label><span><input type="radio" name="order" value="B"> <b>B · Details first</b></span><small>Template → Details → Photo &amp; speakers → Look → Fine-tune → Generate &amp; share</small></label>
+    </div></fieldset>
+    <fieldset><legend>2. Discord posting</legend><div class="opts">
+      <label><span><input type="radio" name="discord" value="A" checked> <b>A · Guild Leaders post after their own confirm</b><span class="rec">Recommended</span></span><small>Signed in with Discord, they pick a channel from your allowed list; the poster plus caption is drafted, and their final "Post" click sends it. It shows as "Steph via TR Poster Maker". Discord doesn't let apps post as the person, so a TR bot posts on their behalf.</small></label>
+      <label><span><input type="radio" name="discord" value="B"> <b>B · Guild Leaders submit, you approve</b></span><small>Same draft, but it waits for your Approve on the Access page before it goes out.</small></label>
+    </div></fieldset>
+    <fieldset><legend>3. Facebook posting</legend><div class="opts">
+      <label><span><input type="radio" name="fb" value="A" checked> <b>A · Admins post to the Trading Republic Page</b><span class="rec">Recommended</span></span><small>Your note: an admin signs in with Facebook once, then "Post to TR Page" drafts the post with the poster and caption, and their final click publishes it. Works now for you and the Page admins you add to the Facebook app; opening it to every Guild Leader needs Meta's app review.</small></label>
+      <label><span><input type="radio" name="fb" value="B"> <b>B · Anyone signs in with their Facebook</b></span><small>Every Guild Leader can post to the Page if they're a Page admin. Needs Meta app review first (about 1–2 weeks). The TR Facebook <i>Group</i> stays manual: Facebook blocks apps from posting there.</small></label>
+    </div></fieldset>
+    <fieldset><legend>4. Which Discord channels can the tool post in?</legend><div class="opts">
+      <label><span><input type="checkbox" name="ch" value="upcoming-events" checked> <b>#upcoming-events</b></span><small>Session and event posters</small></label>
+      <label><span><input type="checkbox" name="ch" value="announcement-board"> <b>#announcement-board</b></span><small>Bigger announcements (admins only?)</small></label>
+      <label><span><input type="checkbox" name="ch" value="guild-round-table"> <b>#guild-round-table</b></span><small>For Guild Leader drafts and feedback</small></label>
+    </div></fieldset>
+    <label for="note" style="font-weight:700">Notes (optional)</label>
+    <textarea id="note" placeholder="Anything to change in the stages, or other channels"></textarea>
+    <p class="status">To dictate, tap the box and use your phone keyboard's mic.</p>
+    <button class="go" type="submit">Submit picks</button>
+    <p class="status" id="status" role="status"></p>
+  </form>
+</main>
+
+<script>/*POSTERS_JS*/</script>
+<script>
+const ASSETS = /*ASSETS_JSON*/;
+const TP = window.TRPoster, by = Object.fromEntries(TP.TEMPLATES.map(t=>[t.id,t]));
+const STAGES = [
+  { t:"Pick a template", body:()=>`<div class="row"><span class="chip on">★ Next Hunt · Tue Nov 10, 5 PM</span><span class="chip">Next Council</span><span class="chip">Next MMU</span></div><div class="grid4">${["hunt","council","meetup","charts"].map((id,i)=>`<div class="tile ${i?'':'on'}"><canvas data-th="${id}"></canvas>${by[id].name}</div>`).join("")}</div><span class="muted">+ 24 base templates (More ▾)</span>` , cfg:{style:"signature",theme:"show"}, photo:false },
+  { t:"Choose the look", body:()=>`<div class="row">${["Signature","Spotlight","Split","Terminal","Editorial","Bold blocks"].map((s,i)=>`<span class="chip ${i==1?'on':''}">${s}</span>`).join("")}</div><div class="row">${["Show colours","House gold","Midnight","Emerald"].map((s,i)=>`<span class="chip ${i==0?'on':''}">${s}</span>`).join("")}<span class="muted">+7</span></div><div class="row"><span class="chip on">Signature font: ZFT Slant</span><span class="chip">Show's own font</span></div>`, cfg:{style:"spotlight",theme:"show"}, photo:false },
+  { t:"Fill in the details", body:()=>`<div class="field"><small>Title</small>The Hunt</div><div class="row"><div class="field" style="flex:1"><small>Date</small>Tue, Nov 10</div><div class="field" style="flex:1"><small>Start (PH time)</small>5:00 PM</div></div><div class="field"><small>Topic</small>Build your own watchlist and turn it into trading ideas</div><div class="field"><small>Where</small>FB Live · YouTube</div><div class="ok" style="font-size:12px">✓ Brand check: readable on phone, date and time set</div>`, cfg:{style:"spotlight",theme:"show"}, photo:false },
+  { t:"Photo & speakers", body:()=>`<div class="grid3">${["hunt-1","hunt-2","hunt-3"].map((k,i)=>`<div class="tile ${i?'':'on'}" style="padding:3px"><img src="${ASSETS['ph_'+k]}" alt="" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:6px"></div>`).join("")}</div><div class="row"><span class="chip on">Dark theme</span><span class="chip">Original theme</span><span class="chip">Drag the gold dot to set the focus</span></div><div class="row"><span class="chip">🙂 Coach Sean</span><span class="chip">+ Add speaker (max 3)</span></div>`, cfg:{style:"spotlight",theme:"show"}, photo:true },
+  { t:"Fine-tune", body:()=>`<div class="field"><small>Title size</small><div style="height:6px;background:var(--gold);width:62%;border-radius:4px"></div></div><div class="field"><small>Photo zoom</small><div style="height:6px;background:var(--gold);width:40%;border-radius:4px"></div></div><div class="row"><span class="chip">Motion:</span><span class="chip on">Gold light sweep</span><span class="chip">Slow zoom</span><span class="chip">Ticker run-in</span></div>`, cfg:{style:"spotlight",theme:"show"}, photo:true },
+  { t:"Generate & share", body:()=>`<div class="row"><span class="chip on">All 4 sizes</span><span class="chip">PNG</span><span class="chip">GIF</span><span class="chip">Video</span></div><div class="cap">Hi @everyone! 👋
+THE HUNT is back this week! See you Tuesday, Nov 10 at 5 PM with Coach Sean…</div><div class="row"><span class="chip">Copy caption</span><span class="chip">Save design</span></div><div class="confirm"><b>Post to Discord · #upcoming-events</b><span>Poster + caption drafted. Posts as "Steph via TR Poster Maker".</span><div class="row"><span class="chip on">Confirm and post</span><span class="chip">Cancel</span></div></div><div class="row"><span class="chip">f  Post to TR Page (admins)</span></div>`, cfg:{style:"spotlight",theme:"show"}, photo:true },
+];
+let cur = 0;
+const sw = document.getElementById("switch");
+STAGES.forEach((s,i)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=`${i+1} · ${s.t}`; b.addEventListener("click",()=>show(i)); sw.append(b); });
+function steps(el, small){ el.innerHTML = STAGES.map((s,i)=>`<div class="step ${i<cur?'done':''} ${i==cur?'cur':''}" title="${s.t}">${small? (i+1) : (i+1)+' '+s.t.split(' ')[0]}</div>`).join(""); el.querySelectorAll(".step").forEach((x,i)=>x.addEventListener("click",()=>show(i))); }
+function fields(st){ const f=JSON.parse(JSON.stringify(by.hunt.fields)); if(st.photo){ f.bgPhoto=TP.IMG["ph_hunt-1"]; f.grade="zft"; } if(cur<2){ f.topic=""; f.date=""; f.time=""; f.cta=""; } if(cur<3) f.speakers=[{name:"Coach Sean",role:"Coach"}]; return f; }
+function show(i){
+  cur=i; const st=STAGES[i];
+  sw.querySelectorAll("button").forEach((b,j)=>b.setAttribute("aria-pressed",String(j===i)));
+  for (const p of ["w","p"]){ document.getElementById(p+"Title").textContent=st.t; document.getElementById(p+"Num").textContent=`Stage ${i+1} of 6`; document.getElementById(p+"Body").innerHTML=st.body(); steps(document.getElementById(p+"Steps"), p==="p"); }
+  document.getElementById("wBack").style.visibility = i? "visible":"hidden";
+  document.getElementById("wNext").textContent = i===5 ? "Done" : `Next: ${STAGES[i+1].t} →`;
+  const f=fields(st);
+  TP.render(document.getElementById("wCanvas"), by.hunt, f, st.cfg, "square", {scale:0.55});
+  TP.render(document.getElementById("pCanvas"), by.hunt, f, st.cfg, "square", {scale:0.2});
+  document.querySelectorAll("canvas[data-th]").forEach(c=>{ const id=c.dataset.th; const ff=JSON.parse(JSON.stringify(by[id].fields)); if(TP.IMG["ph_"+id+"-1"]){ ff.bgPhoto=TP.IMG["ph_"+id+"-1"]; ff.grade="zft"; } TP.render(c, by[id], ff, {style:"signature",theme:"show"}, "square", {scale:0.18}); });
+}
+document.getElementById("wBack").addEventListener("click",()=>show(Math.max(0,cur-1)));
+document.getElementById("wNext").addEventListener("click",()=>show(Math.min(5,cur+1)));
+let db=null;
+(async()=>{ await TP.loadFonts(); await TP.loadAssets(ASSETS); show(0);
+  try{ if(window.claude&&window.claude.use) db=await window.claude.use("db"); }catch(e){}
+  if(db){ try{ const d=await db.doc("picks/latest").get(); if(d&&d.data){ const x=d.data; for(const k of ["order","discord","fb"]){ const el=document.querySelector(`input[name="${k}"][value="${x[k]}"]`); if(el) el.checked=true; } if(x.channels) document.querySelectorAll('input[name="ch"]').forEach(c=>c.checked=x.channels.includes(c.value)); if(x.note) document.getElementById("note").value=x.note; document.getElementById("status").textContent="Picks on file. Change and submit again any time."; } }catch(e){} }
+})();
+document.getElementById("pick").addEventListener("submit", async e=>{ e.preventDefault(); const st=document.getElementById("status");
+  const data={order:document.querySelector('input[name="order"]:checked').value, discord:document.querySelector('input[name="discord"]:checked').value, fb:document.querySelector('input[name="fb"]:checked').value, channels:[...document.querySelectorAll('input[name="ch"]:checked')].map(c=>c.value), note:document.getElementById("note").value.trim(), at:new Date().toISOString()};
+  if(!db){ st.textContent="Saving isn't available here. Tell Claude in chat."; return; }
+  st.textContent="Saving…"; try{ await db.doc("picks/latest").set(data); st.textContent="Saved. Claude will build the stage builder with these picks."; }catch(err){ st.textContent="Couldn't save. Tell Claude in chat instead."; } });
+</script>
