@@ -25,7 +25,14 @@
 
 <header class="hero">
   <div class="container">
-    <div class="hero-badge" id="heroBadge">Checked against official pages</div>
+    <div class="verify" id="verify" role="note" aria-label="Rates verified against official sources">
+      <svg class="seal" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><g fill="#16a34a"><circle cx="42.60" cy="24.00" r="4.6"/><circle cx="41.18" cy="31.12" r="4.6"/><circle cx="37.15" cy="37.15" r="4.6"/><circle cx="31.12" cy="41.18" r="4.6"/><circle cx="24.00" cy="42.60" r="4.6"/><circle cx="16.88" cy="41.18" r="4.6"/><circle cx="10.85" cy="37.15" r="4.6"/><circle cx="6.82" cy="31.12" r="4.6"/><circle cx="5.40" cy="24.00" r="4.6"/><circle cx="6.82" cy="16.88" r="4.6"/><circle cx="10.85" cy="10.85" r="4.6"/><circle cx="16.88" cy="6.82" r="4.6"/><circle cx="24.00" cy="5.40" r="4.6"/><circle cx="31.12" cy="6.82" r="4.6"/><circle cx="37.15" cy="10.85" r="4.6"/><circle cx="41.18" cy="16.88" r="4.6"/><circle cx="24" cy="24" r="19.4"/></g><circle cx="24" cy="24" r="16.2" fill="#22c55e"/><circle cx="24" cy="24" r="14.6" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.1"/><path d="M17.2 24.6l4.6 4.6 9.4-9.8" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div class="verify-txt">
+        <b>Verified against official sources</b>
+        <span id="verifyChecked">Checked on the providers' own pages</span>
+        <span class="verify-next" id="verifyNext"></span>
+      </div>
+    </div>
     <h1>Where should your money <span class="gold">earn</span>?</h1>
     <p class="subtitle">Savings and earn rates from Philippine banks, digital banks, e-wallets and our partner crypto exchanges. Every rate shows its cap, its catches, whether it is a promo, and the day we checked it.</p>
     <div class="stats-row" id="statsRow"></div>
@@ -74,6 +81,8 @@
       <h2>Every rate, with its <span class="gold">fine print</span></h2>
       <p class="subtitle" id="ratesSub">Tap a row for the catches and the official source.</p>
     </div>
+
+    <div class="infl adv-only" id="inflPanel"></div>
 
     <div class="filters" id="filters">
       <div class="chips" data-key="cat" aria-label="Where">
@@ -153,6 +162,40 @@
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
+<section class="section" id="inflation-check">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">For savers in the Philippines</span>
+      <h2>Have you beaten <span class="gold">inflation</span>?</h2>
+      <p class="subtitle">Interest is only half the story. Tax takes a slice, and rising prices take another. See what is really left.</p>
+    </div>
+    <div class="sim-grid">
+      <div class="sim-explain"><div id="simExplain"></div><div class="sim-chart" id="simChart"></div></div>
+      <div class="sim-box">
+        <h3>Simulator</h3>
+        <div class="sim-fields">
+          <label class="sf"><span>Amount</span><input id="simAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+          <label class="sf"><span>Years</span><input id="simYears" type="number" inputmode="numeric" min="1" max="30" step="1" value="5"></label>
+          <label class="sf sf-wide"><span>Where you save</span><select id="simPick"></select></label>
+          <label class="sf"><span>Rate (% a year)</span><input id="simRate" type="number" inputmode="decimal" min="0" max="100" step="0.05" value="4"></label>
+          <label class="sf"><span>Inflation (% a year)</span><input id="simInfl" type="number" inputmode="decimal" min="-5" max="50" step="0.1" value="5"></label>
+          <label class="switch sf-wide"><input type="checkbox" id="simTax" checked><span class="switch-ui" aria-hidden="true"></span><span>Take off 20% tax <b class="dim" id="simTaxNote"></b></span></label>
+        </div>
+        <div class="sim-tiles">
+          <div class="st"><small>Interest earned</small><b id="simGross">—</b></div>
+          <div class="st st-tax"><small>Tax takes</small><b id="simTaxAmt">—</b></div>
+          <div class="st st-infl"><small>Inflation eats</small><b id="simInflAmt">—</b></div>
+          <div class="st st-real" id="simRealTile"><small>What you really gain</small><b id="simReal">—</b></div>
+        </div>
+        <div class="sim-bar" id="simBar" aria-hidden="true"></div>
+        <div class="sim-legend"><span><i class="sb-tax"></i>Tax</span><span><i class="sb-infl"></i>Inflation</span><span><i class="sb-real"></i>Real gain</span><span><i class="sb-loss"></i>Buying power lost</span></div>
+        <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
+        <p class="sim-note">"What you really gain" is in today's pesos. Assumes the rate and inflation stay the same every year, and interest is added once a year. A comparison, not advice; past inflation doesn't predict future inflation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section section-tight" id="method">
   <div class="container">
     <div class="method">
@@ -175,10 +218,9 @@
   <div class="container">
     <div class="footer-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></div>
     <p>TR Yield Tracker — Compare. Calculate. Compound.</p>
+    <div class="footnotes" id="partnerNotes"></div>
     <div class="legal" id="legal">
       <p><b>Not financial advice.</b> This page is education. Rates change without notice and may differ from what you see in the app. Always confirm the rate, cap and terms on the provider's own page before you deposit.</p>
-      <p><b>Partner links.</b> Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice.</p>
-      <p>We may earn a commission if you sign up. It doesn't change our review: we list the cons as well as the pros.</p>
       <p><b>Crypto is not a bank deposit.</b> It is not PDIC-insured, prices and rates move, and an exchange can fail or freeze withdrawals. Rules differ by country. Check with your local regulator (in the Philippines, the SEC) that this exchange is allowed where you live before you sign up. Exchange accounts are for adults (18+).</p>
     </div>
     <p class="credit">By <a href="https://zeefreaks.io" target="_blank" rel="noopener">Zeefreaks</a> and <a href="https://x.com/jayowtrades" target="_blank" rel="noopener">jayowtrades</a></p>

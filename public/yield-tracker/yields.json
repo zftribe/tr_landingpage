@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-09T00:12:30.155Z",
+ "generated": "2026-11-09T06:16:52.723Z",
  "checked": {
   "ph": "2026-11-09",
   "crypto": "2026-11-09"
@@ -58,7 +58,194 @@
    "label": "October 2026",
    "source": "https://www.bsp.gov.ph/SitePages/Default.aspx",
    "checkedOn": "2026-11-09",
-   "note": "Read on the BSP home page (Key Rates). PSA site blocks automated access."
+   "note": "Headline inflation (CPI, 2018=100), monthly, from the BSP home page (Key Rates chart). Re-checked every month by the PH refresh task.",
+   "history": [
+    {
+     "m": "2023-01",
+     "v": 8.7
+    },
+    {
+     "m": "2023-02",
+     "v": 8.6
+    },
+    {
+     "m": "2023-03",
+     "v": 7.6
+    },
+    {
+     "m": "2023-04",
+     "v": 6.6
+    },
+    {
+     "m": "2023-05",
+     "v": 6.1
+    },
+    {
+     "m": "2023-06",
+     "v": 5.4
+    },
+    {
+     "m": "2023-07",
+     "v": 4.7
+    },
+    {
+     "m": "2023-08",
+     "v": 5.3
+    },
+    {
+     "m": "2023-09",
+     "v": 6.1
+    },
+    {
+     "m": "2023-10",
+     "v": 4.9
+    },
+    {
+     "m": "2023-11",
+     "v": 4.1
+    },
+    {
+     "m": "2023-12",
+     "v": 3.9
+    },
+    {
+     "m": "2024-01",
+     "v": 2.8
+    },
+    {
+     "m": "2024-02",
+     "v": 3.4
+    },
+    {
+     "m": "2024-03",
+     "v": 3.7
+    },
+    {
+     "m": "2024-04",
+     "v": 3.8
+    },
+    {
+     "m": "2024-05",
+     "v": 3.9
+    },
+    {
+     "m": "2024-06",
+     "v": 3.7
+    },
+    {
+     "m": "2024-07",
+     "v": 4.4
+    },
+    {
+     "m": "2024-08",
+     "v": 3.3
+    },
+    {
+     "m": "2024-09",
+     "v": 1.9
+    },
+    {
+     "m": "2024-10",
+     "v": 2.3
+    },
+    {
+     "m": "2024-11",
+     "v": 2.5
+    },
+    {
+     "m": "2024-12",
+     "v": 2.9
+    },
+    {
+     "m": "2025-01",
+     "v": 2.9
+    },
+    {
+     "m": "2025-02",
+     "v": 2.1
+    },
+    {
+     "m": "2025-03",
+     "v": 1.8
+    },
+    {
+     "m": "2025-04",
+     "v": 1.4
+    },
+    {
+     "m": "2025-05",
+     "v": 1.3
+    },
+    {
+     "m": "2025-06",
+     "v": 1.4
+    },
+    {
+     "m": "2025-07",
+     "v": 0.9
+    },
+    {
+     "m": "2025-08",
+     "v": 1.5
+    },
+    {
+     "m": "2025-09",
+     "v": 1.7
+    },
+    {
+     "m": "2025-10",
+     "v": 1.7
+    },
+    {
+     "m": "2025-11",
+     "v": 1.5
+    },
+    {
+     "m": "2025-12",
+     "v": 1.8
+    },
+    {
+     "m": "2026-01",
+     "v": 2
+    },
+    {
+     "m": "2026-02",
+     "v": 2.4
+    },
+    {
+     "m": "2026-03",
+     "v": 4.1
+    },
+    {
+     "m": "2026-04",
+     "v": 7.2
+    },
+    {
+     "m": "2026-05",
+     "v": 6.8
+    },
+    {
+     "m": "2026-06",
+     "v": 6.4
+    },
+    {
+     "m": "2026-07",
+     "v": 6.2
+    },
+    {
+     "m": "2026-08",
+     "v": 6.1
+    },
+    {
+     "m": "2026-09",
+     "v": 7.2
+    },
+    {
+     "m": "2026-10",
+     "v": 7.8
+    }
+   ],
+   "base": "2018=100"
   },
   "policyRate": {
    "value": 5.5,
@@ -75,20 +262,46 @@
   }
  },
  "partners": {
+  "Maya": {
+   "kind": "bank",
+   "label": "Maya",
+   "url": "https://official.maya.ph/be7m/gmsb47rr"
+  },
+  "MariBank": {
+   "kind": "bank",
+   "label": "MariBank",
+   "url": "https://www.maribank.ph/c/earnfreemoney?referralCode=GA233507"
+  },
+  "GoTyme": {
+   "kind": "bank",
+   "label": "GoTyme Bank",
+   "code": "GTXGFA27Z70",
+   "url": "https://www.gotyme.com.ph/",
+   "codeHow": "Enter this referral code when you sign up in the GoTyme app."
+  },
   "OKX": {
-   "url": "https://www.okx.com/join/OFF2O",
-   "perk": "Eligible sign-ups may get a fee rebate; check the terms."
+   "kind": "exchange",
+   "label": "OKX",
+   "url": "https://www.okx.com/join/OFF2O"
   },
   "MEXC": {
+   "kind": "exchange",
+   "label": "MEXC",
    "url": "https://www.mexc.com/acquisition/custom-sign-up?shareCode=mexc-TR20OFF"
   },
   "Bitget": {
+   "kind": "exchange",
+   "label": "Bitget",
    "url": "https://partner.bitget.com/bg/OFF20"
   },
   "Bybit": {
+   "kind": "exchange",
+   "label": "Bybit",
    "url": "https://partner.bybit.com/b/tradingrepub"
   },
   "Gate": {
+   "kind": "exchange",
+   "label": "Gate",
    "url": "https://www.gate.com/share/BULLZONE"
   }
  },
@@ -3428,78 +3641,6 @@
   },
   {
    "provider": "OKX",
-   "product": "Simple Earn - BTC flexible",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 0.5,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Ongoing market rate, redeem any time.",
-   "finePrint": "Rates change daily. This is the Simple Earn market lending rate from OKX's public API; your actual rate can differ slightly. Interest is paid in the same coin.",
-   "source": "https://www.okx.com/api/v5/finance/savings/lending-rate-summary?ccy=BTC",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "avgRate/estRate/preRate \"0.005\" (decimal)",
-   "note": "API gives a decimal (0.04 = 4%).",
-   "id": "okx-simple-earn-btc-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the Philippine SEC advisory of early Aug 2025 (10 platforms listed).",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.5
-    }
-   ]
-  },
-  {
-   "provider": "OKX",
-   "product": "Simple Earn - ETH flexible",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 1,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Ongoing market rate, redeem any time.",
-   "finePrint": "Rates change daily. This is the Simple Earn market lending rate from OKX's public API; your actual rate can differ slightly. Interest is paid in the same coin.",
-   "source": "https://www.okx.com/api/v5/finance/savings/lending-rate-summary?ccy=ETH",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "avgRate/estRate/preRate \"0.01\" (decimal)",
-   "note": "API gives a decimal (0.04 = 4%).",
-   "id": "okx-simple-earn-eth-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the Philippine SEC advisory of early Aug 2025 (10 platforms listed).",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 1
-    }
-   ]
-  },
-  {
-   "provider": "OKX",
    "product": "Simple Earn - USDT flexible new-user bonus",
    "category": "cex",
    "currency": "USDT",
@@ -3573,84 +3714,6 @@
     {
      "d": "2026-11-09",
      "r": 10
-    }
-   ]
-  },
-  {
-   "provider": "OKX",
-   "product": "Simple Earn - BTC flexible new-user bonus",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 5,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": "2024-10-30",
-   "promoEnds": null,
-   "cap": 0.01,
-   "capText": "first 0.01 BTC per user, for 180 days",
-   "rateAfterCap": 0.5,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "new users (existing users only get leftover bonus days); ID-verified main account",
-   "conditions": "Bonus rate on the first slice of your balance for 180 days per coin. Money stays flexible.",
-   "finePrint": "Bonus stops after 180 days and redeeming then re-subscribing does not reset the clock. Above the cap you earn the normal market rate. Sub-accounts are not eligible.",
-   "source": "https://www.okx.com/help/simple-earn-flexible-bonus-policy-update",
-   "method": "page",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "Earn page: \"5% bonus for 180 days | New users only\"; help article: BTC 5% bonus, limit 0.01 BTC, 180 days",
-   "note": "Ongoing programme with no end date; the 180 days is per user. rateAfterCap is the market rate read from the API today.",
-   "id": "okx-simple-earn-btc-flexible-new-user-bonus",
-   "promoDays": 180,
-   "rateAfterPromo": 0.5,
-   "newUsersOnly": true,
-   "stablecoin": false,
-   "strings": true,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the Philippine SEC advisory of early Aug 2025 (10 platforms listed).",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 5
-    }
-   ]
-  },
-  {
-   "provider": "OKX",
-   "product": "Simple Earn - ETH flexible new-user bonus",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 5,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": "2024-10-30",
-   "promoEnds": null,
-   "cap": 0.2,
-   "capText": "first 0.2 ETH per user, for 180 days",
-   "rateAfterCap": 1,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "new users (existing users only get leftover bonus days); ID-verified main account",
-   "conditions": "Bonus rate on the first slice of your balance for 180 days per coin. Money stays flexible.",
-   "finePrint": "Bonus stops after 180 days and redeeming then re-subscribing does not reset the clock. Above the cap you earn the normal market rate. Sub-accounts are not eligible.",
-   "source": "https://www.okx.com/help/simple-earn-flexible-bonus-policy-update",
-   "method": "page",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "Earn page: \"5% bonus for 180 days | New users only\"; help article: ETH 5% bonus, limit 0.2 ETH, 180 days",
-   "note": "Ongoing programme with no end date; the 180 days is per user. rateAfterCap is the market rate read from the API today.",
-   "id": "okx-simple-earn-eth-flexible-new-user-bonus",
-   "promoDays": 180,
-   "rateAfterPromo": 1,
-   "newUsersOnly": true,
-   "stablecoin": false,
-   "strings": true,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the Philippine SEC advisory of early Aug 2025 (10 platforms listed).",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 5
     }
    ]
   },
@@ -3867,112 +3930,6 @@
     {
      "d": "2026-11-09",
      "r": 5.39
-    }
-   ]
-  },
-  {
-   "provider": "Bybit",
-   "product": "Easy Earn - BTC flexible",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 0.1,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Rate above first 0.003 BTC.",
-   "finePrint": "Rates change daily. Rate shown is an estimate. Interest paid in the same coin.",
-   "source": "https://api.bybit.com/v5/earn/product?category=FlexibleSaving&coin=BTC",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "estimateApr \"0.1%\"; tiers 0-0.003 = 0.4%, above = 0.1%",
-   "id": "bybit-easy-earn-btc-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.1
-    }
-   ]
-  },
-  {
-   "provider": "Bybit",
-   "product": "Easy Earn - BTC flexible (first 0.003 BTC boost)",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 0.4,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": 0.003,
-   "capText": "first 0.003 BTC",
-   "rateAfterCap": 0.1,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change daily. Rate shown is an estimate. Interest paid in the same coin.",
-   "source": "https://api.bybit.com/v5/earn/product?category=FlexibleSaving&coin=BTC",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "tierAprDetails 0-0.003 = \"0.4%\"",
-   "note": "No end date shown.",
-   "id": "bybit-easy-earn-btc-flexible-first-0-003-btc-boost",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.4
-    }
-   ]
-  },
-  {
-   "provider": "Bybit",
-   "product": "Easy Earn - ETH flexible",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 0.8,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change daily. Rate shown is an estimate. Interest paid in the same coin.",
-   "source": "https://api.bybit.com/v5/earn/product?category=FlexibleSaving&coin=ETH",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "estimateApr \"0.8%\", hasTieredApr false",
-   "id": "bybit-easy-earn-eth-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.8
     }
    ]
   },
@@ -4380,114 +4337,6 @@
   },
   {
    "provider": "Gate",
-   "product": "Simple Earn - BTC flexible",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 0.1,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Flexible lending rate, redeem any time.",
-   "finePrint": "Rates change hourly. est_rate is Gate's estimated annual rate. Interest paid in the same coin.",
-   "source": "https://api.gateio.ws/api/v4/earn/uni/rate",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "est_rate \"0.0010\" for BTC",
-   "note": "est_rate is a decimal, see USDT row.",
-   "id": "gate-simple-earn-btc-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Not among the 10 platforms named in the Aug 2025 advisory (article read; Gate not mentioned). A later SEC list reported 25 Aug 2025 added Blofin, CoinW, DigiFinex, LBank and Pionex; I did not read it in full, so a later naming cannot be ruled out. Gate's own promo terms also say the UK and some other regions are restricted.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.1
-    }
-   ]
-  },
-  {
-   "provider": "Gate",
-   "product": "Simple Earn - ETH flexible",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 1.83,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Flexible lending rate, redeem any time.",
-   "finePrint": "Rates change hourly. est_rate is Gate's estimated annual rate. Interest paid in the same coin.",
-   "source": "https://api.gateio.ws/api/v4/earn/uni/rate",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "est_rate \"0.0183\" for ETH",
-   "note": "est_rate is a decimal, see USDT row.",
-   "id": "gate-simple-earn-eth-flexible",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Not among the 10 platforms named in the Aug 2025 advisory (article read; Gate not mentioned). A later SEC list reported 25 Aug 2025 added Blofin, CoinW, DigiFinex, LBank and Pionex; I did not read it in full, so a later naming cannot be ruled out. Gate's own promo terms also say the UK and some other regions are restricted.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 1.83
-    }
-   ]
-  },
-  {
-   "provider": "Gate",
-   "product": "Simple Earn - USDE flexible",
-   "category": "cex",
-   "currency": "USDE",
-   "rate": 5.25,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "Flexible lending rate, redeem any time.",
-   "finePrint": "Rates change hourly. est_rate is Gate's estimated annual rate. Interest paid in the same coin.",
-   "source": "https://api.gateio.ws/api/v4/earn/uni/rate",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "est_rate \"0.0525\" for USDE",
-   "note": "est_rate is a decimal, see USDT row.",
-   "id": "gate-simple-earn-usde-flexible",
-   "stablecoin": true,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Not among the 10 platforms named in the Aug 2025 advisory (article read; Gate not mentioned). A later SEC list reported 25 Aug 2025 added Blofin, CoinW, DigiFinex, LBank and Pionex; I did not read it in full, so a later naming cannot be ruled out. Gate's own promo terms also say the UK and some other regions are restricted.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 5.25
-    }
-   ]
-  },
-  {
-   "provider": "Gate",
    "product": "Simple Earn Fixed - USDT 7 days (VIP2-14 boost)",
    "category": "cex",
    "currency": "USDT",
@@ -4806,73 +4655,6 @@
   },
   {
    "provider": "Bitget",
-   "product": "Simple Earn Flexible - BTC",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 1,
-   "rateBasis": "APR",
-   "upTo": true,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates are variable. After the promo ends APRs follow the market in real time. Interest is hourly.",
-   "source": "https://www.bitget.com/finance/savings",
-   "method": "page",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "Earn page row: BTC 0.60%~1.00% Flexible",
-   "note": "Page shows a range (0.60% to 1.00%); tier limits not read, so 1.00 is the top of the range.",
-   "id": "bitget-simple-earn-flexible-btc",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 1
-    }
-   ]
-  },
-  {
-   "provider": "Bitget",
-   "product": "Simple Earn Flexible - ETH",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": null,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "",
-   "source": "https://www.bitget.com/finance/savings",
-   "method": "page",
-   "checkedOn": "2026-11-09",
-   "verified": false,
-   "evidence": "ETH not in the visible rows (376 more hidden); not read",
-   "note": "Not on the first screen of the page and the API needs keys; not captured.",
-   "id": "bitget-simple-earn-flexible-eth",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": []
-  },
-  {
-   "provider": "Bitget",
    "product": "Simple Earn Fixed - USDT 7 / 14 days",
    "category": "cex",
    "currency": "USDT",
@@ -5121,146 +4903,6 @@
   },
   {
    "provider": "MEXC",
-   "product": "Savings flexible - BTC",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 7,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": 0.002,
-   "capText": "first 0.002 BTC = 7.0%; 0.002-0.03 BTC = 0.3%; above 0.03 BTC = 0.1%",
-   "rateAfterCap": 0.3,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change. The boost sits on top of a small base rate and each balance band earns that band's rate. Interest paid in the same coin.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "tieredSubsidyApr: 0-0.002 6.99; 0.002-0.03 0.29; 0.03+ 0.09; baseApr 0.01; showApr 7",
-   "id": "mexc-savings-flexible-btc",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 7
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
-   "product": "Savings flexible - BTC (base)",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 0.01,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change. The boost sits on top of a small base rate and each balance band earns that band's rate. Interest paid in the same coin.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "baseApr 0.01",
-   "id": "mexc-savings-flexible-btc-base",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.01
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
-   "product": "Savings flexible - ETH",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 7,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": 0.05,
-   "capText": "first 0.05 ETH = 7.0%; 0.05-0.3 ETH = 2.0%; above 0.3 ETH = 1.0%",
-   "rateAfterCap": 2,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change. The boost sits on top of a small base rate and each balance band earns that band's rate. Interest paid in the same coin.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "tieredSubsidyApr: 0-0.05 6.9; 0.05-0.3 1.9; 0.3+ 0.9; baseApr 0.1; showApr 7",
-   "id": "mexc-savings-flexible-eth",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 7
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
-   "product": "Savings flexible - ETH (base)",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 0.1,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "standard",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": null,
-   "capText": "",
-   "rateAfterCap": null,
-   "lockup": "flexible",
-   "tenorDays": null,
-   "eligibility": "all users",
-   "conditions": "",
-   "finePrint": "Rates change. The boost sits on top of a small base rate and each balance band earns that band's rate. Interest paid in the same coin.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "baseApr 0.1",
-   "id": "mexc-savings-flexible-eth-base",
-   "stablecoin": false,
-   "strings": false,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 0.1
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
    "product": "Savings fixed - USDT new-user exclusive",
    "category": "cex",
    "currency": "USDT",
@@ -5294,82 +4936,6 @@
     {
      "d": "2026-11-09",
      "r": 600
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
-   "product": "Savings fixed - BTC new-user exclusive",
-   "category": "cex",
-   "currency": "BTC",
-   "rate": 600,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": 0.005,
-   "capText": "per order min 0.00155 BTC, max 0.005 BTC",
-   "rateAfterCap": null,
-   "lockup": "short fixed term (unit not confirmed, likely days)",
-   "tenorDays": null,
-   "eligibility": "new users - first-time depositors (EFTD)",
-   "conditions": "Very short fixed term new-user product; the high % applies only to a tiny capped amount.",
-   "finePrint": "Annualised number on a tiny amount for a few days. Needs a first deposit. Exact term length not confirmed.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "memberType EFTD, baseApr 600, min 0.00155, max 0.005, fixedInvestPeriodType 2 count 1; page banner: New user exclusive: Up to 600% APR",
-   "note": "Term length/unit not stated in the data I read, so tenorDays is null.",
-   "id": "mexc-savings-fixed-btc-new-user-exclusive",
-   "newUsersOnly": true,
-   "teaser": true,
-   "stablecoin": false,
-   "strings": true,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 600
-    }
-   ]
-  },
-  {
-   "provider": "MEXC",
-   "product": "Savings fixed - ETH new-user exclusive",
-   "category": "cex",
-   "currency": "ETH",
-   "rate": 200,
-   "rateBasis": "APR",
-   "upTo": false,
-   "kind": "promo",
-   "promoStarts": null,
-   "promoEnds": null,
-   "cap": 0.1,
-   "capText": "per order min 0.03 ETH, max 0.1 ETH",
-   "rateAfterCap": null,
-   "lockup": "short fixed term (unit not confirmed, likely days)",
-   "tenorDays": null,
-   "eligibility": "new users - first-time depositors (EFTD)",
-   "conditions": "Very short fixed term new-user product; the high % applies only to a tiny capped amount.",
-   "finePrint": "Annualised number on a tiny amount for a few days. Needs a first deposit. Exact term length not confirmed.",
-   "source": "https://www.mexc.com/api/financialactivity/financial/products/list/V2",
-   "method": "api",
-   "checkedOn": "2026-11-09",
-   "verified": true,
-   "evidence": "memberType EFTD, baseApr 200, min 0.03, max 0.1, fixedInvestPeriodType 2 count 1; page banner: New user exclusive: Up to 600% APR",
-   "note": "Term length/unit not stated in the data I read, so tenorDays is null.",
-   "id": "mexc-savings-fixed-eth-new-user-exclusive",
-   "newUsersOnly": true,
-   "teaser": true,
-   "stablecoin": false,
-   "strings": true,
-   "cons": "Not a bank deposit and not insured. The exchange can change the rate or pause withdrawals. Named as not SEC-registered in the same Aug 2025 advisory.",
-   "history": [
-    {
-     "d": "2026-11-09",
-     "r": 200
     }
    ]
   }

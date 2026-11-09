@@ -15,12 +15,16 @@ const overrides = read('overrides.json') || {}
 const history = read('history.json') || {}
 const regions = read('cex-regions.json') || []
 
+// Partner and referral links. They are shown only in the footer footnotes ("Partner & referral links"); rows link down to them.
 const PARTNERS = {
-  OKX: { url: 'https://www.okx.com/join/OFF2O', perk: 'Eligible sign-ups may get a fee rebate; check the terms.' },
-  MEXC: { url: 'https://www.mexc.com/acquisition/custom-sign-up?shareCode=mexc-TR20OFF' },
-  Bitget: { url: 'https://partner.bitget.com/bg/OFF20' },
-  Bybit: { url: 'https://partner.bybit.com/b/tradingrepub' },
-  Gate: { url: 'https://www.gate.com/share/BULLZONE' },
+  Maya: { kind: 'bank', label: 'Maya', url: 'https://official.maya.ph/be7m/gmsb47rr' },
+  MariBank: { kind: 'bank', label: 'MariBank', url: 'https://www.maribank.ph/c/earnfreemoney?referralCode=GA233507' },
+  GoTyme: { kind: 'bank', label: 'GoTyme Bank', code: 'GTXGFA27Z70', url: 'https://www.gotyme.com.ph/', codeHow: 'Enter this referral code when you sign up in the GoTyme app.' },
+  OKX: { kind: 'exchange', label: 'OKX', url: 'https://www.okx.com/join/OFF2O' },
+  MEXC: { kind: 'exchange', label: 'MEXC', url: 'https://www.mexc.com/acquisition/custom-sign-up?shareCode=mexc-TR20OFF' },
+  Bitget: { kind: 'exchange', label: 'Bitget', url: 'https://partner.bitget.com/bg/OFF20' },
+  Bybit: { kind: 'exchange', label: 'Bybit', url: 'https://partner.bybit.com/b/tradingrepub' },
+  Gate: { kind: 'exchange', label: 'Gate', url: 'https://www.gate.com/share/BULLZONE' },
 }
 // Words that mean "you must do something to get this rate".
 const STRINGS = /\b(spend|purchase|transact|cash[- ]?in|card|loan|payroll|maintain|average daily balance|adb|task|refer|invite|new users? only|first[- ]time|vip|hold(ing)? (okb|bgb|mx|gt)|stake)\b/i
@@ -48,7 +52,8 @@ for (const { f, rows: list } of sources) {
     if (/\bvip\b/i.test(elig)) r.vipOnly = true
     if (/new[- ]user|first[- ]time/i.test(elig + ' ' + (r.product || ''))) r.newUsersOnly = true
     if (r.rate != null && r.rate > 30) r.teaser = true // tiny-cap headline offers: listed, never ranked
-    if (r.category === 'cex') r.stablecoin = /^(usdt|usdc|usde|fdusd|dai)$/i.test(r.currency || '')
+    if (r.category === 'cex' && !/^(usdt|usdc|usdg)$/i.test(r.currency || '')) continue // George 9 Nov: crypto = USDT, USDC, USDG only (no other stablecoins, no BTC/ETH)
+    if (r.category === 'cex') r.stablecoin = /^(usdt|usdc|usdg)$/i.test(r.currency || '')
     if (r.vipOnly || r.newUsersOnly) r.strings = r.strings ?? true
     if (r.strings == null) r.strings = STRINGS.test(`${r.conditions || ''}`) && !/^none|no (special )?conditions/i.test(r.conditions || '')
     if (r.category === 'cex') {
