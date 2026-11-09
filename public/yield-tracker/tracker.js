@@ -167,9 +167,11 @@ function renderFootnotes() {
       ? `<span class="fn-code"><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="fn-how">${esc(p.codeHow || '')} <a href="${esc(p.url)}" target="_blank" rel="noopener">Official site ↗</a></span>`
       : `<a class="fn-url" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a> <small class="fn-dom">${esc(new URL(p.url).hostname.replace(/^www\./, ''))}</small>`}</li>`;
   const banks = list.filter((p) => p.kind === 'bank'), ex = list.filter((p) => p.kind !== 'bank');
-  el.innerHTML = `<h3 class="fn-title">Partner &amp; referral links</h3>
+  // Collapsed by default (George, 9 Nov); the heading and disclosure line always stay visible.
+  el.innerHTML = `<div class="fn-head"><h3 class="fn-title">Partner &amp; referral links</h3>
+    <button type="button" class="fn-toggle" id="fnToggle" aria-expanded="false" aria-controls="fnBody">Show all ${list.length} links <span aria-hidden="true">▾</span></button></div>
     <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
-    <div class="fn-cols">
+    <div class="fn-cols" id="fnBody" hidden>
       <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
       <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
     </div>`;
@@ -556,6 +558,12 @@ function wire() {
   });
   ['simAmt', 'simYears', 'simRate', 'simInfl', 'simTax'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', sim); });
   const sp = $('#simPick'); if (sp) sp.addEventListener('change', () => { const r = ROWS.find((x) => x.id === sp.value); if (r) $('#simRate').value = r.rate; sim(); });
+  document.addEventListener('click', (e) => {
+    const t = e.target.closest('#fnToggle'); if (!t) return;
+    const body = document.getElementById('fnBody'), open = body.hidden;
+    body.hidden = !open; t.setAttribute('aria-expanded', String(open));
+    t.innerHTML = (open ? 'Hide links' : 'Show all ' + body.querySelectorAll('li').length + ' links') + ' <span aria-hidden="true">' + (open ? '▴' : '▾') + '</span>';
+  });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
   $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });

@@ -397,3 +397,10 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .ref-lbl { font-size: .74rem; color: var(--text-dim); }
 .ref-code code { font: 600 .82rem ui-monospace, Consolas, monospace; color: var(--gold); background: var(--bg-card-2); border: 1px solid var(--border-2); padding: 3px 8px; border-radius: 6px; letter-spacing: .5px; }
 .ref-how { font-size: .72rem; color: var(--text-dim); align-self: center; }
+
+/* Footer partner list: collapsed by default */
+.fn-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 6px; }
+.fn-head .fn-title { margin: 0; }
+.fn-toggle { font: 600 .8rem/1 var(--font-body); padding: 8px 14px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--white); cursor: pointer; min-height: 36px; }
+.fn-toggle:hover, .fn-toggle[aria-expanded="true"] { border-color: var(--gold); }
+.fn-cols[hidden] { display: none; }
