@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-09T00:01:42.714Z",
+ "generated": "2026-11-09T00:12:30.155Z",
  "checked": {
   "ph": "2026-11-09",
   "crypto": "2026-11-09"
@@ -209,7 +209,7 @@
    "minDeposit": null,
    "interestCredited": "daily accrual, credited next day",
    "conditions": "Existing users: hit spending goals with Maya (for example PHP 250 to PHP 35,000 in payments, or approval of a Maya card or loan for the top tiers). New users: sign up, cash in PHP 1,000, upgrade, and put PHP 1,000 into Maya Savings.",
-   "finePrint": "The boost applies only on the first PHP 100,000 and lasts until the end of the month you qualify. The top 13% to 15% tiers are for select users (loan, credit card, payroll). Balance above the cap earns the base rate (page shows both 3% and 3.5%).",
+   "finePrint": "Conditions apply. The top 13% to 15% tiers are only for select users (Maya loan, credit card or payroll), and any boost applies only to the first ₱100,000, for the month you qualify. Most users get a lower tier. Money above ₱100,000 earns the base rate.",
    "pdic": true,
    "source": "https://www.mayabank.ph/highinterestsavings/",
    "checkedOn": "2026-11-09",
@@ -3323,7 +3323,7 @@
    "minDeposit": 500,
    "interestCredited": "Dividend declared once a year after year-end; paid yearly or compounded to maturity (member's choice)",
    "conditions": "Pag-IBIG members only. 5-year savings term. Rate is the dividend declared for 2025 (announced 27 Feb 2026), not a promised rate for future years.",
-   "finePrint": "This is last year's dividend, not a promised rate: Pag-IBIG declares it each year from its earnings. Money is locked for 5 years; early withdrawal only for allowed reasons and may cut the dividend. Backed by Pag-IBIG Fund, not PDIC.",
+   "finePrint": "Not a bank deposit and not PDIC-insured. 7.12% is the 2025 dividend, not a promise: Pag-IBIG declares a new rate each year from its earnings. Money is locked for 5 years; early withdrawal only for allowed reasons and may cut the dividend. Tax-free.",
    "pdic": false,
    "taxExempt": true,
    "taxExemptReason": "DOF says savings in SSS, GSIS and Pag-IBIG programs such as MP2 remain tax-free after CMEPA: https://www.dof.gov.ph/dof-calls-out-fake-news-cmepa-does-not-impose-a-new-tax-instead-corrects-an-unfair-system-that-favors-the-wealthy/",

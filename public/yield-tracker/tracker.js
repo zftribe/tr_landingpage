@@ -10,9 +10,9 @@ const daysBetween = (a, b) => Math.round((b - a) / DAY);
 const PH_CATS = ['traditional', 'digital', 'ewallet', 'government'];
 const CAT_LABEL = { traditional: 'Banks', digital: 'Digital banks', ewallet: 'E-wallets', government: 'Government', cex: 'Crypto exchanges', dex: 'DeFi · Kamino + Jupiter (live)' };
 const CAT_NOTE = {
-  cex: 'Paid in the coin you deposit. Not a bank deposit and not PDIC-insured. Rates change often, sometimes daily.',
-  dex: 'Kamino (its lending markets and curated vaults) and Jupiter Lend on Solana. USDC and USDT only, pools over $2M. Live from DefiLlama, so rates move every hour. Smart-contract risk; no insurance.',
-  government: 'Not a bank deposit. Backed by the agency itself, not PDIC.',
+  cex: 'Paid in the coin you deposit. Not a bank deposit and not PDIC-insured. Rates change often, sometimes daily. Rules differ by country: check with your local regulator (in the Philippines, the SEC) that an exchange is allowed where you live. Adults (18+) only.',
+  dex: 'Kamino (its lending markets and curated vaults) and Jupiter Lend on Solana. USDC and USDT only, pools over $2M. Live from DefiLlama, so rates move every hour. Curated vaults are run by outside managers, not Kamino or us. Smart-contract risk: you could lose some or all of your money. No insurance and no support desk. Adults (18+) only.',
+  government: 'Not a bank deposit and not PDIC-insured. The rate is last year’s dividend (7.12% for 2025), not a promise. Money is locked for 5 years. Tax-free.',
 };
 const ORDER = ['digital', 'ewallet', 'traditional', 'government', 'cex', 'dex'];
 const LOGOS = { gcash: 'gcash', maribank: 'maribank', gotyme: 'gotyme', maya: 'maya', cimb: 'cimb', ownbank: 'ownbank', uniondigital: 'uniondigital', 'uno ': 'uno', tonik: 'tonik', ofbank: 'ofbank', 'overseas filipino': 'ofbank', netbank: 'netbank', komo: 'komo', diskartech: 'diskartech', bpi: 'bpi', metrobank: 'metrobank', rcbc: 'rcbc', 'security bank': 'securitybank', landbank: 'landbank', dbp: 'dbp', 'development bank': 'dbp', pnb: 'pnb', 'philippine national': 'pnb', psbank: 'psbank', bdo: 'bdo', eastwest: 'eastwest', unionbank: 'unionbank', aub: 'aub', 'asia united': 'aub', 'china bank': 'chinabank', 'pag-ibig': 'pagibig', okx: 'okx', bybit: 'bybit', bitget: 'bitget', mexc: 'mexc', gate: 'gate', kamino: 'kamino', jupiter: 'jupiter' };
@@ -65,7 +65,7 @@ function yearRate(r, amount) {
   const after = r.rateAfterPromo != null ? r.rateAfterPromo : 0;
   return (b * d + after * (365 - d)) / 365;
 }
-const ended = (r) => r.kind === 'promo' && r.promoEnds && new Date(r.promoEnds) < TODAY;
+const ended = (r) => r.kind === 'promo' && r.promoEnds && new Date(r.promoEnds) <= TODAY; // treat the end date itself as ended (Legal docket 27)
 const daysLeft = (r) => (r.promoEnds ? daysBetween(TODAY, new Date(r.promoEnds)) : null);
 const staleLimit = (r) => (r.category === 'cex' ? 16 : r.category === 'dex' ? 2 : 35);
 const age = (r) => (r.checkedOn ? daysBetween(new Date(r.checkedOn), TODAY) : 999);
@@ -96,6 +96,7 @@ function spark(h) {
   return `<svg class="spark" width="${w}" height="${ht}" viewBox="0 0 ${w} ${ht}" aria-label="Rate history: ${h.map((p) => p.d + ' ' + p.r + '%').join(', ')}"><polyline fill="none" stroke="${up ? '#22c55e' : '#ef4444'}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="${pts}"/></svg>`;
 }
 function kindBadge(r) {
+  if (r.category === 'government') return '<span class="badge cap">Past dividend</span>';
   if (r.kind !== 'promo') return '<span class="badge std">Standard</span>';
   if (ended(r)) return '<span class="badge stale">Promo ended</span>';
   const d = daysLeft(r);
@@ -122,7 +123,7 @@ function visibleRows() {
     if (S.view === 'advanced' && S.f.lock === 'flexible' && locked(r)) return false;
     if (S.view === 'advanced' && S.f.lock === 'locked' && !locked(r)) return false;
     if (q && !(`${r.provider} ${r.product}`.toLowerCase().includes(q))) return false;
-    if (S.view === 'basic' && (r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin))) return false;
+    if (S.view === 'basic' && (r.rate == null || ended(r) || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin))) return false;
     return true;
   });
 }
@@ -134,7 +135,7 @@ function rowHTML(r) {
   const rateCell = r.rate == null
     ? '<div class="rate na">Not published<small>check in the app</small></div>'
     : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.tax && taxable(r) ? '<small>after tax</small>' : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
-  const ins = r.pdic ? '<span class="badge ins">PDIC ₱1M</span>' : r.category === 'cex' || r.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
+  const ins = r.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r.category === 'cex' || r.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   const st = stale(r) ? '<span class="badge stale">Needs re-check</span>' : '';
   const facts = [
     ['Rate', r.rate == null ? 'Not published' : `${r.upTo ? 'Up to ' : ''}${pct2(r.rate)} ${isPeso(r) ? 'p.a. before tax' : (r.rateBasis || 'APR')}`],
@@ -147,7 +148,7 @@ function rowHTML(r) {
     r.minDeposit ? ['Minimum', (isPeso(r) ? '₱' : '') + Number(r.minDeposit).toLocaleString('en-PH')] : null,
     r.interestCredited ? ['Interest paid', esc(r.interestCredited)] : null,
     r.eligibility ? ['Who can get it', esc(r.eligibility)] : null,
-    ['Insurance', r.pdic ? 'PDIC member bank: up to ₱1,000,000 per depositor, per bank' : r.category === 'government' ? 'Not PDIC; backed by the agency' : 'None. Not a bank deposit'],
+    ['Insurance', r.pdic ? 'PDIC member bank: up to ₱1,000,000 per depositor, per bank, counting all your accounts at that bank together' : r.category === 'government' ? 'Not PDIC; backed by the agency' : 'None. Not a bank deposit'],
     ['Checked', `${fmtDate(r.checkedOn)}${stale(r) ? ' (older than our schedule)' : ''}`],
   ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
   return `<div class="row${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
@@ -194,9 +195,9 @@ function provHTML({ k, rs }) {
   const bits = [
     std ? `Steady up to <b>${pct2(net(std.rate, std))}</b>` : '',
     promo ? `Promo up to <b>${pct2(net(promo.rate, promo))}</b>${promo.promoEnds ? ' · ends ' + fmtDate(promo.promoEnds) : ''}` : '',
-    rs.some((r) => locked(r)) && rs.some((r) => !locked(r)) ? 'Savings + time deposits' : rs.every(locked) ? 'Time deposits' : '',
+    rs.some((r) => locked(r)) && rs.some((r) => !locked(r)) ? (isPeso(r0) ? 'Savings + time deposits' : 'Flexible + fixed terms') : rs.every(locked) ? 'Time deposits' : '',
   ].filter(Boolean).join(' <span class="dot">·</span> ');
-  const ins = r0.pdic ? '<span class="badge ins">PDIC ₱1M</span>' : r0.category === 'cex' || r0.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
+  const ins = r0.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r0.category === 'cex' || r0.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   return `<div class="prov-card${open ? ' open' : ''}" data-prov="${esc(k)}">
   <button class="prov-head" aria-expanded="${open}" aria-controls="${kid}">
     <div class="prov"><div class="logo">${logo(r0)}</div><div class="prov-txt"><span class="prov-name">${esc(r0.provider)}</span><span class="prov-prod">${rs.length} products · tap to compare</span></div></div>
@@ -210,8 +211,8 @@ function provHTML({ k, rs }) {
 function renderRates() {
   const list = visibleRows();
   const sortKey = (r) => (r.rate == null ? -1 : ended(r) ? -0.5 : net(r.rate, r));
-  const head = S.view === 'advanced'
-    ? `<div class="row-main" style="cursor:default;padding-top:0;padding-bottom:0;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim)" aria-hidden="true"><div>Provider</div><div>${S.tax ? 'Net rate' : 'Rate'}</div><div class="c-adv">Gross</div><div class="c-kind">Type</div><div class="c-cap">Cap</div><div class="c-adv">Access</div><div class="c-adv">Checked</div><div class="c-adv">Trend</div><div></div></div>`
+  const headFor = (cat) => S.view === 'advanced'
+    ? `<div class="row-main" style="cursor:default;padding-top:0;padding-bottom:0;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim)" aria-hidden="true"><div>Provider</div><div>${S.tax && PH_CATS.includes(cat) && cat !== 'government' ? 'Net rate' : 'Rate'}</div><div class="c-adv">Gross</div><div class="c-kind">Type</div><div class="c-cap">Cap</div><div class="c-adv">Access</div><div class="c-adv">Checked</div><div class="c-adv">Trend</div><div></div></div>`
     : '';
   let html = '';
   for (const cat of ORDER) {
@@ -219,7 +220,7 @@ function renderRates() {
     if (!g.length) continue;
     { const np = new Set(g.map((r) => r.provider)).size; html += `<div class="rgroup-title">${CAT_LABEL[cat]} <span>${np} provider${np > 1 ? 's' : ''} · ${g.length} rate${g.length > 1 ? 's' : ''}</span></div>`; }
     if (CAT_NOTE[cat]) html += `<p class="rgroup-note">${CAT_NOTE[cat]}</p>`;
-    html += (head ? head : '') + groupByProvider(g).map(provHTML).join('');
+    html += headFor(cat) + groupByProvider(g).map(provHTML).join('');
   }
   $('#rates').innerHTML = html || '<p class="no-picks">No rates match these filters.</p>';
   const hidden = ROWS.filter((r) => r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin)).length;
@@ -296,14 +297,14 @@ function renderPicks() {
       <div class="pick-rank">${ranks[i]}</div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
-      <div class="pick-earn">On ${money(amt)}: about <b>${money(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}${r.category === 'cex' ? ' <span class="tag">(paid in ' + esc(r.currency) + '; value moves with the dollar)</span>' : ''}</div>
+      <div class="pick-earn">On ${money(amt)}: about <b>${money(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar). Not insured.</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''}</div>
       <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? `<a class="btn gold" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Open ${esc(p.name)} ↗</a>` : ''}</div>
       ${p ? '<span class="tag">Partner link: we may earn a commission.</span>' : ''}
     </article>`;
   }).join('');
-  $('#treeResult').innerHTML = `<div class="path">${path}</div>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
+  $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.</p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
     <p class="rates-foot">Ranked by what your amount earns over the next 12 months${S.tax ? ' after tax' : ''}: caps applied, and promos count only until they end. Only rates we could check on an official page. Not financial advice.</p>`;
 }
 
@@ -351,7 +352,7 @@ function renderStats() {
   const promos = u.filter((r) => r.kind === 'promo').length;
   const providers = new Set(ROWS.filter((r) => r.category !== 'dex').map((r) => r.provider)).size;
   const stat = (v, l) => `<div class="stat-item"><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`;
-  $('#statsRow').innerHTML = stat(providers, 'Providers') + stat(std.length ? pct2(Math.max(...std)) : '—', `Best steady savings${S.tax ? ', after tax' : ''}`) + stat(promoTop.length ? pct2(Math.max(...promoTop)) : '—', 'Top promo rate (short-term)') + stat(promos, 'Live promos');
+  $('#statsRow').innerHTML = stat(providers, 'Providers') + stat(std.length ? pct2(Math.max(...std)) : '—', `Best steady savings${S.tax ? ', after tax' : ''}`) + stat(promoTop.length ? pct2(Math.max(...promoTop)) : '—', `Top promo rate${S.tax ? ' after tax' : ''} (short-term, conditions apply)`) + stat(promos, 'Live promos');
   const ph = DATA.checked && DATA.checked.ph, cx = DATA.checked && DATA.checked.crypto;
   $('#heroBadge').textContent = `Peso rates checked ${fmtDate(ph)} · Crypto ${fmtDate(cx)}`;
 }

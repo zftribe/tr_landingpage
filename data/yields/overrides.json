@@ -3,7 +3,8 @@
     "rateAfterPromo": 3,
     "rateAfterCap": 3,
     "strings": true,
-    "_why": "Base Maya Savings rate 3.0% (verified row). Page shows 3% and 3.5% for balances above the cap; we use the lower one."
+    "_why": "Base Maya Savings rate 3.0% (verified row). Page shows 3% and 3.5% for balances above the cap; we use the lower one.",
+    "finePrint": "Conditions apply. The top 13% to 15% tiers are only for select users (Maya loan, credit card or payroll), and any boost applies only to the first ₱100,000, for the month you qualify. Most users get a lower tier. Money above ₱100,000 earns the base rate."
   },
   "cimb-bank-ph-upsave-gsave-earn-more-promo-up-to-4-15": {
     "rateAfterPromo": 2.3,
@@ -136,7 +137,7 @@
     "pdic": false,
     "source": "https://www.pna.gov.ph/articles/1270003",
     "evidence": "MP2 Savings rate climbed to 7.12 percent (2025 dividend, PNA)",
-    "finePrint": "This is last year's dividend, not a promised rate: Pag-IBIG declares it each year from its earnings. Money is locked for 5 years; early withdrawal only for allowed reasons and may cut the dividend. Backed by Pag-IBIG Fund, not PDIC.",
+    "finePrint": "Not a bank deposit and not PDIC-insured. 7.12% is the 2025 dividend, not a promise: Pag-IBIG declares a new rate each year from its earnings. Money is locked for 5 years; early withdrawal only for allowed reasons and may cut the dividend. Tax-free.",
     "lockup": "5 years",
     "_why": "pagibigfund.gov.ph is behind reCAPTCHA; PNA (government news agency) reports the official announcement."
   },

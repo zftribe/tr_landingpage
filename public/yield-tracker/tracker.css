@@ -276,3 +276,5 @@ select.calc-input { font-size: .88rem; font-weight: 500; }
 .prov-body .prov-prod { color: var(--white); font-size: .86rem; font-weight: 500; white-space: normal; }
 .prov-body .row-more { padding-left: 16px; }
 @media (max-width: 720px) { .prov-body .row-main .c-badges { padding-left: 0; } }
+
+.rank-note { text-align: center; font-size: .84rem; color: var(--text); margin: -6px auto 16px; max-width: 640px; }
