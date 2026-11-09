@@ -8,6 +8,17 @@ node scripts/yields/build.js           # writes public/yield-tracker/yields.json
 node scripts/yields/build.js --check   # checks only; exits 1 on errors
 ```
 
+## Live and preview (George, 9 Nov 2026)
+| | Where | Branch |
+|---|---|---|
+| **Live** | welcome.tradingrepublic.io/yield-tracker/ | `main` |
+| **Preview** | tr-welcome-preview.1037293.workers.dev/yield-tracker/ (ribbon "PREVIEW, not live") | `claude/yield-tracker-polish` (draft PR #16) |
+| **Compare** | tr-welcome-preview.1037293.workers.dev/yield-options.html (live vs preview, web + phone) | — |
+
+- Every polish round is committed to `claude/yield-tracker-polish` and deployed to the preview only: `sh D:/Temp/yield-tracker/deploy.sh` (adds the ribbon at deploy time; the ribbon is never committed). `/yield-tracker-live/` on the preview mirrors `origin/main`.
+- Scheduled data refreshes open a data PR to `main` **and** merge the same data into the polish branch, then redeploy the preview.
+- When George says polishing is done: one release card to the Command Center keeper with live vs preview screenshots and the go line. Only George's go, typed in the Yield Tracker session's chat, merges PR #16. After merging, check that Vercel deployed main; if not, start it from the Vercel dashboard (team tr-lms-vercel → tr-landingpage → Deployments → … → Create Deployment → main → Deploy to Production).
+
 ## Data files (`data/yields/`)
 
 | File | What | Refresh |
