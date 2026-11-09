@@ -43,7 +43,9 @@ export type Product = {
  */
 export function toProduct(p: LmsPackage): Product {
   const courses = p.items.filter((i) => i.itemType === 'course').map((i) => i.itemId)
-  const membership = p.items.find((i) => i.itemType === 'discord')
+  // Membership time = the first Discord item with a numeric duration. Course keys (Titans, Digital Walkers,
+  // Market Makers…) are ₱0 Discord items with no duration: they are lifetime keys, not membership (LMS, 9 Nov).
+  const membership = p.items.find((i) => i.itemType === 'discord' && typeof i.durationDays === 'number')
   const hasTI = courses.includes(TI_COURSE)
   const hasWeb3 = WEB3_COURSES.some((id) => courses.includes(id))
   const months = membership?.durationDays ? Math.round(membership.durationDays / 30) : null
