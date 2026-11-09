@@ -116,3 +116,8 @@
 .pc-top { flex-wrap: wrap; row-gap: 6px; }
 .pc-top .program-tag { white-space: normal; text-align: right; }
 @media (max-width: 380px) { .pc-logo { width: 32px; height: 32px; } .pc-logo img { width: 22px; height: 22px; } .pc-logo img[src$=".svg"] { width: 32px; height: 32px; } .pc-coin { width: 24px; height: 24px; font-size: 9px; } }
+
+/* LP Masterclass (9 Nov): "Includes the LP Masterclass" note on WEB3 cards; disabled Buy on a preview placeholder. */
+.pc-includes li.pc-incl-note { color: var(--gold); font-size: 12px; }
+.pc-includes li.pc-incl-note::before { content: "+"; }
+.pc-soon { opacity: .55; cursor: default; pointer-events: none; }

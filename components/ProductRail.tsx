@@ -29,13 +29,15 @@ const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
   // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
   web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
+  // Same coin style as W3 until a drawn LP mark exists.
+  lp: { alt: 'Liquidity Provider Masterclass', coin: 'LP' },
   // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
   citizen: { alt: 'Citizen membership', src: '/logos/programs/citizen.svg' },
 } satisfies Record<string, Logo>
 
 const logosOf = (p: Product): Logo[] => [
   ...(p.hasTI ? [L.ti] : []),
-  ...(p.hasWeb3 ? [L.web3] : []),
+  ...(p.hasWeb3 ? [L.web3] : p.hasLP && !p.hasTI ? [L.lp] : []),
   ...(p.months ? [L.citizen] : []),
 ]
 
@@ -162,7 +164,12 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
 
               <ul className="pc-includes">
                 {/* A single course already names itself in the title, so its card says what you get instead. */}
-                {!p.months && p.hasTI !== p.hasWeb3 ? (
+                {p.hasLP && !p.hasWeb3 && !p.hasTI ? (
+                  <>
+                    <li>Liquidity Provider Masterclass course</li>
+                    <li>Market Makers role in Discord (yours for life)</li>
+                  </>
+                ) : !p.months && p.hasTI !== p.hasWeb3 ? (
                   <li>Full recorded course, yours to keep</li>
                 ) : (
                   <>
@@ -171,6 +178,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                   </>
                 )}
                 {p.months && <li>{p.months} months as a Citizen: live sessions, support groups, every channel</li>}
+                {p.hasWeb3 && <li className="pc-incl-note">Includes the Liquidity Provider Masterclass</li>}
               </ul>
 
               {/* George, 8 Nov: Curriculum and Watch intro sit as pills above Buy now / Compare. */}
@@ -185,7 +193,9 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                 </div>
               )}
               <div className="pc-actions">
-                <a href={p.checkout} className="btn btn-gold">Buy now</a>
+                {p.placeholder
+                  ? <span className="btn btn-gold pc-soon" aria-disabled="true">Coming soon</span>
+                  : <a href={p.checkout} className="btn btn-gold">Buy now</a>}
                 <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
                   {on ? '✓ Comparing' : 'Compare'}
                 </button>
@@ -226,6 +236,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
             <tbody>
               <tr><th scope="row">Technical Intensive</th>{compared.map((p) => <td key={p.id}>{p.hasTI ? '✓' : '—'}</td>)}</tr>
               <tr><th scope="row">WEB3 Masterclass</th>{compared.map((p) => <td key={p.id}>{p.hasWeb3 ? '✓' : '—'}</td>)}</tr>
+              <tr><th scope="row">Liquidity Provider Masterclass</th>{compared.map((p) => <td key={p.id}>{p.hasLP ? '✓' : '—'}</td>)}</tr>
               <tr><th scope="row">Membership</th>{compared.map((p) => <td key={p.id}>{p.months ? `${p.months} months` : '—'}</td>)}</tr>
               <tr><th scope="row">Price</th>{compared.map((p) => <td key={p.id} className="pc-strong">{peso(p.price)}</td>)}</tr>
               <tr><th scope="row">You save</th>{compared.map((p) => <td key={p.id}>{p.discount > 0 ? peso(p.discount) : '—'}</td>)}</tr>
