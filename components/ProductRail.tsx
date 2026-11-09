@@ -29,8 +29,8 @@ const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
   // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
   web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
-  // Same coin style as W3 until a drawn LP mark exists.
-  lp: { alt: 'Liquidity Provider Masterclass', coin: 'LP' },
+  // "Range bins" mark, A1 Classic (George picked 9 Nov): liquidity bins inside a price range.
+  lp: { alt: 'Liquidity Provider Masterclass', src: '/logos/programs/lp-masterclass.svg' },
   // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
   citizen: { alt: 'Citizen membership', src: '/logos/programs/citizen.svg' },
 } satisfies Record<string, Logo>
