@@ -19,6 +19,7 @@
   const MARKER = '"Permanent Marker", "Comic Sans MS", cursive';
   const MONO = '"JetBrains Mono", Consolas, "Courier New", monospace';
   const TAU = Math.PI * 2;
+  let REP = null, PH = {};   // per-render: brand-check report, photo focus/zoom/motion
 
   /* ---------- colour + maths helpers ---------- */
   function rgb(hex) { const h = hex.replace("#", ""); const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; }
@@ -57,6 +58,7 @@
   /* shorten text with an ellipsis until it fits maxW (current ctx font) */
   function ellipsize(ctx, text, maxW) {
     text = String(text || ""); if (ctx.measureText(text).width <= maxW) return text;
+    if (REP) REP.cut = true;
     const chars = Array.from(text); while (chars.length && ctx.measureText(chars.join("") + "…").width > maxW) chars.pop();
     return chars.length ? chars.join("").trimEnd() + "…" : "";
   }
@@ -116,6 +118,12 @@
   };
 
   /* ---------- styles ---------- */
+  const MOTIONS = {
+    classic: { name: "Classic", note: "Soft fade-up, gentle drift" },
+    sweep: { name: "Gold light sweep", note: "A light band runs across the title" },
+    zoom: { name: "Slow zoom", note: "The photo slowly pushes in" },
+    ticker: { name: "Ticker run-in", note: "Lines slide in from the left" },
+  };
   const STYLES = {
     signature: { name: "Signature", look: "series", note: "Each show's own art and type" },
     spotlight: { name: "Spotlight", look: "series", note: "Big speakers or photo, cinematic" },
@@ -273,12 +281,14 @@
   /* grade: "zft" = dark duotone in the theme's accent + film grain; "natural" = original colours, just darkened */
   function photoLayer(ctx, img, W, H, P, grade, p, opts) {
     opts = opts || {};
-    const zoom = (opts.zoom || 1.02) + 0.035 * Math.sin(TAU * p);
+    const slow = PH.motion === "zoom";
+    const zoom = ((opts.zoom || 1.02) + (slow ? 0 : 0.035 * Math.sin(TAU * p))) * (PH.zoom || 1) * (slow ? 1 + 0.09 * (0.5 - 0.5 * Math.cos(TAU * p)) : 1);
+    const fx = PH.fx ?? 0.5, fy = PH.fy ?? opts.fy ?? 0.45;
     ctx.save();
     ctx.globalAlpha = opts.alpha ?? 1;
-    if (grade === "natural") { ctx.filter = "brightness(0.78) contrast(1.05)"; coverImg(ctx, img, 0, 0, W, H, 0.5, opts.fy ?? 0.45, zoom); ctx.filter = "none"; ctx.restore(); return; }
+    if (grade === "natural") { ctx.filter = "brightness(0.78) contrast(1.05)"; coverImg(ctx, img, 0, 0, W, H, fx, fy, zoom); ctx.filter = "none"; ctx.restore(); return; }
     ctx.filter = "grayscale(1) contrast(1.28) brightness(0.62)";
-    coverImg(ctx, img, 0, 0, W, H, 0.5, opts.fy ?? 0.45, zoom);
+    coverImg(ctx, img, 0, 0, W, H, fx, fy, zoom);
     ctx.filter = "none";
     ctx.globalCompositeOperation = "multiply"; ctx.fillStyle = A(P.bg2 || P.bg, 0.55); ctx.fillRect(0, 0, W, H);
     ctx.globalCompositeOperation = "soft-light"; ctx.fillStyle = A(P.accent, 0.75); ctx.fillRect(0, 0, W, H);
@@ -435,7 +445,13 @@
   }
 
   /* ---------- per-style backgrounds and layout ---------- */
-  function styleFonts(tpl, style) {
+  /* "ZFT Slant": one bold, slightly slanted headline face for every series (cfg.font = "signature") */
+  function styleFonts(tpl, style, cfg) {
+    const f = styleFonts0(tpl, style);
+    if (cfg && cfg.font === "signature" && style !== "terminal") return Object.assign({}, f, { fam: ARCHIVO, w: 400, ls: -0.005, script: false, slant: 0.12 });
+    return f;
+  }
+  function styleFonts0(tpl, style) {
     if (style === "signature") return Object.assign({ upper: true }, tpl.font);
     if (style === "spotlight") return { fam: ANTON, w: 400, ls: 0.01, upper: true };
     if (style === "split") return { fam: DISPLAY, w: 800, ls: -0.02, upper: true };
@@ -564,6 +580,8 @@
     const inA = (i) => (animated ? ease((t - 0.15 - i * 0.14) / 0.55) : 1) * outA;
     const spk = (f.speakers || []).filter((x) => x && (x.name || x.photo)).slice(0, 3);
     const F = Object.assign({}, f, { speakers: spk });
+    REP = opts.report || null; PH = { fx: f.focusX, fy: f.focusY, zoom: f.photoZoom, motion: cfg.motion };
+    if (REP) Object.assign(REP, { cut: false, W, H, s });
 
     const M = Math.round(64 * s);
     const logoH = Math.round((wide ? 40 : 46) * s);
@@ -573,14 +591,15 @@
     ctx.save();
     const lay = drawStyle(ctx, canvas, W, H, s, r, P, tpl, F, cfg, p, L);
     ctx.restore();
-    const fonts = styleFonts(tpl, cfg.style);
+    const fonts = styleFonts(tpl, cfg.style, cfg);
     const mono = !!fonts.mono;
+    if (REP) { const R0 = lay.rect, [cr, cg2, cb] = avgColor(ctx, R0.x, R0.y + R0.h * 0.3, R0.w, R0.h * 0.7), bl = lum(cr, cg2, cb), il = hexLum(P.ink); REP.contrast = (Math.max(bl, il) + 0.05) / (Math.min(bl, il) + 0.05); }
 
     // top bar
     const [lr, lg, lb] = avgColor(ctx, W - M - 260 * s, M, 260 * s, logoH);
     const tone = lum(lr, lg, lb) > 0.6 ? "black" : "white";
     ctx.save(); ctx.globalAlpha = inA(0);
-    drawLogos(ctx, W - M, M, logoH, tone);
+    const lw = drawLogos(ctx, W - M, M, logoH, tone); if (REP) REP.logos = lw > 0;
     let lx = M; const cpx = Math.round(22 * s);
     if (F.live) {
       const blink = animated ? 0.55 + 0.45 * Math.abs(Math.cos(TAU * p * 4)) : 1;
@@ -667,26 +686,38 @@
     let titleBlock;
     if (fonts.script && /\s/.test(F.title || "") && cfg.style === "signature") {
       const words = (F.title || "").split(/\s+/), first = words[0].toUpperCase(), rest = words.slice(1).join(" ");
-      const a1 = fit(ctx, first, fonts.fam, fonts.w, colW, Math.min(260 * s, avail * 0.55), 40 * s, 1, fonts.ls);
-      const b1 = fit(ctx, rest, MARKER, 400, colW * 0.95, Math.min(170 * s, avail * 0.42), 28 * s, 1, 0);
+      const ts = f.titleScale || 1;
+      const a1 = fit(ctx, first, fonts.fam, fonts.w, colW, Math.min(260 * s * ts, avail * 0.55), 40 * s, 1, fonts.ls);
+      const b1 = fit(ctx, rest, MARKER, 400, colW * 0.95, Math.min(170 * s * ts, avail * 0.42), 28 * s, 1, 0);
+      if (REP) REP.titlePx = a1.px;
       titleBlock = { k: "title", h: a1.px * 0.95 + b1.px * 1.1, draw(x, y, a, dy) {
         ctx.save(); ctx.globalAlpha = a; y += dy; ctx.fillStyle = P.ink; setFont(ctx, fonts.w, a1.px, fonts.fam, fonts.ls); ctx.fillText(a1.lines[0] || "", x, y + a1.px * 0.9);
         ctx.translate(x + 10 * s, y + a1.px * 0.95 + b1.px * 0.9); ctx.rotate(-0.06); ctx.fillStyle = P.accent; setFont(ctx, 400, b1.px, MARKER, 0);
         if (animated) { const w = ctx.measureText(b1.lines[0] || "").width; ctx.beginPath(); ctx.rect(-10 * s, -b1.px * 1.2, (w + 20 * s) * ease((t - 0.5) / 0.9), b1.px * 1.6); ctx.clip(); }
         ctx.fillText(b1.lines[0] || "", 0, 0); ctx.restore(); } };
     } else {
-      const maxPx = Math.min((wide ? 110 : tall ? 170 : 150) * s * (lay.big ? 1.1 : 1), avail);
-      const lhK = fonts.fam === ANTON ? 1.0 : 1.02;
-      let tt = fit(ctx, ttl, fonts.fam, fonts.w, colW, maxPx, 30 * s, wide ? 2 : 3, fonts.ls);
-      while (tt.px > 30 * s && tt.px * lhK * tt.lines.length > avail) tt = fit(ctx, ttl, fonts.fam, fonts.w, colW, tt.px - 4, 30 * s, wide ? 2 : 3, fonts.ls);
+      const maxPx = Math.min((wide ? 110 : tall ? 170 : 150) * s * (lay.big ? 1.1 : 1) * (f.titleScale || 1), avail);
+      const lhK = fonts.fam === ANTON ? 1.0 : 1.02, sl = fonts.slant || 0;
+      const tW = (px) => colW - sl * px * 0.8;
+      let tt = fit(ctx, ttl, fonts.fam, fonts.w, tW(maxPx), maxPx, 30 * s, wide ? 2 : 3, fonts.ls);
+      while (tt.px > 30 * s && tt.px * lhK * tt.lines.length > avail) tt = fit(ctx, ttl, fonts.fam, fonts.w, tW(tt.px), tt.px - 4, 30 * s, wide ? 2 : 3, fonts.ls);
+      if (REP) REP.titlePx = tt.px;
+      const sweep = animated && cfg.motion === "sweep";
       const lh = tt.px * lhK, capTop = tt.px * (fonts.fam === ANTON ? 0.98 : 0.8);
       titleBlock = { k: "title", h: lh * (tt.lines.length - 1) + capTop + tt.px * 0.05, draw(x, y, a, dy) {
         ctx.save(); ctx.globalAlpha = a; y += dy; setFont(ctx, fonts.w, tt.px, fonts.fam, fonts.ls); ctx.textAlign = center ? "center" : "left";
         const xx = center ? x + colW / 2 : x;
         tt.lines.forEach((l, i) => {
           const yy = y + capTop + lh * i;
-          if (fonts.outline && i === tt.lines.length - 1 && tt.lines.length > 1) { ctx.strokeStyle = P.accent; ctx.lineWidth = Math.max(2, tt.px * 0.035); ctx.strokeText(l, xx, yy); }
-          else { ctx.fillStyle = (cfg.theme === "gold" && i === tt.lines.length - 1 && cfg.style !== "bold") ? P.accent : P.ink; ctx.fillText(l, xx, yy); }
+          ctx.save(); ctx.translate(xx, yy); if (sl) ctx.transform(1, 0, -sl, 1, 0, 0);
+          if (fonts.outline && i === tt.lines.length - 1 && tt.lines.length > 1) { ctx.strokeStyle = P.accent; ctx.lineWidth = Math.max(2, tt.px * 0.035); ctx.strokeText(l, 0, 0); }
+          else { ctx.fillStyle = (cfg.theme === "gold" && i === tt.lines.length - 1 && cfg.style !== "bold") ? P.accent : P.ink; ctx.fillText(l, 0, 0); }
+          if (sweep) { // a gold light band runs across the title once per loop
+            const lw2 = ctx.measureText(l).width, x0 = center ? -lw2 / 2 : 0, bx = x0 - lw2 * 0.4 + (lw2 * 1.8) * ((p + i * 0.06) % 1), bw = Math.max(60 * s, lw2 * 0.22);
+            const g = ctx.createLinearGradient(bx - bw, 0, bx + bw, 0); g.addColorStop(0, "rgba(255,226,140,0)"); g.addColorStop(0.5, "rgba(255,236,170,0.85)"); g.addColorStop(1, "rgba(255,226,140,0)");
+            ctx.fillStyle = g; ctx.fillText(l, 0, 0);
+          }
+          ctx.restore();
         });
         ctx.restore(); } };
     }
@@ -702,7 +733,8 @@
     if (total > R.h && lay.stack && lay.side) { const ex = Math.min(total - R.h, lay.side.h * 0.5); lay.side.h -= ex; R.y -= ex; R.h += ex; }
     let y = lay.v === "center" ? R.y + Math.max(0, (R.h - total) / 2) : R.y + R.h - total;
     if (y < R.y) y = R.y;
-    blocks.forEach((b, i) => { const a = inA(i + 1); b.draw(R.x, y, a, (1 - a) * 26 * s); y += b.h + (b.gapAfter ?? (b.k === "title" ? 20 * s : gap)); });
+    const ticker = animated && cfg.motion === "ticker";
+    blocks.forEach((b, i) => { const a = inA(i + 1); if (ticker) { ctx.save(); ctx.translate(-(1 - a) * 140 * s, 0); b.draw(R.x, y, Math.min(1, a * 1.6), 0); ctx.restore(); } else b.draw(R.x, y, a, (1 - a) * 26 * s); y += b.h + (b.gapAfter ?? (b.k === "title" ? 20 * s : gap)); });
 
     // side speakers
     if (lay.side && spk.length) { const a = inA(3); speakerGallery(ctx, lay.side, spk, P, s, a, (1 - a) * 30 * s); }
@@ -713,6 +745,8 @@
     footerPill(ctx, canvas, wide || lay.footerLeft ? M : W / 2, fy, footText.toUpperCase(), fpx, wide || lay.footerLeft ? "left" : "center", W - 2 * M);
     ctx.restore();
     ctx.letterSpacing = "0px";
+    if (REP) REP.topic = !!blocks.find((b) => b.k === "topic");
+    REP = null; PH = {};
     return canvas;
   }
 
@@ -722,5 +756,5 @@
     const want = ['800 40px "Plus Jakarta Sans"', '700 40px "Plus Jakarta Sans"', '500 40px "DM Sans"', '600 40px "DM Sans"', '700 40px "DM Sans"', '800 40px "DM Sans"', '400 40px Anton', '400 40px "Archivo Black"', '400 40px "Permanent Marker"', '700 40px "JetBrains Mono"'];
     try { await Promise.all(want.map((f) => document.fonts.load(f))); } catch (e) {}
   }
-  window.TRPoster = { render, TEMPLATES: T, SIZES, STYLES, THEMES, loadAssets, loadFonts, loadImg, IMG, fmtDate, timeLine };
+  window.TRPoster = { render, TEMPLATES: T, SIZES, STYLES, THEMES, MOTIONS, loadAssets, loadFonts, loadImg, IMG, fmtDate, timeLine };
 })();
