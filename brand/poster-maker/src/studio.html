@@ -225,7 +225,8 @@ a{color:var(--gold)}
           <input type="range" class="hue" id="hue" min="0" max="360" value="205" aria-label="Hue">
           <div class="hexrow"><div class="swatch" id="swatch"></div><input type="text" id="hex" maxlength="7" aria-label="HEX colour" spellcheck="false" autocomplete="off"><button class="btn" type="button" id="copyHex">Copy</button></div>
           <p class="contrast" id="contrast" aria-live="polite"></p>
-          <div class="row"><button class="btn gold" type="button" id="saveSw">Save as my swatch</button><button class="x" type="button" id="delSw" hidden>Remove this swatch</button></div>
+          <div class="row"><button class="btn gold" type="button" id="saveSw">Save as my swatch</button><button class="btn" type="button" id="teamSw" hidden>Share with the team</button><button class="x" type="button" id="delSw" hidden>Remove this swatch</button></div>
+          <p class="note" id="teamSwNote" aria-live="polite"></p>
         </div></div>
       <div class="sec"><div class="label">Fonts</div>
         <div class="row" role="group" aria-label="Font for"><button class="chipbtn" type="button" data-ff="title" aria-pressed="true">Headline</button><button class="chipbtn" type="button" data-ff="body" aria-pressed="false">Body text</button></div>
@@ -233,6 +234,7 @@ a{color:var(--gold)}
         <div class="addfont">
           <div class="row"><input type="text" id="gfName" maxlength="40" placeholder="Add any Google Font by name, e.g. Righteous" style="flex:1;min-width:180px" aria-label="Google Font name"><button class="btn" type="button" id="gfAdd">Add</button></div>
           <div class="row"><button class="btn" type="button" id="upBtn">Upload a font (.ttf .otf .woff2)</button><input type="file" id="upFile" accept=".ttf,.otf,.woff,.woff2" hidden></div>
+          <label class="toggle" id="teamFontRow" hidden><input type="checkbox" id="teamFont"> Share the next font I add with the whole team</label>
           <p class="note" id="fontNote" aria-live="polite">Only free Google Fonts or fonts you own. Fonts you add stay in this browser.</p>
         </div></div>
     </div>
@@ -326,7 +328,8 @@ a{color:var(--gold)}
       </div>
       <div class="sec"><div class="label">Post</div>
         <div class="row" role="group" aria-label="Attach"><span class="note">Attach:</span><button class="chipbtn" type="button" data-attach="png" aria-pressed="true">PNG</button><button class="chipbtn" type="button" data-attach="gif" disabled>GIF</button><button class="chipbtn" type="button" data-attach="video" disabled>Video</button></div>
-        <div class="btns"><button class="btn" type="button" id="draftDiscord">Post to Discord…</button><button class="btn" type="button" id="draftFb">Post to the TR Facebook Page…</button></div>
+        <div class="btns"><button class="btn" type="button" id="draftDiscord">Post to Discord…</button><button class="btn" type="button" id="draftFb">Post to the TR Facebook Page…</button><button class="btn" type="button" id="draftEvent">Create a Discord event…</button></div>
+        <div class="sec" id="schedSec" hidden><div class="label">Scheduled Discord posts</div><div class="dlist" id="schedList"></div></div>
         <div id="draftBox"></div>
         <p class="note">Nothing is posted until you press <b>Confirm and post</b> on the draft. The TR Facebook <i>Group</i> stays manual: Facebook doesn't let apps post there.</p>
       </div>
@@ -392,9 +395,13 @@ function phToday(){ const p = new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Ma
 function addDays(iso, n){ const [Y,M,D]=iso.split("-").map(Number); const d=new Date(Date.UTC(Y,M-1,D+n)); return d.toISOString().slice(0,10); }
 function weekday(iso){ const [Y,M,D]=iso.split("-").map(Number); return new Date(Date.UTC(Y,M-1,D)).getUTCDay(); }
 function nextWeekday(wd){ const t=phToday(); for(let i=0;i<7;i++){ const d=addDays(t,i); if(weekday(d)===wd) return d; } return t; }
+/* the nth weekday of a month (e.g. 3rd Saturday); this month's if it hasn't passed, else next month's */
+function nthWeekday(Y, M, wd, nth){ const first=new Date(Date.UTC(Y, M-1, 1)).getUTCDay(); const day=1+((wd-first+7)%7)+(nth-1)*7; const d=new Date(Date.UTC(Y, M-1, day)); return d.getUTCMonth()===M-1 ? d.toISOString().slice(0,10) : null; }
+function nextNth(wd, nth){ const t=phToday(); let [Y,M]=t.split("-").map(Number); for (let k=0;k<3;k++){ const d=nthWeekday(Y,M,wd,nth); if (d && d>=t) return d; M++; if(M>12){ M=1; Y++; } } return t; }
+function presetDate(p, fallback){ return p.weekday===undefined ? fallback : (p.nth ? nextNth(p.weekday, p.nth) : nextWeekday(p.weekday)); }
 const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const BUILTIN_PRESETS = { hunt:{weekday:2}, charts:{weekday:3}, council:{weekday:4}, mmu:{weekday:1} };
+const BUILTIN_PRESETS = { hunt:{weekday:2}, charts:{weekday:3}, council:{weekday:4}, mmu:{weekday:1}, meetup:{weekday:6, nth:3} };
 function teamPresets(){ return (ZT && ZT.presets) || load("presets") || {}; }
 function presetFor(id){ const p = Object.assign({}, BUILTIN_PRESETS[id]||{}, teamPresets()[id]||{}); return Object.keys(p).length ? p : null; }
 function shortDate(iso){ if(!iso) return ""; const [Y,M,D]=iso.split("-").map(Number); return `${DAYS[weekday(iso)].slice(0,3)} ${MONTHS[M-1]} ${D}`; }
@@ -404,7 +411,7 @@ function applyPreset(id){
   pushHistory();
   state.tpl=id; state.f = freshFields(id); state.bgPhoto=null; state.designId=null;
   if (p.fields) Object.assign(state.f, JSON.parse(JSON.stringify(p.fields)));
-  if (p.weekday !== undefined) state.f.date = nextWeekday(p.weekday);
+  if (p.weekday !== undefined) state.f.date = presetDate(p, state.f.date);
   if (p.style && TP.STYLES[p.style]) state.style = p.style;
   if (p.theme && TP.THEMES[p.theme]) state.theme = p.theme;
   state.photoKey = p.photoKey !== undefined ? p.photoKey : defaultPhoto(id); state.f.photoKey = state.photoKey;
@@ -415,7 +422,7 @@ function buildPresets(){
   const box=$("presets"); box.textContent="";
   const favs = TP.TEMPLATES.filter(t=>t.fav && presetFor(t.id) && !hidden.has(t.id));
   box.closest(".presets-sec").hidden = !favs.length;
-  for (const t of favs){ const p=presetFor(t.id); const f=Object.assign(freshFields(t.id), p.fields||{}); const d = p.weekday!==undefined ? nextWeekday(p.weekday) : f.date;
+  for (const t of favs){ const p=presetFor(t.id); const f=Object.assign(freshFields(t.id), p.fields||{}); const d = presetDate(p, f.date);
     const b=document.createElement("button"); b.type="button"; b.className="chipbtn"; b.innerHTML=`★ Next ${esc(t.name.replace(/^The /,""))}<small>${esc(shortDate(d))}${f.time?" · "+esc(fmtT(f.time)):""}</small>`;
     b.addEventListener("click",()=>applyPreset(t.id)); box.append(b); }
 }
@@ -460,7 +467,7 @@ function goStage(i, focusTitle){
   if (i===0) drawThumbs();
   if (i===2) brandCheck();
   if (i===3) buildPhotoLib();
-  if (i===5){ brandCheck(); if(!$("caption").value || !capEdited) writeCaption(); if(!$("designName").value) $("designName").value = defaultName(); checkDuplicates(); }
+  if (i===5){ loadSchedule(); brandCheck(); if(!$("caption").value || !capEdited) writeCaption(); if(!$("designName").value) $("designName").value = defaultName(); checkDuplicates(); }
   if (focusTitle !== false) { fitScrollPadding(); $("stageTitle").focus({preventScroll:true}); const pinned = phoneLayout() ? $("previewPane").offsetHeight : 0; const top = $("builder").getBoundingClientRect().top + window.scrollY - pinned - 8; if (phoneLayout() || $("builder").getBoundingClientRect().top < 0) window.scrollTo({top: Math.max(0, top), behavior:"auto"}); }
 }
 /* phone: keep focused fields clear of the pinned preview (top) and the stage bar (bottom) */
@@ -620,12 +627,14 @@ function themeFrom(hex){ const c=fromHex(hex)||[125,196,250]; const [h,s]=rgb2hs
 let customFor="";
 function applyCustom(){ if (customFor!==state.custom){ TP.THEMES.custom = themeFrom(state.custom); customFor=state.custom; } }
 let mySw = (load("swatches")||[]).filter(x=>fromHex(x)).slice(0,8);
+const teamColours = ()=>((ZT && ZT.brand && ZT.brand.colours)||[]).filter(x=>fromHex(x));
 let hsv=[205,0.5,0.98];
 function buildSwatches(){
   document.querySelectorAll("[data-sw]").forEach(b=>b.remove());
   const mk=(key,label,bg)=>{ const b=document.createElement("button"); b.type="button"; b.className="sw"; b.dataset.sw=key; const i=document.createElement("i"); i.style.background=bg; b.append(i, document.createTextNode(label));
     b.addEventListener("click",()=>{ pushHistory(); if(key!=="new"){ state.custom=key; } state.theme="custom"; store("theme","custom"); store("custom",state.custom); hsv=rgb2hsv(...fromHex(state.custom)); $("picker").hidden=false; paintPicker(); markLook(); draw(); drawThumbs(); }); $("themes").append(b); };
-  for (const h of mySw) mk(h, h, h);
+  for (const h of teamColours()) mk(h, "★ "+h, h);
+  for (const h of mySw) if (!teamColours().includes(h)) mk(h, h, h);
   mk("new", "＋ Custom colour", "conic-gradient(red,yellow,lime,cyan,blue,magenta,red)");
 }
 function paintPicker(pushHex){
@@ -634,7 +643,7 @@ function paintPicker(pushHex){
   $("sv").setAttribute("aria-valuetext", `${state.custom}, saturation ${Math.round(hsv[1]*100)}%, brightness ${Math.round(hsv[2]*100)}%`);
   const t=themeFrom(state.custom), L=relLumC(...c), onBg=cRatio(L, relLumC(...fromHex(t.bg))), onBlock=cRatio(L, t.blockInk==="#ffffff"?1:0);
   $("contrast").innerHTML = `<span class="${onBg>=3?"ok":"bad"}">${onBg>=3?"✓":"⚠"} Colour on the dark background ${onBg.toFixed(1)} : 1</span> · <span class="ok">✓ ${t.blockInk==="#ffffff"?"White":"Black"} text on blocks ${onBlock.toFixed(1)} : 1</span>` + (onBg<3 ? `<br><span class="bad">Too dark to stand out as an accent: pick a lighter colour.</span>` : "");
-  $("delSw").hidden = !mySw.includes(state.custom);
+  $("delSw").hidden = !mySw.includes(state.custom); $("teamSw").hidden = !(ZT && ZT.admin) || teamColours().includes(state.custom);
 }
 function setCustomFromHsv(push){ state.custom=toHex(...hsv2rgb(...hsv)); state.theme="custom"; store("custom",state.custom); store("theme","custom"); paintPicker(push); markLook(); queueDraw(); }
 (function picker(){ const el=$("sv"); let down=false;
@@ -646,6 +655,7 @@ function setCustomFromHsv(push){ state.custom=toHex(...hsv2rgb(...hsv)); state.t
   $("hex").addEventListener("input",()=>{ const c=fromHex($("hex").value); if(!c) return; pushHistory(true); hsv=rgb2hsv(...c); state.custom=toHex(...c); state.theme="custom"; store("custom",state.custom); paintPicker(false); markLook(); queueDraw(); });
   $("hex").addEventListener("change",()=>{ $("hex").value=state.custom; drawThumbs(); });
   $("copyHex").addEventListener("click",async()=>{ try{ await navigator.clipboard.writeText(state.custom); $("copyHex").textContent="Copied ✓"; }catch(e){ $("hex").select(); $("copyHex").textContent="Ctrl+C"; } setTimeout(()=>$("copyHex").textContent="Copy",1800); });
+  $("teamSw").addEventListener("click", async ()=>{ try{ const j=await api("brand.php",{act:"add_colour", hex:state.custom}); ZT.brand=Object.assign({}, ZT.brand, {colours:j.colours}); $("teamSwNote").textContent=`${state.custom} is now in every Guild Leader's colours (★).`; buildSwatches(); markLook(); paintPicker(); }catch(e){ $("teamSwNote").textContent="Couldn't share it. Try again."; } });
   $("saveSw").addEventListener("click",()=>{ if(!mySw.includes(state.custom)) mySw.unshift(state.custom); mySw=mySw.slice(0,8); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
   $("delSw").addEventListener("click",()=>{ mySw=mySw.filter(x=>x!==state.custom); store("swatches",mySw); buildSwatches(); markLook(); paintPicker(); });
 })();
@@ -666,7 +676,7 @@ function googleLink(name){ const id="gf-"+name.replace(/ /g,"_"); if(document.ge
   const l=document.createElement("link"); l.id=id; l.rel="stylesheet"; l.href=`https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,"+")}:wght@400;700;800&display=swap`;
   return new Promise(r=>{ l.onload=()=>r(true); l.onerror=()=>{ l.remove(); r(false); }; document.head.append(l); setTimeout(()=>r(false),8000); }); }
 async function ensureFont(name, w){ name=safeFont(name); if(!name) return true;
-  if (!CURATED.has(name) && !name.startsWith("Mine ")) await googleLink(name);
+  if (!CURATED.has(name) && !name.startsWith("Mine ") && !name.startsWith("Team ")) await googleLink(name);
   try{ const f=await document.fonts.load(`${w||700} 40px "${name}"`); return f.length>0; }catch(e){ return false; } }
 function buildFonts(){ const box=$("fonts"); box.textContent="";
   for (const [label,fam,w,use,note] of FONTS.concat(extraFonts)) {
@@ -690,7 +700,8 @@ $("gfAdd").addEventListener("click", async ()=>{ const name=safeFont($("gfName")
   if(!loaded){ note.textContent=`Couldn't find “${name}” on Google Fonts. Check the spelling on fonts.google.com.`; return; }
   if (!extraFonts.some(f=>f[1]===name)) extraFonts.unshift([name,name,700,"both","Added from Google Fonts"]);
   const list=(load("gfonts")||[]).filter(x=>x!==name); list.unshift(name); store("gfonts", list.slice(0,12));
-  note.textContent=`Added ${name}. It's at the top of the list.`; $("gfName").value=""; buildFonts(); });
+  let shared=""; if (ZT && ZT.admin && $("teamFont").checked){ try{ const j=await api("brand.php",{act:"add_gfont", name}); ZT.brand=Object.assign({}, ZT.brand, {gfonts:j.gfonts}); shared=" Shared with the whole team."; $("teamFont").checked=false; }catch(e){ shared=" (Couldn't share it with the team.)"; } }
+  note.textContent=`Added ${name}. It's at the top of the list.`+shared; $("gfName").value=""; buildFonts(); });
 $("upBtn").addEventListener("click",()=>$("upFile").click());
 /* uploaded fonts live in this browser's IndexedDB */
 function fontDB(){ return new Promise((res)=>{ try{ const r=indexedDB.open("trpm-fonts",1); r.onupgradeneeded=()=>r.result.createObjectStore("f"); r.onsuccess=()=>res(r.result); r.onerror=()=>res(null); }catch(e){ res(null); } }); }
@@ -700,9 +711,20 @@ async function addFontFace(name, buf){ try{ const ff=new FontFace(name, buf); aw
 $("upFile").addEventListener("change", async (e)=>{ const file=e.target.files[0]; e.target.value=""; if(!file) return; const note=$("fontNote");
   if (file.size>5*1048576){ note.textContent="That font file is over 5 MB."; return; }
   const name=safeFont("Mine "+file.name.replace(/\.[^.]+$/,"")); const buf=await file.arrayBuffer();
+  if (ZT && ZT.admin && $("teamFont").checked){   // team upload: stored on the server for every Guild Leader
+    const fd=new FormData(); fd.append("csrf",ZT.csrf); fd.append("act","upload_font"); fd.append("name", name.replace(/^Mine /,"")); fd.append("file", new Blob([buf]), file.name);
+    try{ const r=await fetch("brand.php",{method:"POST",body:fd}); const j=await r.json(); if(!r.ok||!j.ok) throw j; ZT.brand=Object.assign({}, ZT.brand, {fonts:j.fonts}); $("teamFont").checked=false; await loadTeamFonts(); note.textContent=`Shared ${file.name} with the whole team. Only fonts we own or free fonts.`; buildFonts(); }
+    catch(err){ note.textContent=(err&&err.message)||"Couldn't share that font. Try again."; }
+    return; }
   if (await addFontFace(name, buf)){ await fontPut(name, buf); note.textContent=`Added ${file.name}. Only use fonts you own or that are free.`; buildFonts(); }
   else note.textContent="That file isn't a font this browser can read. Try .ttf, .otf or .woff2."; });
+/* team fonts: Google names load from Google; uploaded files come from brand.php (signed-in only) */
+async function loadTeamFonts(){ if(!ZT || !ZT.brand) return;
+  for (const g of (ZT.brand.gfonts||[]).map(safeFont).filter(Boolean)){ if (!extraFonts.some(f=>f[1]===g)) extraFonts.unshift([g,g,700,"both","Team font"]); await googleLink(g); }
+  for (const f of (ZT.brand.fonts||[])){ const name=safeFont("Team "+f.name); if (extraFonts.some(x=>x[1]===name)) continue;
+    try{ const r=await fetch("brand.php?font="+encodeURIComponent(f.id)); if(!r.ok) continue; const ff=new FontFace(name, await r.arrayBuffer()); await ff.load(); document.fonts.add(ff); extraFonts.unshift([f.name,name,400,"both","Team font"]); }catch(e){} } }
 async function restoreFonts(){
+  await loadTeamFonts(); $("teamFontRow").hidden = !(ZT && ZT.admin);
   for (const n of (load("gfonts")||[]).map(safeFont).filter(Boolean)) if (!extraFonts.some(f=>f[1]===n)) extraFonts.push([n,n,700,"both","Added from Google Fonts"]);
   for (const [n,buf] of await fontAll()) await addFontFace(n, buf);
   await Promise.all(extraFonts.filter(f=>!f[1].startsWith("Mine ")).map(f=>googleLink(f[1])));
@@ -728,7 +750,8 @@ $("reset").addEventListener("click", ()=>{ pushHistory(); state.f = freshFields(
 $("savePreset").addEventListener("click", async ()=>{
   const f=cloneF(state.f); delete f.date; f.speakers=(f.speakers||[]).map(s=>({name:s.name||"",role:s.role||""}));
   const wd = state.f.date ? weekday(state.f.date) : (BUILTIN_PRESETS[state.tpl]||{}).weekday;
-  const preset={fields:f, weekday:wd, photoKey:state.photoKey, style:state.style, theme:state.theme};
+  const monthly = !!(presetFor(state.tpl)||{}).nth, nth = monthly && state.f.date ? Math.ceil(+state.f.date.slice(8,10)/7) : undefined;
+  const preset={fields:f, weekday:wd, nth, photoKey:state.photoKey, style:state.style, theme:state.theme};
   try{ const j=await api("presets.php",{act:"save", tpl:state.tpl, preset}); ZT.presets=j.presets||ZT.presets; $("presetNote").textContent="Saved for the team. \"Next "+byId[state.tpl].name.replace(/^The /,"")+"\" now fills these in."; buildPresets(); }
   catch(e){ $("presetNote").textContent="Couldn't save the preset. Try again."; }
 });
@@ -1074,7 +1097,7 @@ async function checkDuplicates(){
 /* ---------- posting: draft first, the person's own click sends it ---------- */
 let attach="png", posting=false;
 function newOp(){ return (crypto.randomUUID ? crypto.randomUUID() : Array.from(crypto.getRandomValues(new Uint8Array(16)),b=>b.toString(16).padStart(2,"0")).join("")).toLowerCase(); }
-function lockDrafts(on){ posting=on; $("draftDiscord").disabled=on; $("draftFb").disabled=on; }
+function lockDrafts(on){ posting=on; $("draftDiscord").disabled=on; $("draftFb").disabled=on; $("draftEvent").disabled=on; }
 /* a GIF or video can only be attached while it still matches the design on screen */
 function fresh(m){ return m && m.key===designKey(); }
 function markAttach(){ document.querySelectorAll("[data-attach]").forEach(b=>{ const k=b.dataset.attach; const m = k==="gif"?made.gif:k==="video"?made.video:true; b.disabled = k!=="png" && !fresh(m); b.title = b.disabled && m && m!==true ? "Changed since you made it: make it again" : ""; if(b.disabled && attach===k) attach="png"; b.setAttribute("aria-pressed",String(attach===k)); }); }
@@ -1092,7 +1115,7 @@ function draftCard(target){
   const no=document.createElement("button"); no.type="button"; no.className="btn"; no.textContent="Cancel";
   const st=document.createElement("p"); st.className="status"; st.setAttribute("role","status");
   row.append(go,no); right.append(cap, who, row, st); body.append(prev,right); card.append(head, body); box.append(card);
-  no.addEventListener("click",()=>{ box.textContent=""; $(target==="discord"?"draftDiscord":"draftFb").focus(); });
+  no.addEventListener("click",()=>{ box.textContent=""; $({discord:"draftDiscord",fb:"draftFb",event:"draftEvent"}[target]).focus(); });
   return {card, head, prev, cap, who, go, st, right};
 }
 async function showPreview(el, a){ const url=URL.createObjectURL(a.blob); const m=document.createElement(a.blob.type.startsWith("video")?"video":"img"); m.src=url; if(m.tagName==="VIDEO"){ m.muted=true; m.loop=true; m.autoplay=true; m.playsInline=true; } else m.alt="Poster to post"; el.append(m); }
@@ -1106,7 +1129,14 @@ $("draftDiscord").addEventListener("click", async ()=>{
   capKind="discord"; markCap(); if(!capEdited) writeCaption(); d.cap.value=$("caption").value;
   d.who.textContent=`Posts as “${ZT.name} via TR Poster Maker”.` + (a.blob.size>10*1048576?" This file is over 10 MB: Discord will refuse it. Attach the PNG or a smaller GIF.":"");
   const op=newOp(); sel.addEventListener("change",()=>{ d.op=newOp(); }); d.op=op;
-  d.go.addEventListener("click", ()=>sendPost("post-discord.php", {channel: sel.value, caption: d.cap.value}, a, d, "#"+sel.value));
+  // when: now, or a time later (PH time, up to 30 days)
+  const when=document.createElement("div"); when.className="row"; when.innerHTML='<label class="toggle"><input type="radio" name="dwhen" value="now" checked> Post now</label><label class="toggle"><input type="radio" name="dwhen" value="later"> Schedule</label><input type="datetime-local" aria-label="Post at (PH time)" hidden style="max-width:230px">';
+  const at=when.querySelector("input[type=datetime-local]"); at.min=phNowLocal(5); at.max=phNowLocal(30*1440); at.value = defaultSchedule();
+  when.addEventListener("change",()=>{ const later=when.querySelector('input[value=later]').checked; at.hidden=!later; d.go.textContent = later ? "Confirm and schedule" : "Confirm and post"; d.who.textContent = later && !ZT.cron ? "Heads up: the server timer isn't switched on yet, so a scheduled post waits until George turns it on." : `Posts as “${ZT.name} via TR Poster Maker”.`; d.op=newOp(); });
+  d.right.insertBefore(when, d.cap);
+  d.go.addEventListener("click", ()=>{ const later=when.querySelector('input[value=later]').checked;
+    if (later) sendPost("schedule.php", {act:"schedule", channel: sel.value, caption: d.cap.value, at: at.value, title: state.f.title||""}, a, d, "#"+sel.value, "Scheduled for "+fmtLocal(at.value)+" PH time in");
+    else sendPost("post-discord.php", {channel: sel.value, caption: d.cap.value}, a, d, "#"+sel.value); });
   d.go.focus();
 });
 $("draftFb").addEventListener("click", async ()=>{
@@ -1123,14 +1153,48 @@ $("draftFb").addEventListener("click", async ()=>{
   d.go.addEventListener("click", ()=>sendPost("post-fb.php", {caption: d.cap.value}, a, d, "TR Page"));
   d.go.focus();
 });
-async function sendPost(url, fields, a, d, where){
+/* PH-time helpers for the schedule picker (value format YYYY-MM-DDTHH:MM) */
+function phNowLocal(addMin){ const t=new Date(Date.now()+addMin*60000); const p=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Manila",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",hourCycle:"h23"}).formatToParts(t).reduce((o,x)=>(o[x.type]=x.value,o),{}); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; }
+function defaultSchedule(){ const soon=phNowLocal(60); if (state.f.date && state.f.time){ const ev=state.f.date+"T"+state.f.time; const [h,m]=state.f.time.split(":").map(Number); const twoBefore=state.f.date+"T"+String(Math.max(0,h-2)).padStart(2,"0")+":"+String(m).padStart(2,"0"); if (twoBefore>soon) return twoBefore; } return soon; }
+function fmtLocal(v){ if(!v) return ""; return shortDate(v.slice(0,10))+", "+fmtT(v.slice(11,16)); }
+async function loadSchedule(){ if(!ZT || ZT.via!=="discord") return; try{ const r=await fetch("schedule.php"); const j=await r.json(); renderSchedule(j.items||[]); }catch(e){} }
+function renderSchedule(items){ const box=$("schedList"); box.textContent=""; const live=items.filter(x=>x.status==="queued"||x.status==="sending"||(x.status!=="cancelled"&&x.at>Date.now()/1000-86400));
+  $("schedSec").hidden=!live.length;
+  for (const x of live){ const row=document.createElement("div"); row.className="ditem"; const dt=new Date(x.at*1000).toLocaleString("en-PH",{timeZone:"Asia/Manila",weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"});
+    const info=document.createElement("div"); info.innerHTML=`<b>${esc(x.title||"Poster")} → #${esc(x.channel)}</b><small>${esc(dt)} PH time · ${esc({queued:"waiting",sending:"sending now",done:"posted",failed:"didn't post",unknown:"check the channel"}[x.status]||x.status)}${x.mine?"":" · by "+esc(x.by)}</small>`;
+    const act=document.createElement("div"); act.className="row";
+    if (x.status==="queued"){ const c=document.createElement("button"); c.type="button"; c.className="x"; c.textContent="Cancel"; c.addEventListener("click", async ()=>{ c.disabled=true; try{ const j=await api("schedule.php",{act:"cancel", id:x.id}); renderSchedule(j.items||[]); $("schedSec").focus?.(); }catch(e){ c.disabled=false; c.textContent=(e.body&&e.body.message)||"Couldn't cancel"; } }); act.append(c); }
+    if (x.url && /^https:\/\//.test(x.url)){ const a=document.createElement("a"); a.href=x.url; a.target="_blank"; a.rel="noopener"; a.textContent="Open"; act.append(a); }
+    row.append(info, act); box.append(row); } }
+$("draftEvent").addEventListener("click", async ()=>{
+  const d=draftCard("event"); if(!d) return; d.head.textContent="Create a Discord event";
+  if (!ZT){ d.who.textContent="Discord events work on zeefreaks.io/posters after you sign in with Discord."; d.go.disabled=true; return; }
+  if (ZT.via!=="discord"){ d.who.innerHTML='You signed in by email. <a href="auth-discord.php">Sign in with Discord</a> to create events.'; d.go.disabled=true; return; }
+  if (!ZT.events){ d.who.textContent="Discord events aren't switched on yet: George is adding the TR Tools bot to the server."; d.go.disabled=true; return; }
+  const f=state.f; if (!f.date || !f.time){ d.who.textContent="Add the date and start time in Details first."; d.go.disabled=true; return; }
+  const sn=snapshot(); const a={blob: await pngBlob("discord", sn), name: fileBase("discord", sn)+".png"}; await showPreview(d.prev, a);
+  const mk=(label, el)=>{ const w=document.createElement("label"); w.className="f"; const l=document.createElement("span"); l.className="lab"; l.textContent=label; w.append(l, el); return w; };
+  const name=document.createElement("input"); name.type="text"; name.maxLength=100; name.value=(f.title||byId[state.tpl].name);
+  const loc=document.createElement("input"); loc.type="text"; loc.maxLength=100; loc.value=f.where||f.channel||"Discord";
+  const st=document.createElement("input"); st.type="datetime-local"; st.value=f.date+"T"+f.time;
+  const en=document.createElement("input"); en.type="datetime-local"; en.value=f.endTime ? f.date+"T"+f.endTime : "";
+  d.cap.value=[f.topic, f.cta, f.link].filter(Boolean).join("\n\n").slice(0,1000); d.cap.maxLength=1000; d.cap.setAttribute("aria-label","Event description");
+  const grid=document.createElement("div"); grid.className="grid2"; grid.append(mk("Event name",name), mk("Where",loc), mk("Starts (PH time)",st), mk("Ends (optional, PH time)",en));
+  d.right.insertBefore(grid, d.cap);
+  d.who.textContent="Shows in Discord's Events list with this poster as the cover (Discord cover size). Members can tap Interested and get reminded.";
+  d.go.textContent="Confirm and create"; d.op=newOp();
+  d.go.addEventListener("click", ()=>sendPost("event.php", {name:name.value, location:loc.value, start:st.value, end:en.value, description:d.cap.value}, a, d, "Discord events", "Created in"));
+  d.go.focus();
+});
+async function sendPost(url, fields, a, d, where, verb){
   if (d.go.disabled || posting) return; d.go.disabled=true; lockDrafts(true); d.cap.readOnly=true; d.st.textContent="Posting…";
   const fd=new FormData(); fd.append("csrf", ZT.csrf); fd.append("op", d.op); for (const [k,v] of Object.entries(fields)) fd.append(k, v); fd.append("file", a.blob, a.name);
   let r=null, j={};
   try{ r=await fetch(url,{method:"POST", body:fd}); j=await r.json().catch(()=>({})); } catch(e){ r=null; }
   if (r && r.ok && j.ok){
-    d.st.innerHTML = `Posted to ${esc(where)} ✓` + (j.url && /^https:\/\//.test(j.url) ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">Open the post</a>` : "");
-    d.go.textContent="Posted"; teamCache=null; lockDrafts(false);
+    d.st.innerHTML = `${esc(verb||"Posted to")} ${esc(where)} ✓` + (j.url && /^https:\/\//.test(j.url) ? ` · <a href="${esc(j.url)}" target="_blank" rel="noopener">Open it</a>` : "");
+    d.go.textContent = verb && verb.startsWith("Scheduled") ? "Scheduled" : verb ? "Done" : "Posted"; teamCache=null; lockDrafts(false);
+    if (j.items) renderSchedule(j.items);
     try{ await saveDesign(true); if(state.designId) await api("designs.php",{act:"posted", id:state.designId, where}); }catch(e){}
     return;
   }
