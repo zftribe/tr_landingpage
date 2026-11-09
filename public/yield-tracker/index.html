@@ -162,6 +162,40 @@
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
+<section class="section" id="inflation-check">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">For savers in the Philippines</span>
+      <h2>Have you beaten <span class="gold">inflation</span>?</h2>
+      <p class="subtitle">Interest is only half the story. Tax takes a slice, and rising prices take another. See what is really left.</p>
+    </div>
+    <div class="sim-grid">
+      <div class="sim-explain"><div id="simExplain"></div><div class="sim-chart" id="simChart"></div></div>
+      <div class="sim-box">
+        <h3>Simulator</h3>
+        <div class="sim-fields">
+          <label class="sf"><span>Amount</span><input id="simAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+          <label class="sf"><span>Years</span><input id="simYears" type="number" inputmode="numeric" min="1" max="30" step="1" value="5"></label>
+          <label class="sf sf-wide"><span>Where you save</span><select id="simPick"></select></label>
+          <label class="sf"><span>Rate (% a year)</span><input id="simRate" type="number" inputmode="decimal" min="0" max="100" step="0.05" value="4"></label>
+          <label class="sf"><span>Inflation (% a year)</span><input id="simInfl" type="number" inputmode="decimal" min="-5" max="50" step="0.1" value="5"></label>
+          <label class="switch sf-wide"><input type="checkbox" id="simTax" checked><span class="switch-ui" aria-hidden="true"></span><span>Take off 20% tax <b class="dim" id="simTaxNote"></b></span></label>
+        </div>
+        <div class="sim-tiles">
+          <div class="st"><small>Interest earned</small><b id="simGross">—</b></div>
+          <div class="st st-tax"><small>Tax takes</small><b id="simTaxAmt">—</b></div>
+          <div class="st st-infl"><small>Inflation eats</small><b id="simInflAmt">—</b></div>
+          <div class="st st-real" id="simRealTile"><small>What you really gain</small><b id="simReal">—</b></div>
+        </div>
+        <div class="sim-bar" id="simBar" aria-hidden="true"></div>
+        <div class="sim-legend"><span><i class="sb-tax"></i>Tax</span><span><i class="sb-infl"></i>Inflation</span><span><i class="sb-real"></i>Real gain</span><span><i class="sb-loss"></i>Buying power lost</span></div>
+        <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
+        <p class="sim-note">"What you really gain" is in today's pesos. Assumes the rate and inflation stay the same every year, and interest is added once a year. A comparison, not advice; past inflation doesn't predict future inflation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <section class="section section-tight" id="method">
   <div class="container">
     <div class="method">

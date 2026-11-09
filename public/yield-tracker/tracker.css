@@ -241,6 +241,39 @@ body[data-view=advanced] .row-main { grid-template-columns: minmax(200px, 2fr) .
 .fn-copy { font-size: .72rem; padding: 3px 9px; border-radius: 100px; border: 1px solid var(--border-2); background: var(--bg-card); color: var(--white); cursor: pointer; }
 .fn-how { display: block; font-size: .74rem; margin-top: 2px; }
 .fn-note { font-size: .72rem; color: var(--text-dim); line-height: 1.6; margin: 8px 0 0; opacity: .85; }
+/* inflation simulator */
+.sim-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; align-items: start; }
+.sim-explain { display: grid; gap: 14px; font-size: .92rem; }
+.sim-explain p { margin: 0 0 10px; color: var(--text); line-height: 1.65; }
+.sim-explain b { color: var(--white); }
+.sim-chart { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; display: grid; gap: 6px; }
+.sim-chart small { color: var(--text-dim); font-size: .74rem; }
+.sim-box { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px; display: grid; gap: 16px; }
+.sim-box h3 { font-size: .8rem; letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); }
+.sim-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sf { display: grid; gap: 6px; font-size: .8rem; color: var(--text-dim); min-width: 0; }
+.sf-wide { grid-column: 1 / -1; }
+.sf input, .sf select { width: 100%; min-width: 0; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border-2); border-radius: var(--radius-sm); color: var(--white); font-size: .95rem; font-weight: 600; min-height: 44px; }
+.sf select { font-size: .85rem; font-weight: 500; }
+.sf input:focus, .sf select:focus { outline: none; border-color: var(--gold); }
+.sim-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.st { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 12px; display: grid; gap: 4px; min-width: 0; }
+.st small { font-size: .68rem; letter-spacing: .8px; text-transform: uppercase; color: var(--text-dim); font-weight: 600; }
+.st b { font-family: var(--font-display); font-size: 1.15rem; color: var(--white); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.st-tax b { color: #fbbf24; } .st-infl b { color: var(--red); }
+.st-real[data-good="true"] { border-color: rgba(34,197,94,.5); background: var(--green-bg); } .st-real[data-good="true"] b { color: var(--green); }
+.st-real[data-good="false"] { border-color: rgba(239,68,68,.5); background: var(--red-bg); } .st-real[data-good="false"] b { color: var(--red); }
+.sim-bar { display: flex; height: 14px; border-radius: 100px; overflow: hidden; background: var(--bg); border: 1px solid var(--border); }
+.sim-bar span { display: block; height: 100%; transition: width .3s; }
+.sb-tax { background: #fbbf24; } .sb-infl { background: var(--red); } .sb-real { background: var(--green); } .sb-loss { background: repeating-linear-gradient(45deg, rgba(239,68,68,.85) 0 6px, rgba(239,68,68,.35) 6px 12px); }
+.sim-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .74rem; color: var(--text-dim); }
+.sim-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.sim-verdict { font-size: .95rem; line-height: 1.6; margin: 0; }
+.sim-verdict .good { color: var(--green); } .sim-verdict .bad { color: var(--red); }
+.sim-note { font-size: .74rem; color: var(--text-dim); margin: 0; line-height: 1.6; }
+@media (max-width: 960px) { .sim-grid { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .sim-tiles { grid-template-columns: 1fr 1fr; } }
+
 /* calculator */
 .calc-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 20px; }
 .calc-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }

@@ -72,6 +72,41 @@ function renderInfl() {
     <div class="infl-chart"><div class="infl-now"><b>${i.value}%</b><small>PH inflation, ${esc(i.label || i.month)}</small></div>${inflSpark(h)}<small class="infl-src">Last 24 months · Source: <a href="${esc(i.source)}" target="_blank" rel="noopener">BSP</a> (CPI ${esc(i.base || '')}) · checked ${fmtDate(i.checkedOn)}</small></div></div>
     <p class="infl-foot">Real yield = rate after tax − inflation. Each peso rate below shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span>. Crypto is paid in dollars, so it isn't compared. This is a comparison, not advice; past inflation doesn't predict future inflation.</p>`;
 }
+/* ── "Have you beaten inflation?" simulator (Basic + Advanced) ── */
+function simRows() { return ROWS.filter((r) => rankable(r) && isPeso(r) && !locked(r) || (rankable(r) && r.category === 'government')).sort((a, b) => b.rate - a.rate); }
+function fillSim() {
+  const sel = $('#simPick'); if (!sel) return;
+  const rows = simRows();
+  sel.innerHTML = rows.map((r) => `<option value="${esc(r.id)}">${esc(r.provider)} · ${esc(r.product)} — ${r.upTo ? 'up to ' : ''}${pct2(r.rate)}${r.kind === 'promo' ? ' (promo)' : ''}</option>`).join('') + '<option value="">My own rate…</option>';
+  const def = rows.find((r) => r.kind === 'standard' && !r.strings && !r.upTo && !r.tiers && !(r.minDeposit > 100000) && r.category !== 'government') || rows[0];
+  if (def) { sel.value = def.id; $('#simRate').value = def.rate; }
+  const i = INFL(); if (i != null) $('#simInfl').value = i;
+  const h = ((DATA.rules || {}).inflation || {});
+  $('#simExplain').innerHTML = i == null ? '' : `<p><b>Inflation</b> is how fast prices go up. Philippine prices rose <b>${i}%</b> in the year to ${esc(h.label || h.month || '')}: groceries that cost ₱1,000 a year earlier now cost about <b>₱${Math.round(1000 * (1 + i / 100)).toLocaleString('en-PH')}</b>.</p>
+    <p><b>Tax</b>: banks keep <b>${TAX()}%</b> of the interest you earn and pay it to the BIR, so a 4% rate pays you about ${pct2(4 * (1 - TAX() / 100))}. Pag-IBIG MP2 is tax-free.</p>
+    <p><b>So:</b> if your rate <i>after tax</i> is lower than inflation, your money grows in pesos but buys <b>less</b> every year. Try it below.</p>`;
+  $('#simChart').innerHTML = inflSpark((h.history || []).slice(-24), 320, 70) + `<small>PH inflation, last 24 months · Source: <a href="${esc(h.source || '#')}" target="_blank" rel="noopener">BSP</a> · checked ${fmtDate(h.checkedOn)}</small>`;
+  sim();
+}
+function sim() {
+  const A = Math.max(0, Number($('#simAmt').value) || 0), Y = Math.max(1, Number($('#simYears').value) || 1);
+  const pick = ROWS.find((x) => x.id === $('#simPick').value);
+  const r = (Number($('#simRate').value) || 0) / 100, i = (Number($('#simInfl').value) || 0) / 100;
+  const taxFree = pick ? !taxable(pick) : false, t = $('#simTax').checked && !taxFree ? TAX() / 100 : 0;
+  $('#simTaxNote').textContent = taxFree ? '(this one is tax-free)' : '';
+  const gross = A * (Math.pow(1 + r, Y) - 1);
+  const netBal = A * Math.pow(1 + r * (1 - t), Y), net = netBal - A, tax = Math.max(0, gross - net);
+  const realBal = netBal / Math.pow(1 + i, Y), realGain = realBal - A, inflEat = net - realGain;
+  const m = (n) => (n < 0 ? '−' : '') + '₱' + Math.round(Math.abs(n)).toLocaleString('en-PH');
+  $('#simGross').textContent = m(gross); $('#simTaxAmt').textContent = t ? '−' + m(tax) : '₱0';
+  $('#simInflAmt').textContent = '−' + m(inflEat); $('#simReal').textContent = (realGain >= 0 ? '+' : '') + m(realGain);
+  $('#simRealTile').dataset.good = String(realGain >= 0);
+  const tot = Math.max(gross, tax + inflEat, 1), w = (n) => Math.max(0, n / tot * 100).toFixed(1) + '%';
+  $('#simBar').innerHTML = `<span class="sb-tax" style="width:${w(tax)}" title="Tax"></span><span class="sb-infl" style="width:${w(Math.min(inflEat, Math.max(net, 0)))}" title="Inflation"></span><span class="sb-real" style="width:${w(Math.max(realGain, 0))}" title="Real gain"></span>${realGain < 0 ? `<span class="sb-loss" style="width:${w(-realGain)}" title="Buying power lost"></span>` : ''}`;
+  $('#simVerdict').innerHTML = !A ? 'Enter an amount to see the result.' : realGain >= 0
+    ? `<b class="good">You beat inflation.</b> After ${Y} year${Y > 1 ? 's' : ''}, your ${m(A)} grows to ${m(netBal)} after tax. In today's prices that buys what ${m(realBal)} buys now: <b>${m(realGain)} more</b>.`
+    : `<b class="bad">Inflation wins.</b> After ${Y} year${Y > 1 ? 's' : ''}, your ${m(A)} grows to ${m(netBal)} after tax, but prices rise faster. It will buy only what ${m(realBal)} buys today: <b>${m(-realGain)} less</b> than now.`;
+}
 function blended(r, pesos) {
   if (r.rate == null) return null;
   const amount = units(r, pesos);
@@ -447,7 +482,7 @@ function setView(v) {
 function syncChips() { $$('.chips').forEach((c) => $$('button', c).forEach((b) => b.setAttribute('aria-pressed', String(S.f[c.dataset.key] === b.dataset.v)))); syncFilterUi(); }
 
 /* ── collapsible filters (preview looks: ?filters=a|b|c, default a) ── */
-const FLOOK = (new URLSearchParams(location.search).get('filters') || 'a').toLowerCase();
+const FLOOK = 'a'; // George picked A on the review board, 9 Nov
 const FLABEL = { cat: 'Where', kind: 'Promo', cap: 'Cap', lock: 'Access' };
 const optLabel = (k, v) => { const b = $(`.chips[data-key="${k}"] button[data-v="${v}"]`); return b ? b.textContent : v; };
 function activeKeys(keys) { return keys.filter((k) => S.f[k] !== 'all' && !(k === 'lock' && S.view !== 'advanced')); }
@@ -458,25 +493,14 @@ function setupFilters() {
   const search = $('.search-bar', box);
   const mk = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
   const icon = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg>';
-  if (FLOOK === 'c') {
-    const row = mk('div', 'f-row');
-    for (const k of ['cat', 'kind', 'cap', 'lock']) {
-      const g = groups[k]; g.hidden = true;
-      const wrap = mk('label', 'f-select' + (g.classList.contains('adv-only') ? ' adv-only' : ''));
-      wrap.innerHTML = `<span>${FLABEL[k]}</span><select data-key="${k}">${$$('button', g).map((b) => `<option value="${b.dataset.v}"${b.classList.contains('adv-only') ? ' data-adv="1"' : ''}>${b.textContent}</option>`).join('')}</select>`;
-      wrap.querySelector('select').addEventListener('change', (e) => { S.f[k] = e.target.value; syncChips(); renderRates(); });
-      row.appendChild(wrap);
-    }
-    row.appendChild(search); box.prepend(row); return;
-  }
-  const more = FLOOK === 'b' ? ['cat', 'kind', 'cap', 'lock'] : ['kind', 'cap', 'lock'];
+  const more = ['kind', 'cap', 'lock'];
   const panel = mk('div', 'f-panel'); panel.id = 'fPanel'; panel.hidden = true;
   for (const k of more) { const g = groups[k]; const row = mk('div', 'f-group' + (g.classList.contains('adv-only') ? ' adv-only' : ''), `<span class="f-label">${FLABEL[k]}</span>`); row.appendChild(g); panel.appendChild(row); }
-  const btn = mk('button', 'f-toggle', `${icon}<span class="f-tl">${FLOOK === 'b' ? 'Filters' : 'More filters'}</span><span class="f-count" hidden></span><svg class="f-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`);
+  const btn = mk('button', 'f-toggle', `${icon}<span class="f-tl">More filters</span><span class="f-count" hidden></span><svg class="f-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>`);
   btn.type = 'button'; btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-controls', 'fPanel');
   btn.addEventListener('click', () => { panel.hidden = !panel.hidden; btn.setAttribute('aria-expanded', String(!panel.hidden)); });
   const top = mk('div', 'f-row');
-  if (FLOOK === 'a') top.appendChild(groups.cat);
+  top.appendChild(groups.cat);
   const tools = mk('div', 'f-tools'); tools.appendChild(btn); tools.appendChild(search); top.appendChild(tools);
   const pills = mk('div', 'f-active'); pills.id = 'fActive';
   pills.addEventListener('click', (e) => { const x = e.target.closest('[data-clear]'); if (!x) return; const k = x.dataset.clear; if (k === '*') more.forEach((m) => (S.f[m] = 'all')); else S.f[k] = 'all'; syncChips(); renderRates(); });
@@ -484,8 +508,7 @@ function setupFilters() {
 }
 function syncFilterUi() {
   const box = $('#filters'); if (!box || !box.dataset.flook) return;
-  if (FLOOK === 'c') { $$('select[data-key]', box).forEach((sel) => { sel.value = S.f[sel.dataset.key]; $$('option[data-adv]', sel).forEach((o) => (o.hidden = S.view !== 'advanced')); }); return; }
-  const more = FLOOK === 'b' ? ['cat', 'kind', 'cap', 'lock'] : ['kind', 'cap', 'lock'];
+  const more = ['kind', 'cap', 'lock'];
   const act = activeKeys(more), cnt = $('.f-count', box);
   cnt.hidden = !act.length; cnt.textContent = act.length;
   $('#fActive').innerHTML = act.length ? act.map((k) => `<button class="f-pill" data-clear="${k}" aria-label="Clear ${FLABEL[k]} filter">${FLABEL[k]}: ${optLabel(k, S.f[k])} <span aria-hidden="true">×</span></button>`).join('') + (act.length > 1 ? '<button class="f-pill f-clear" data-clear="*">Clear all</button>' : '') : '';
@@ -528,6 +551,8 @@ function wire() {
     const c = e.target.closest('.fn-copy');
     if (c) { const done = () => { c.textContent = 'Copied ✓'; setTimeout(() => (c.textContent = 'Copy code'), 1800); }; try { navigator.clipboard.writeText(c.dataset.copy).then(done, done); } catch (err) { done(); } }
   });
+  ['simAmt', 'simYears', 'simRate', 'simInfl', 'simTax'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', sim); });
+  const sp = $('#simPick'); if (sp) sp.addEventListener('change', () => { const r = ROWS.find((x) => x.id === sp.value); if (r) $('#simRate').value = r.rate; sim(); });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
   $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });
@@ -560,7 +585,7 @@ async function init() {
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); renderFootnotes(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
+  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
   const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
