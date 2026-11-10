@@ -736,7 +736,7 @@ async function init() {
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
-  if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; if (Q.get('where')) S.tree.where = Q.get('where'); if (Q.get('access')) S.tree.access = Q.get('access'); renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
   if (Q.get('cmp')) { CMP.ids = Q.get('cmp').split(',').filter((id) => ROWS.some((r) => r.id === id)).slice(0, 3); if (Q.get('cmpccy') === 'usd') { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = 1000; } CMP.open = CMP.ids.length > 1; syncCmpForm(); syncCmp(); }
   if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
