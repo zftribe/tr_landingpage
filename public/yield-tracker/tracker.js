@@ -620,6 +620,34 @@ function renderTree() {
   $('#treeResult').hidden = !done;
   if (done) renderPicks();
 }
+/* Round 13 A: in the step 4 card, the best rates the answers left out (same currency and "where", access/promo/strings answers relaxed) */
+function renderNextTop() {
+  const box = $('#nextTop'); if (!box) return
+  const T = S.tree, usd = S.currency === 'USD', amt = amountPesos(), skip = new Set(S.topProv || [])
+  if (!T.where) { box.hidden = true; return }
+  const pool = ROWS.filter((r) => {
+    if (!rankable(r) || r.pastReturn || skip.has(r.provider)) return false
+    if ((r.category === 'cex' || r.category === 'dex') && !r.stablecoin) return false
+    if (usd && !(((r.category === 'cex' || r.category === 'dex') && r.stablecoin) || isUsdBank(r))) return false
+    if (!usd && isUsdBank(r)) return false
+    if (T.where === 'bank' && !PH_CATS.includes(r.category)) return false
+    if (T.where === 'crypto' && r.category !== 'cex') return false
+    if (T.where === 'defi' && r.category !== 'dex') return false
+    if (r.category === 'dex' && S.view !== 'advanced' && T.where !== 'defi') return false
+    if (r.minDeposit && (units(r, amt) || 0) < r.minDeposit) return false
+    if (r.maxDeposit && amt && amt > r.maxDeposit && isPeso(r)) return false
+    return true
+  }).map((r) => { const y = yearRate(r, amt); return y == null ? null : { r, ny: y * (S.tax && taxable(r) ? 1 - TAX() / 100 : 1) } }).filter(Boolean).sort((a, b) => b.ny - a.ny)
+  const seen = new Set(), top = []
+  for (const x of pool) { if (seen.has(x.r.provider)) continue; seen.add(x.r.provider); top.push(x); if (top.length === 3) break }
+  if (!top.length) { box.hidden = true; return }
+  const why = (r) => [r.kind === 'promo' ? (r.promoEnds ? 'Promo until ' + fmtDate(r.promoEnds) : 'Promo') : '', r.strings ? 'Has tasks' : '', locked(r) ? 'Locked in' : '', r.category === 'cex' || r.category === 'dex' ? 'Not insured' : ''].filter(Boolean)
+  box.hidden = false
+  box.innerHTML = '<p class="next-top-h">The top 3 your answers left out <span>each has a catch, so check it in the list</span></p><div class="next-top-row">' + top.map((x) => {
+    const r = x.r, w = why(r)
+    return '<div class="nt"><div class="logo">' + logo(r) + '</div><div class="nt-txt"><b>' + esc(r.provider) + '</b><small>' + esc(r.product || '') + '</small></div><div class="nt-rate">' + pct2(x.ny) + '<small>' + (S.tax && taxable(r) ? 'after tax' : 'a year') + '</small></div>' + (w.length ? '<div class="nt-why">' + w.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>' : '') + '</div>'
+  }).join('') + '</div>'
+}
 function renderPicks() {
   if (S.step) setStep(S.step);
   const T = S.tree, usd = S.currency === 'USD', amt = amountPesos();
@@ -648,6 +676,7 @@ function renderPicks() {
     .sort((a, b) => b.ny - a.ny);
   const seen = new Set(), top = [];
   for (const x of pool) { const k = x.r.provider; if (seen.has(k)) continue; seen.add(k); top.push(x); if (top.length === 3) break; }
+  S.topProv = top.map((x) => x.r.provider); renderNextTop()
   const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); const n = (typeof t.nodes === 'function' ? t.nodes() : t.nodes).find((x) => x[0] === v); return n ? n[2] : v; };
   const path = TREE.map((t) => `<span class="step">${lbl(t.key, S.tree[t.key])}</span>`).join('<span aria-hidden="true">→</span>');
   const ranks = ['Best fit', 'Runner-up', 'Also good'];
