@@ -1,0 +1,6 @@
+### Result
+7. [GET] http://127.0.0.1:3197/yield-tracker/yields.json => [200] OK
+35. [GET] https://yields.llama.fi/pools => [200]
+42. [GET] http://127.0.0.1:3197/yield-tracker/yields.json => [200] OK
+
+Note: 72 static requests not shown, run with --static option to see them.

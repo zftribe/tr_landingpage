@@ -3,7 +3,7 @@ import { lineup } from '@/lib/lineup'
 import { PROMOS } from '@/lib/promos'
 import { DISCORD_INVITE } from '@/lib/fill'
 import { ProductRail, type ExtraCard } from './ProductRail'
-import { Quiz } from './Quiz'
+import { Assessment } from './Assessment'
 
 const BLUEPRINT_PLAYLIST = 'https://www.youtube.com/playlist?list=PL033hJEN0tRsgTDmsylZus4BONq8zeHjN'
 
@@ -64,7 +64,7 @@ export async function Programs() {
         </div>
 
         <ProductRail products={products} curriculum={curriculum} before={BEFORE} after={AFTER} />
-        <Quiz products={products} />
+        <Assessment products={products} />
       </div>
     </section>
   )

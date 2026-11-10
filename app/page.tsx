@@ -30,6 +30,10 @@ export default async function Home() {
   const bottom = fill(after, packages)
   return (
     <>
+      {/* Tap-the-candle intro (George, 10 Nov): decided before first paint; once a day, never for crawlers. */}
+      <script dangerouslySetInnerHTML={{ __html: "(function(){try{var d=document.documentElement,q=/[?&]intro=1/.test(location.search),bot=/bot|crawl|spider|slurp|lighthouse|headless|facebookexternalhit|embedly|preview/i.test(navigator.userAgent),seen=null;try{seen=localStorage.getItem('tr-intro-day')}catch(e){}if(q||(!bot&&seen!==new Date().toDateString()))d.classList.add('intro-on')}catch(e){}})()" }} />
+      <div id="tr-intro" aria-label="Welcome intro" />
+      <Script src="/intro/candle-intro.js" strategy="afterInteractive" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData(bottom)).replace(/</g, '\\u003c') }}

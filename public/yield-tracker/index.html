@@ -5,7 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TR Yield Tracker — Trading Republic</title>
 <meta name="description" content="Compare savings and earn rates across Philippine banks, digital banks, e-wallets and partner crypto exchanges. Caps, fine print, promo end dates and after-tax yields, each with its official source and the date we checked it.">
-<link rel="icon" href="../TR logo.png">
+<link rel="canonical" href="https://welcome.tradingrepublic.io/yield-tracker/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TR Yield Tracker — Trading Republic">
+<meta property="og:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
+<meta property="og:url" content="https://welcome.tradingrepublic.io/yield-tracker/index.html">
+<meta property="og:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
+<meta property="og:image:alt" content="Trading Republic logo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TR Yield Tracker — Trading Republic">
+<meta name="twitter:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
+<meta name="twitter:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
+<link rel="icon" href="../tr-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tracker.css">
 </head>
@@ -13,35 +24,41 @@
 
 <nav class="nav" id="nav">
   <div class="nav-inner">
-    <a href="../" class="nav-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></a>
+    <a href="../" class="nav-brand"><img src="../tr-logo.png" alt=""><span>Trading Republic</span></a>
     <div class="nav-links">
+      <a href="#yields">Rates</a>
       <a href="#finder">Finder</a>
-      <a href="#yields">All rates</a>
       <a href="#calculator">Calculator</a>
       <a href="../">Main site</a>
     </div>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" id="best">
   <div class="container">
-    <div class="verify" id="verify" role="note" aria-label="Rates verified against official sources">
-      <svg class="seal" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><g fill="#16a34a"><circle cx="42.60" cy="24.00" r="4.6"/><circle cx="41.18" cy="31.12" r="4.6"/><circle cx="37.15" cy="37.15" r="4.6"/><circle cx="31.12" cy="41.18" r="4.6"/><circle cx="24.00" cy="42.60" r="4.6"/><circle cx="16.88" cy="41.18" r="4.6"/><circle cx="10.85" cy="37.15" r="4.6"/><circle cx="6.82" cy="31.12" r="4.6"/><circle cx="5.40" cy="24.00" r="4.6"/><circle cx="6.82" cy="16.88" r="4.6"/><circle cx="10.85" cy="10.85" r="4.6"/><circle cx="16.88" cy="6.82" r="4.6"/><circle cx="24.00" cy="5.40" r="4.6"/><circle cx="31.12" cy="6.82" r="4.6"/><circle cx="37.15" cy="10.85" r="4.6"/><circle cx="41.18" cy="16.88" r="4.6"/><circle cx="24" cy="24" r="19.4"/></g><circle cx="24" cy="24" r="16.2" fill="#22c55e"/><circle cx="24" cy="24" r="14.6" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.1"/><path d="M17.2 24.6l4.6 4.6 9.4-9.8" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="verify-txt">
-        <b>Verified against official sources</b>
-        <span id="verifyChecked">Checked on the providers' own pages</span>
-        <span class="verify-next" id="verifyNext"></span>
-      </div>
+    <div class="verify" id="verify" role="note" aria-label="Source check dates">
+      <span class="verify-dot" aria-hidden="true">●</span><span id="verifyChecked">Rates checked on each provider's own page</span>
     </div>
     <h1>Where should your money <span class="gold">earn</span>?</h1>
     <p class="subtitle">Savings and earn rates from Philippine banks, digital banks, e-wallets and our partner crypto exchanges. Every rate shows its cap, its catches, whether it is a promo, and the day we checked it.</p>
-    <div class="stats-row" id="statsRow"></div>
+    <div class="stats-row" id="statsRow" aria-label="Today's rate highlights"></div>
   </div>
 </header>
 
 <!-- Controls shared by every section -->
 <div class="controls" id="controls">
   <div class="container-wide controls-inner">
+    <div class="shared-amount">
+      <label for="sharedAmount">Your amount</label>
+      <div class="amount-input-group">
+        <div class="currency-switch" role="group" aria-label="Amount currency">
+          <button type="button" data-currency="PHP" aria-pressed="true" aria-label="Philippine pesos">₱</button>
+          <button type="button" data-currency="USD" aria-pressed="false" aria-label="US dollars">$</button>
+        </div>
+        <input id="sharedAmount" type="number" value="100000" min="0" step="any" inputmode="decimal" aria-describedby="amountScope">
+      </div>
+    </div>
+    <p id="amountScope" class="amount-scope">One amount for rates, Finder and calculators.</p>
     <div class="seg" role="group" aria-label="View">
       <button data-view="basic" aria-pressed="true">Basic</button>
       <button data-view="advanced" aria-pressed="false">Advanced</button>
@@ -60,19 +77,6 @@
 </div>
 
 <main>
-<!-- ═══════════ FINDER (tech tree) ═══════════ -->
-<section class="section" id="finder">
-  <div class="container">
-    <div class="sec-head">
-      <span class="eyebrow">Finder</span>
-      <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
-      <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
-    </div>
-    <div class="tree" id="tree"></div>
-    <div class="tree-result" id="treeResult" hidden></div>
-  </div>
-</section>
-
 <!-- ═══════════ ALL RATES ═══════════ -->
 <section class="section" id="yields">
   <div class="container-wide">
@@ -130,6 +134,20 @@
 
     <div class="rates" id="rates"><div class="loading-spinner"></div></div>
     <p class="rates-foot" id="ratesFoot"></p>
+    <p id="defiStatus" class="rates-foot adv-only" role="status"></p>
+  </div>
+</section>
+
+<!-- ═══════════ FINDER (tech tree) ═══════════ -->
+<section class="section" id="finder">
+  <div class="container">
+    <div class="sec-head">
+      <span class="eyebrow">Finder</span>
+      <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
+      <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
+    </div>
+    <div class="tree" id="tree"></div>
+    <div class="tree-result" id="treeResult" hidden></div>
   </div>
 </section>
 
@@ -148,10 +166,10 @@
           <select id="calcPick" class="calc-input"></select>
           <p class="calc-hint" id="calcHint"></p>
         </div>
-        <div class="calc-field">
-          <label for="calcDeposit">Amount <span class="val" id="calcDepositLabel"></span></label>
-          <input type="number" class="calc-input" id="calcDeposit" value="100000" min="0" step="1000" inputmode="numeric">
-          <input type="range" class="calc-slider" id="calcDepositSlider" min="1000" max="5000000" step="1000" value="100000" aria-label="Amount slider">
+        <div class="calc-field calc-amount-readout">
+          <span class="eyebrow">Your amount</span>
+          <strong id="calcDepositLabel">₱100,000</strong>
+          <a href="#controls">Change amount ↑</a>
         </div>
         <div class="calc-field">
           <label for="calcYears">Years <span class="val" id="calcYearsLabel"></span></label>
@@ -168,6 +186,13 @@
           <div class="breakdown-item"><div class="breakdown-label">Per year</div><div class="breakdown-value" id="resYear">—</div></div>
           <div class="breakdown-item"><div class="breakdown-label">Blended rate</div><div class="breakdown-value" id="resRate">—</div></div>
         </div>
+        <div class="calc-ledger" aria-label="From interest to real gain">
+          <div><span>Interest earned</span><strong id="calcGross">—</strong></div>
+          <div><span>Minus tax</span><strong id="calcTax">—</strong></div>
+          <div><span>Minus inflation</span><strong id="calcInflation">—</strong></div>
+          <div class="ledger-total"><span>Real gain or loss</span><strong id="calcReal">—</strong></div>
+        </div>
+        <p class="calc-note" id="calcRealNote"></p>
         <p class="calc-note" id="calcNote"></p>
       </div>
     </div>
@@ -206,7 +231,7 @@
       <div class="sim-box">
         <h3>Simulator</h3>
         <div class="sim-fields">
-          <label class="sf"><span>Amount</span><input id="simAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+          <p class="sf sf-wide sim-shared-note">Uses your amount from the shared control above. <a href="#controls">Change amount ↑</a></p>
           <label class="sf"><span>Years</span><input id="simYears" type="number" inputmode="numeric" min="1" max="30" step="1" value="5"></label>
           <label class="sf sf-wide"><span>Where you save</span><select id="simPick"></select></label>
           <label class="sf"><span>Rate (% a year)</span><input id="simRate" type="number" inputmode="decimal" min="0" max="100" step="0.05" value="4"></label>
@@ -222,7 +247,7 @@
         <div class="sim-bar" id="simBar" aria-hidden="true"></div>
         <div class="sim-legend"><span><i class="sb-tax"></i>Tax</span><span><i class="sb-infl"></i>Inflation</span><span><i class="sb-real"></i>Real gain</span><span><i class="sb-loss"></i>Buying power lost</span></div>
         <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
-        <p class="sim-note">"What you really gain" is in today's pesos. Assumes the rate and inflation stay the same every year, and interest is added once a year. A comparison, not advice; past inflation doesn't predict future inflation.</p>
+        <p class="sim-note">Real gain measures PHP buying power, shown in your selected currency at the fixed BSP reference rate. Caps, promo periods and published base rates apply; inflation is held constant and interest compounds annually. A comparison, not advice.</p>
       </div>
     </div>
   </div>
@@ -248,7 +273,7 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></div>
+    <div class="footer-brand"><img src="../tr-logo.png" alt=""><span>Trading Republic</span></div>
     <p>TR Yield Tracker — Compare. Calculate. Compound.</p>
     <div class="footnotes" id="partnerNotes"></div>
     <div class="legal" id="legal">
@@ -263,6 +288,13 @@
   <div class="cmp-tray-in"><b>Compare <span id="cmpCount">0 of 3</span></b><span id="cmpNames" class="cmp-names"></span>
   <button type="button" class="btn gold" id="cmpOpen">Compare side by side</button><button type="button" class="btn" id="cmpClear">Clear</button></div>
 </div>
+<nav class="phone-nav" aria-label="Jump to section">
+  <a href="#best"><span aria-hidden="true">✧</span>Best</a>
+  <a href="#yields"><span aria-hidden="true">≡</span>Rates</a>
+  <a href="#finder"><span aria-hidden="true">⌕</span>Finder</a>
+  <a href="#calculator"><span aria-hidden="true">＋</span>Calc</a>
+</nav>
+<script src="tracker-math.js"></script>
 <script src="tracker.js"></script>
 </body>
 </html>
