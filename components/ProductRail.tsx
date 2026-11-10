@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
 import type { CurriculumCourse } from '@/lib/lms'
 import { CurriculumDialog } from './CurriculumDialog'
@@ -89,6 +89,20 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
     el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: reduce ? 'auto' : 'smooth' })
   }
 
+  // Phone page dots: which card the rail is resting on.
+  const [at, setAt] = useState(0)
+  useEffect(() => {
+    const el = rail.current
+    if (!el) return
+    const sync = () => {
+      const first = el.querySelector<HTMLElement>('.pc-card')
+      const step = first ? first.offsetWidth + 14 : el.clientWidth
+      setAt(Math.round(el.scrollLeft / step))
+    }
+    el.addEventListener('scroll', sync, { passive: true })
+    return () => el.removeEventListener('scroll', sync)
+  }, [])
+
   const compared = picked.map((id) => products.find((p) => p.id === id)!).filter(Boolean)
   const total = before.length + products.length + after.length
 
@@ -122,7 +136,8 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
     <div className="pc">
       <div className="pc-bar">
         <p className="pc-hint">
-          {total} programs · swipe or use the arrows · tap Compare on up to three
+          Start free with the Blueprint. Go deeper when you&apos;re ready.{' '}
+          <span className="pc-hint-sub">Tap Compare on up to three.</span>
         </p>
         <div className="pc-arrows">
           <button type="button" className="carousel-btn" onClick={() => page(-1)} aria-label="Previous programs">&#8592;</button>
@@ -194,6 +209,9 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
           )
         })}
         {after.map(extra)}
+      </div>
+      <div className="pc-dots" aria-hidden="true">
+        {Array.from({ length: total }, (_, i) => <i key={i} className={i === Math.min(at, total - 1) ? 'on' : undefined} />)}
       </div>
 
       <p className="pc-notice" role="status">{notice}</p>
