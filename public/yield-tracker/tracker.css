@@ -638,3 +638,4 @@ body[data-view=advanced] .prov-head { grid-template-columns: minmax(200px, 2fr) 
 .prov-txt, .prov { min-width: 0; } .prov-name { overflow-wrap: anywhere; }
 .prov-head .rate .na { display: block; font-family: var(--font-body); font-size: .82rem; font-weight: 600; color: var(--text-dim); line-height: 1.35; }
 @media (max-width: 720px) { .prov-head .rate .na { max-width: 110px; text-align: right; font-size: .74rem; } }
+.best-def { font-size: .72rem; color: var(--text-dim); margin: 2px 0 0; line-height: 1.4; }
