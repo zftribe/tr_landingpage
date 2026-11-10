@@ -705,3 +705,20 @@ body[data-view=basic] .jhide { display: none !important; }
 body[data-view=basic] #inflation-check { display: block; order: 3; }
 body[data-view=basic] #fx-check { order: 3; }
 body[data-view=basic] #nextSteps { order: 4; }
+
+/* Inflation check as one card (George, 11 Nov): explanation + chart across the top, inputs in one row, results full width. */
+#inflation-check .sim-grid { grid-template-columns: 1fr; gap: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+#inflation-check .sim-explain { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); align-items: center; gap: 24px; padding: 22px 24px; border-bottom: 1px solid var(--border); }
+#inflation-check .sim-explain p:last-child { margin-bottom: 0; }
+#inflation-check .sim-chart { background: var(--bg); }
+#inflation-check .sim-box { background: none; border: 0; border-radius: 0; padding: 22px 24px; }
+#inflation-check .sim-fields { grid-template-columns: .7fr 2.2fr 1fr 1fr auto; align-items: end; }
+#inflation-check .sim-fields .sf-wide { grid-column: auto; }
+#inflation-check .sim-fields .sim-shared-note { grid-column: 1 / -1; margin: 0; }
+#inflation-check .sim-fields .switch { padding-bottom: 10px; white-space: nowrap; }
+@media (max-width: 960px) {
+  #inflation-check .sim-explain { grid-template-columns: 1fr; }
+  #inflation-check .sim-fields { grid-template-columns: 1fr 1fr; }
+  #inflation-check .sim-fields .sf:nth-child(3), #inflation-check .sim-fields .switch { grid-column: 1 / -1; }
+}
+@media (max-width: 720px) { #inflation-check .sim-explain, #inflation-check .sim-box { padding: 16px; } }
