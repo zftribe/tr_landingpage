@@ -492,7 +492,7 @@ const beText = (m) => (!isFinite(m) ? 'never, at this rate' : m < 1 ? 'under a m
 const fxBoardRows = () => ((DATA.rules && DATA.rules.fxBoard && DATA.rules.fxBoard.banks) || []);
 function renderFx() {
   const box = $('#fxOut'); if (!box) return;
-  const pesos = Number($('#fxAmt').value) || 0, months = Number($('#fxMonths').value) || 12;
+  const pesos = parseAmount($('#fxAmt').value), months = Number($('#fxMonths').value) || 12;
   const r = ROWS.find((x) => x.id === $('#fxPick').value);
   if (!r) { box.innerHTML = '<p class="fx-verdict none">Pick a bank dollar account above.</p>'; return; }
   const x = roundTrip(r, pesos, months);
@@ -965,7 +965,7 @@ async function init() {
     if (nx) {
       const k = nx.dataset.stepNext, seq = journey()
       if (k === 'finder') { if (S.topPick && $('#calcPick')) { $('#calcPick').value = S.topPick; calc() } setStep(Math.max(S.step, 2), '#calculator'); return }
-      if (k === 'calc') { if (seq[2] === '#fx-check') { const fa = $('#fxAmt'); if (fa) fa.value = Math.round(amountPesos()); renderFx() } setStep(Math.max(S.step, 3), seq[2]); return }
+      if (k === 'calc') { if (seq[2] === '#fx-check') { const fa = $('#fxAmt'); if (fa) fa.value = fmtAmount(Math.round(amountPesos())); renderFx() } setStep(Math.max(S.step, 3), seq[2]); return }
       if (k === 'fx' || k === 'infl') { setStep(seq.length, '#nextSteps'); return }
     }
     const it = e.target.closest('#calcInflToggle'); if (it) { $('#calculator').classList.toggle('no-infl', !it.checked); return }
@@ -977,6 +977,7 @@ async function init() {
   const big = $('#amtBig'); if (big) big.addEventListener('input', () => { const v = Number(big.value); if (isFinite(v) && v >= 0) { S.amount = v; $('#sharedAmount').value = v; renderAll(); renderAmountCard(); if (DATA) sim() } })
   const sb = $('#sortBy'); if (sb) sb.addEventListener('change', () => { S.sort = sb.value; renderRates() });
   ['fxAmt', 'fxMonths', 'fxPick'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', renderFx); });
+  { const fa = $('#fxAmt'); if (fa) { fa.addEventListener('change', () => (fa.value = fmtAmount(parseAmount(fa.value)))); fa.addEventListener('focus', () => fa.select()) } }
   setupFilters();
   wire();
   document.body.dataset.view = S.view; $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === S.view)));
