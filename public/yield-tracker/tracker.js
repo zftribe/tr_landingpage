@@ -79,7 +79,7 @@ function renderInfl() {
   const beatSteady = beat.filter((r) => r.kind !== 'promo' && !r.strings && !locked(r));
   const h = (i.history || []).slice(-24);
   el.classList.toggle('infl-slim', INFL_MODE === 'a');
-  if (INFL_MODE === 'a') { el.innerHTML = `<span class="infl-n">${i.value}%</span><span>PH inflation, ${esc(i.label || i.month)} (<a href="${esc(i.source)}" target="_blank" rel="noopener" style="margin:0">BSP</a>)</span><span>·</span><span><b>${beat.length} of ${peso.length}</b> peso rates beat it after tax${beatSteady.length ? '' : ', none without a promo, task or lock-up'}</span><span>·</span><span>Each row shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span></span><a href="#inflation-check">Run the inflation check</a>`; return }
+  if (INFL_MODE === 'a') { el.innerHTML = `<span class="infl-n">${i.value}%</span><span>PH inflation, ${esc(i.label || i.month)} (<a href="${esc(i.source)}" target="_blank" rel="noopener" style="margin:0">BSP</a>)</span><span class="sep">·</span><span><b>${beat.length} of ${peso.length}</b> peso rates beat it after tax${beatSteady.length ? '' : ', none without a promo, task or lock-up'}</span><span class="sep">·</span><span>Each row shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span></span><a href="#inflation-check">Run the inflation check</a>`; return }
   el.innerHTML = `<div class="infl-head"><div><span class="eyebrow">For savers in the Philippines</span><h3>Have you beaten inflation?</h3>
       <p>Prices rose <b>${i.value}%</b> in the year to ${esc(i.label || i.month)}. To keep your buying power, your rate <b>after tax</b> has to be at least that.
       <b>${beat.length} of ${peso.length}</b> peso rate${peso.length === 1 ? "" : "s"} ${beat.length === 1 ? "does" : "do"} it today${beatSteady.length ? `, and only ${beatSteady.length} without a promo, task or lock-up` : ', and none without a promo, task or lock-up'}.</p></div>
@@ -354,7 +354,7 @@ function restartJourney() {
 function renderStrip() {
   const st = $('#jrStrip'); if (!st) return
   const seq = journey(), n = document.body.dataset.flow ? seq.length : Math.min(S.step || 1, seq.length)
-  st.hidden = !(S.step >= 2)
+  st.hidden = !(S.step >= 2 || document.body.dataset.flow)
   $('#jrStep').textContent = 'Step ' + n + ' of ' + seq.length
   $('#jrLabel').textContent = document.body.dataset.flow ? 'Every rate, with its fine print' : (STEP_LABEL[seq[n - 1]] || '')
   $('#jrDots').innerHTML = seq.map((_, i) => '<i class="' + (i < n ? 'on' : '') + '"></i>').join('')
@@ -417,6 +417,7 @@ const STEP_SECTIONS = ['#finder', '#calculator', '#fx-check', '#inflation-check'
 const NEXT_LABEL = { '#fx-check': 'Next: does a dollar account pay after the exchange? →', '#inflation-check': 'Next: have you beaten inflation? →', '#nextSteps': 'Next: more analytics →' }
 function setStep(n, go) {
   S.step = n; const seq = journey()
+  if (S.view === 'basic' && seq.includes('#inflation-check') && !S.inflTouched) { const t = $('#calcInflToggle'), c = $('#calculator'); if (t && c) { t.checked = false; c.classList.add('no-infl') } }
   STEP_SECTIONS.forEach((sel) => { const el = $(sel); if (!el) return; const i = seq.indexOf(sel)
     el.classList.toggle('jhide', i < 0 || i >= n)
     el.querySelectorAll('[data-step-of]').forEach((t) => (t.textContent = i < 0 ? '' : 'Step ' + (i + 1) + ' of ' + seq.length + ' · ')) })
@@ -429,6 +430,7 @@ function setStep(n, go) {
   if (go) { const el = $(go); if (el) { el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in'); setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60) } }
 }
 const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
+document.addEventListener('toggle', (e) => { const d = e.target; if (!d || !d.matches || !d.matches('details.np-more')) return; S.npOpen = S.npOpen || new Set(); d.open ? S.npOpen.add(d.dataset.np) : S.npOpen.delete(d.dataset.np) }, true)
 function renderRates() {
   const list = visibleRows();
   const sortKey = (r) => (r.rate == null ? -1 : ended(r) ? -0.5 : net(r.rate, r));
@@ -441,7 +443,9 @@ function renderRates() {
     { const np = new Set(g.map((r) => r.provider)).size; html += `<div class="rgroup-title">${CAT_LABEL[cat]} <span>${np} provider${np > 1 ? 's' : ''} · ${g.length} rate${g.length > 1 ? 's' : ''}</span></div>`; }
     if (CAT_NOTE[cat]) html += `<p class="rgroup-note">${CAT_NOTE[cat]}</p>`;
     TREND_GROUP = g.some(r => (r.history || []).length >= 2);
-    html += headFor(cat, TREND_GROUP) + groupByProvider(g).map(provHTML).join('');
+    { const gp = groupByProvider(g), np = gp.filter((p) => p.rs.every((r) => r.rate == null)), pub = gp.filter((p) => !np.includes(p))
+      html += headFor(cat, TREND_GROUP) + pub.map(provHTML).join('')
+      if (np.length) html += `<details class="np-more" data-np="${cat}"${S.npOpen && S.npOpen.has(cat) ? ' open' : ''}><summary><b>${np.length} more ${np.length > 1 ? 'don’t' : 'doesn’t'} publish a rate online</b><span>${np.slice(0, 4).map((p) => esc(p.rs[0].provider)).join(', ')}${np.length > 4 ? '…' : ''}</span><i>Show</i></summary>${np.map(provHTML).join('')}</details>` }
     TREND_GROUP = false;
   }
   $('#rates').innerHTML = html ? '<p class="est-note">* What ' + showMoney(amountPesos()) + ' would earn in 12 months, after the 20% PH tax where it applies, if the rate stays the same.</p>' + html : '<p class="no-picks">No rates match these filters.</p>';
@@ -970,7 +974,7 @@ async function init() {
       if (k === 'calc') { if (seq[2] === '#fx-check') { const fa = $('#fxAmt'); if (fa) fa.value = fmtAmount(Math.round(amountPesos())); renderFx() } setStep(Math.max(S.step, 3), seq[2]); return }
       if (k === 'fx' || k === 'infl') { setStep(seq.length, '#nextSteps'); return }
     }
-    const it = e.target.closest('#calcInflToggle'); if (it) { $('#calculator').classList.toggle('no-infl', !it.checked); return }
+    const it = e.target.closest('#calcInflToggle'); if (it) { S.inflTouched = true; $('#calculator').classList.toggle('no-infl', !it.checked); return }
     const ra = e.target.closest('a[href="#yields"]'); if (ra && S.view === 'basic') { e.preventDefault(); setView('advanced'); setTimeout(() => $('#yields').scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60); return }
     const c = e.target.closest('[data-amt]'); if (c) { S.amount = Number(c.dataset.amt); updateAmount(); return }
     const g = e.target.closest('[data-goadv]'); if (g && !e.target.closest('#ratesFoot')) { e.preventDefault(); setView('advanced'); const to = $(g.dataset.go || '#yields'); setTimeout(() => to && to.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60); return }

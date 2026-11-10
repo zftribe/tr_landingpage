@@ -816,3 +816,25 @@ body[data-view=advanced][data-flow=journey] #fx-check { order: 6; } body[data-vi
 /* ── Round 11: the step strip stays after step 4 (the full list opened below the steps) ── */
 body[data-view=advanced][data-flow] .jr-strip.basic-only:not([hidden]) { display: block !important; }
 .cmp-amt input { width: 140px; }
+
+/* ── Round 12 (Claude's audit) ── */
+.infl-slim .sep { display: none; }
+.infl.infl-slim { gap: 8px 22px; }
+details.np-more { margin-top: 8px; border: 1px dashed var(--border-2); border-radius: 14px; }
+details.np-more > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 6px 14px; flex-wrap: wrap; padding: 14px 18px; color: var(--text-dim); font-size: .86rem; }
+details.np-more > summary::-webkit-details-marker { display: none; }
+details.np-more > summary b { color: var(--white); font-weight: 600; }
+details.np-more > summary i { margin-left: auto; font-style: normal; color: var(--gold); font-weight: 600; }
+details.np-more[open] > summary i { font-size: 0; } details.np-more[open] > summary i::after { content: 'Hide'; font-size: .86rem; }
+details.np-more > .prov-card, details.np-more > .row { margin: 0 8px 8px; }
+@media (max-width: 720px) {
+  #statsRow.stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 12px; }
+  #statsRow .stats-note { grid-column: 1 / -1; margin-top: 0; }
+  .jr-in { flex-wrap: nowrap; gap: 8px; padding-top: 7px; padding-bottom: 7px; }
+  .jr-in > b { white-space: nowrap; font-size: .68rem; }
+  .jr-in > span#jrLabel { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .8rem; }
+  .jr-dots { display: none; }
+  .jr-btns { gap: 6px; }
+  .jr-btn { padding: 7px 10px; min-height: 32px; font-size: .76rem; white-space: nowrap; }
+  #jrBack { font-size: 0; padding: 7px 11px; } #jrBack::before { content: '←'; font-size: .9rem; }
+}
