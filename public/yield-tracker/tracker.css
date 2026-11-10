@@ -812,3 +812,7 @@ body[data-view=advanced][data-flow=journey] #fx-check { order: 6; } body[data-vi
 }
 .method-fold > .method { margin: 0 auto; padding: 8px 24px 24px; }
 .method-fold > .method > div:first-child > h3 { display: none; }
+
+/* ── Round 11: the step strip stays after step 4 (the full list opened below the steps) ── */
+body[data-view=advanced][data-flow] .jr-strip.basic-only:not([hidden]) { display: block !important; }
+.cmp-amt input { width: 140px; }
