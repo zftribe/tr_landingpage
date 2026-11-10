@@ -621,8 +621,16 @@ function renderStats() {
       r.promoEnds ? `Ends ${fmtDate(r.promoEnds)}` : r.kind === 'standard' ? 'Variable standard rate' : ''].filter(Boolean).join(' · ');
     return `<article class="best-card ${primary ? 'best-primary' : 'best-small'}" data-best-id="${esc(r.id)}"><p class="best-label">${label}</p>${primary ? bestDef : ''}<div class="best-rate">${r.upTo ? '<small>Up to </small>' : ''}${pct2(afterTax(r))}</div><p class="best-net">${taxable(r) ? `After ${TAX()}% tax · ${pct2(r.rate)} gross` : r.taxExempt ? 'Tax-free · past dividend' : esc(r.rateBasis || 'APR') + ' · paid in ' + esc(r.currency)}</p><h3 class="best-product">${esc(r.provider)}<span>${esc(r.product)}</span></h3><p class="best-catch">${esc(catches)}</p>${r.source ? `<a class="best-source" href="${esc(r.source)}" target="_blank" rel="noopener">Official source ↗</a>` : '<p>Source not available</p>'}</article>`;
   };
-  const bestDef = '<p class="best-def">Best = highest after-tax standard rate on today\'s checked data: no minimum, no tasks, withdraw anytime.</p>';
-  $('#statsRow').innerHTML = card(plain, 'Best today · plain peso savings', true) + card(promo, 'Best peso promo · conditions apply', false) + card(usd, 'Best USD · standard stablecoin rate', false);
+  // The live four-stat look (George, 11 Nov), with honest figures: "best steady" is the best plain rate (no "up to",
+  // no minimum, no tasks, withdraw anytime), and the top promo says "up to" when it is one.
+  const promoRows = u.filter((r) => r.kind === 'promo'), promoBest = promoRows.sort((a, b) => net(b.rate, b) - net(a.rate, a))[0]
+  const providers = new Set(ROWS.filter((r) => r.category !== 'dex').map((r) => r.provider)).size
+  const stat = (v, l) => '<div class="stat-item"><div class="stat-value">' + v + '</div><div class="stat-label">' + l + '</div></div>'
+  $('#statsRow').innerHTML = stat(providers, 'Providers') +
+    stat(plain ? pct2(net(plain.rate, plain)) : '—', 'Best steady savings' + (S.tax ? ', after tax' : '') + '<sup>*</sup>') +
+    stat(promoBest ? (promoBest.upTo ? '<small>up to </small>' : '') + pct2(net(promoBest.rate, promoBest)) : '—', 'Top promo rate' + (S.tax ? ' after tax' : '') + ' (short-term, conditions apply)') +
+    stat(promoRows.length, 'Live promos') +
+    '<p class="stats-note">* Highest after-tax standard rate with no minimum, no tasks and withdraw anytime, on today\'s checked data: ' + (plain ? esc(plain.provider) + ' ' + esc(plain.product) : '') + '.</p>';
   const ph = DATA.checked && DATA.checked.ph, cx = DATA.checked && DATA.checked.crypto;
   // Next scheduled checks: peso rates on the 28th, crypto on the 1st and 15th (Manila calendar date).
   const t = new Date(TODAY), nextPh = new Date(t), nextCx = new Date(t);
@@ -630,7 +638,8 @@ function renderStats() {
   if (t.getUTCDate() < 15) nextCx.setUTCDate(15); else nextCx.setUTCMonth(t.getUTCMonth() + 1, 1);
   const dm = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
   const late = (iso, days) => iso && daysBetween(new Date(iso), TODAY) > days;
-  $('#verifyChecked').innerHTML = `<span class="vc">Peso rates checked <b>${fmtDate(ph)}</b></span><span class="vsep"> · </span><span class="vc">crypto <b>${fmtDate(cx)}</b></span><span class="vsep"> · </span><span class="vc">next checks: pesos ${dm(nextPh)}, crypto ${dm(nextCx)}</span>${late(ph, 35) || late(cx, 16) ? '<span class="vsep"> · </span><span class="vc verify-late">a re-check is overdue</span>' : ''}`;
+  $('#verifyChecked').innerHTML = `<span class="vc">Peso rates checked <b>${fmtDate(ph)}</b></span><span class="vsep"> · </span><span class="vc">Crypto checked <b>${fmtDate(cx)}</b></span>${late(ph, 35) || late(cx, 16) ? '<span class="vsep"> · </span><span class="vc verify-late">a re-check is overdue</span>' : ''}`;
+  $('#verifyNext').innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Next update: <span class="vc">peso rates <b>${dm(nextPh)}</b> (end of every month)</span><span class="vsep"> · </span><span class="vc">crypto <b>${dm(nextCx)}</b> (every 2 weeks)</span>`;
 }
 function renderRules() {
   const R = DATA.rules || {};
