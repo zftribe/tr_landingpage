@@ -78,6 +78,8 @@ function renderInfl() {
   const beat = peso.filter((r) => realYield(r) >= 0);
   const beatSteady = beat.filter((r) => r.kind !== 'promo' && !r.strings && !locked(r));
   const h = (i.history || []).slice(-24);
+  el.classList.toggle('infl-slim', INFL_MODE === 'a');
+  if (INFL_MODE === 'a') { el.innerHTML = `<span class="infl-n">${i.value}%</span><span>PH inflation, ${esc(i.label || i.month)} (<a href="${esc(i.source)}" target="_blank" rel="noopener" style="margin:0">BSP</a>)</span><span>·</span><span><b>${beat.length} of ${peso.length}</b> peso rates beat it after tax${beatSteady.length ? '' : ', none without a promo, task or lock-up'}</span><span>·</span><span>Each row shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span></span><a href="#inflation-check">Run the inflation check</a>`; return }
   el.innerHTML = `<div class="infl-head"><div><span class="eyebrow">For savers in the Philippines</span><h3>Have you beaten inflation?</h3>
       <p>Prices rose <b>${i.value}%</b> in the year to ${esc(i.label || i.month)}. To keep your buying power, your rate <b>after tax</b> has to be at least that.
       <b>${beat.length} of ${peso.length}</b> peso rate${peso.length === 1 ? "" : "s"} ${beat.length === 1 ? "does" : "do"} it today${beatSteady.length ? `, and only ${beatSteady.length} without a promo, task or lock-up` : ', and none without a promo, task or lock-up'}.</p></div>
@@ -99,6 +101,11 @@ function fillSim() {
     <p><b>So:</b> if your rate <i>after tax</i> is lower than inflation, your money grows in pesos but buys <b>less</b> every year. Try it below.</p>`;
   $('#simChart').innerHTML = inflSpark((h.history || []).slice(-24), 320, 70) + `<small>PH inflation, last 24 months · Source: <a href="${esc(h.source || '#')}" target="_blank" rel="noopener">BSP</a> · checked ${fmtDate(h.checkedOn)}</small>`;
   sim();
+}
+function syncSim() {
+  const r = ROWS.find((x) => x.id === ($('#calcPick') || {}).value), sp = $('#simPick'); if (!r || !sp) return
+  if ([...sp.options].some((o) => o.value === r.id)) sp.value = r.id; else sp.value = ''
+  $('#simRate').value = r.rate; const y = Number(($('#calcYears') || {}).value) || 1; $('#simYears').value = y; sim()
 }
 function sim() {
   const A = amountPesos(), Y = Math.max(1, Math.min(30, Number($('#simYears').value) || 1));
@@ -316,13 +323,15 @@ function earnOf(r) {
   return p * (S.tax && taxable(r) ? y * (1 - TAX() / 100) : y) / 100
 }
 /* Round 6: Basic is a guided journey. Step 1 Finder, 2 Calculator + inflation, 3 Dollar round trip (pesos only), 4 See the full list. */
+const INFL_MODE = new URLSearchParams(location.search).get('infl') === 'b' ? 'b' : 'a'
+document.body.dataset.infl = INFL_MODE
 const journey = () => {
   const seq = ['#finder', '#calculator']
   if (S.currency === 'USD' && S.tree.where === 'bank') seq.push('#fx-check') // dollars kept at a bank: the exchange round trip
-  else if (S.currency === 'PHP') seq.push('#inflation-check') // pesos: have you beaten inflation?
+  else if (S.currency === 'PHP' && INFL_MODE === 'a') seq.push('#inflation-check') // pesos: have you beaten inflation?
   seq.push('#nextSteps'); return seq
 }
-const STEP_LABEL = { '#finder': 'Finder', '#calculator': 'What would it earn?', '#fx-check': 'Dollar round trip', '#inflation-check': 'Have you beaten inflation?', '#nextSteps': 'Your result' }
+const STEP_LABEL = { '#finder': 'Finder', '#calculator': 'What would it earn?', '#fx-check': 'Dollar round trip', '#inflation-check': 'Have you beaten inflation?', '#nextSteps': 'More analytics' }
 const JR_KEY = 'tr-yield-journey'
 function saveJourney() {
   try { if (!S.step || S.step < 2) return; localStorage.setItem(JR_KEY, JSON.stringify({ at: Date.now(), step: S.step, tree: S.tree, currency: S.currency, amount: S.amount, pick: ($('#calcPick') || {}).value, years: Number(($('#calcYears') || {}).value) || 1 })) } catch (e) {}
@@ -332,13 +341,14 @@ function applyJourney(j) {
   if (j.currency && j.currency !== S.currency) { S.currency = j.currency }
   if (j.amount) S.amount = j.amount
   S.tree = j.tree || {}; renderTree(); updateAmount()
+  if (j.pick) { S.choice = j.pick; renderPicks() }
   if (j.pick && $('#calcPick')) $('#calcPick').value = j.pick
   if (j.years && $('#calcYears')) $('#calcYears').value = j.years
   calc(); const seq = journey(), n = Math.min(j.step || 2, seq.length); setStep(n, seq[n - 1])
 }
 function restartJourney() {
   try { localStorage.removeItem(JR_KEY) } catch (e) {}
-  S.tree = {}; S.topPick = null; renderTree(); $('#jrWelcome').hidden = true; setStep(1, '#finder')
+  S.tree = {}; S.topPick = null; S.choice = null; renderTree(); $('#jrWelcome').hidden = true; setStep(1, '#finder')
 }
 function renderStrip() {
   const st = $('#jrStrip'); if (!st) return
@@ -403,14 +413,18 @@ async function copyLink() {
 }
 async function shareCard() { const data = { title: 'My savings check', text: shareText(), url: journeyLink() }; if (navigator.share) { try { await navigator.share(data); return } catch (e) { if (e && e.name === 'AbortError') return } } copyLink() }
 const STEP_SECTIONS = ['#finder', '#calculator', '#fx-check', '#inflation-check', '#nextSteps']
-const NEXT_LABEL = { '#fx-check': 'Next: does a dollar account pay after the exchange? →', '#inflation-check': 'Next: have you beaten inflation? →', '#nextSteps': 'Next: see everything →' }
+const NEXT_LABEL = { '#fx-check': 'Next: does a dollar account pay after the exchange? →', '#inflation-check': 'Next: have you beaten inflation? →', '#nextSteps': 'Next: more analytics →' }
 function setStep(n, go) {
   S.step = n; const seq = journey()
   STEP_SECTIONS.forEach((sel) => { const el = $(sel); if (!el) return; const i = seq.indexOf(sel)
     el.classList.toggle('jhide', i < 0 || i >= n)
     el.querySelectorAll('[data-step-of]').forEach((t) => (t.textContent = i < 0 ? '' : 'Step ' + (i + 1) + ' of ' + seq.length + ' · ')) })
   const nb = $('#nextFromCalc'); if (nb) nb.textContent = NEXT_LABEL[seq[2]]
-  renderStrip(); saveJourney(); if (n >= seq.length) renderCard()
+  { const hostSel = seq[seq.length - 2], host = $(hostSel), box = $('#jrCardHost'), nx = host && host.querySelector('.step-next')
+    if (box && host) { if (nx) host.insertBefore(box, nx); else host.appendChild(box) }
+    if (box) box.hidden = !(n >= seq.length - 1); if (n >= seq.length - 1) renderCard() }
+  if (seq.includes('#inflation-check') && n >= seq.indexOf('#inflation-check') + 1) syncSim()
+  renderStrip(); saveJourney()
   if (go) { const el = $(go); if (el) { el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in'); setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60) } }
 }
 const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
@@ -631,12 +645,14 @@ function renderPicks() {
   const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); const n = (typeof t.nodes === 'function' ? t.nodes() : t.nodes).find((x) => x[0] === v); return n ? n[2] : v; };
   const path = TREE.map((t) => `<span class="step">${lbl(t.key, S.tree[t.key])}</span>`).join('<span aria-hidden="true">→</span>');
   const ranks = ['Best fit', 'Runner-up', 'Also good'];
+  if (!top.some((x) => x.r.id === S.choice)) S.choice = top[0] ? top[0].r.id : null;
   const cards = top.map((x, i) => {
     const r = x.r, p = partner(r), yr = amt * x.ny / 100;
     const base = r.kind === 'promo' ? M.baseProduct(r, ROWS) : null;
     const why = [r.kind === 'promo' ? (r.promoEnds ? `Promo ends ${fmtDate(r.promoEnds)}` : r.promoDays ? `Promo lasts ${r.promoDays} days` : 'Promo, no end date set') : 'Standard rate', r.tiers ? 'tiered rate, blended for your amount' : capped(r) && (units(r, amt) || 0) > (r.cap || Infinity) ? `cap ${isPeso(r) ? '₱' : ''}${Number(r.cap).toLocaleString('en-PH')}${isPeso(r) ? '' : ' ' + r.currency}, rest earns ${pct(r.rateAfterCap || 0)}` : capped(r) ? 'within the cap' : 'no cap', locked(r) ? r.lockup : 'withdraw anytime', r.pdic ? 'PDIC-insured' : r.category === 'cex' ? 'not insured' : ''].filter(Boolean).join(' · ');
-    return `<article class="pick">
-      <div class="pick-rank">${ranks[i]}</div>
+    const on = r.id === S.choice;
+    return `<article class="pick${on ? ' chosen' : ''}" data-choose="${esc(r.id)}" tabindex="0" aria-pressed="${on}">
+      <div class="pick-rank"><span>${ranks[i]}</span><span class="pick-choice basic-only">${on ? '✓ Your choice' : 'Choose this'}</span></div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
       <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months if the rate stays the same${r.kind === 'promo' ? ` <span class="tag">(${r.promoEnds ? 'ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'first ' + r.promoDays + ' days' : 'modeled for year 1 only'}, then ${base ? pct2(net(base.rate, r)) : 'base not published'}; ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. No tax adjustment. Stablecoins modeled at US$1${usd ? '' : `, converted at BSP ₱${FX()}/US$1`}. Future FX changes excluded. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
@@ -646,8 +662,8 @@ function renderPicks() {
       <div class="actions">${cmpBtn(r)}<a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
-  S.topPick = top[0] ? top[0].r.id : null;
-  $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.</p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
+  S.topPick = S.choice;
+  $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.<span class="basic-only"> Best fit is chosen for you; tap another card to use it in the next steps.</span></p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
     <p class="rates-foot">Ranked by what your amount earns over the next 12 months${S.tax ? ' after tax' : ''}: caps applied, and promos count only until they end. Only rates we could check on an official page. Not financial advice.</p>${top.length ? '<div class="step-next basic-only"><button type="button" class="btn gold" data-step-next="finder">Next: what would it earn? →</button></div>' : ''}`;
 }
 
@@ -660,7 +676,8 @@ function fillCalc() {
   sel.value = opts.some(r => r.id === previous) ? previous : (M.bestPlain(ROWS, TODAY_ISO) || opts[0] || {}).id || '';
 }
 function calc() {
-  if (S.step && S.step >= journey().length) setTimeout(renderCard, 0);
+  if (S.step && S.step >= journey().length - 1) setTimeout(renderCard, 0);
+  if (S.step && journey().includes('#inflation-check') && S.step >= journey().indexOf('#inflation-check') + 1) setTimeout(syncSim, 0);
   if (S.step >= 2) setTimeout(saveJourney, 0);
   const r = ROWS.find((x) => x.id === $('#calcPick').value);
   const A = amountPesos(), Y = Number($('#calcYears').value) || 1;
@@ -822,7 +839,7 @@ function updateAmount() {
   renderAll(); renderAmountCard(); if (DATA) sim();
 }
 function wire() {
-  $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+  $$('.seg button').forEach((b) => b.addEventListener('click', () => { delete document.body.dataset.flow; setView(b.dataset.view) }));
   $('#taxToggle').addEventListener('change', (e) => { S.tax = e.target.checked; renderAll(); });
   $('#realToggle').addEventListener('change', (e) => { S.real = e.target.checked; renderAll(); });
   $$('.chips').forEach((c) => c.addEventListener('click', (e) => { const b = e.target.closest('button'); if (!b) return; S.f[c.dataset.key] = b.dataset.v; syncChips(); renderRates(); }));
@@ -923,12 +940,26 @@ function ensureDefi() {
   })();
   return defiPromise;
 }
+function chooseCard(id) {
+  S.choice = id; S.topPick = id
+  $$('#treeResult .pick').forEach((p) => { const on = p.dataset.choose === id; p.classList.toggle('chosen', on); p.setAttribute('aria-pressed', String(on)); const c = p.querySelector('.pick-choice'); if (c) c.textContent = on ? '✓ Your choice' : 'Choose this' })
+  if (S.step >= 2 && $('#calcPick')) { $('#calcPick').value = id; calc() }
+}
+/* Step 4: the full list opens right below the journey (Advanced columns), then the dollar check as a good-to-know */
+function openListBelow() {
+  const seq = journey(); document.body.dataset.flow = seq.includes('#fx-check') ? 'fx' : 'journey'
+  setView('advanced')
+  const el = $('#yields'); el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in')
+  setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 80)
+}
 async function init() {
   wireCmp();
   document.addEventListener('click', (e) => {
     if (e.target.closest('#jrRestart') || e.target.closest('#jrFresh')) { restartJourney(); return }
     if (e.target.closest('#jrContinue')) { const j = loadJourney(); $('#jrWelcome').hidden = true; if (j) applyJourney(j); return }
     if (e.target.closest('#jrBack')) { const seq = journey(), n = Math.min(S.step || 1, seq.length); const cur = seq.slice(0, n).reduce((best, sel) => { const el = $(sel); return el && el.getBoundingClientRect().top < innerHeight * 0.4 ? sel : best }, seq[0]); const i = Math.max(0, seq.indexOf(cur) - 1); $(seq[i]).scrollIntoView({ behavior: scrollMotion(), block: 'start' }); return }
+    const ch = e.target.closest('[data-choose]'); if (ch && S.view === 'basic' && !e.target.closest('a, button, .actions')) { chooseCard(ch.dataset.choose); return }
+    if (e.target.closest('[data-flow-list]')) { openListBelow(); return }
     const jb = e.target.closest('[data-jr]'); if (jb) { const k = jb.dataset.jr; if (k === 'save') saveCardImage(); else if (k === 'share') shareCard(); else copyLink(); return }
     const nx = e.target.closest('[data-step-next]')
     if (nx) {

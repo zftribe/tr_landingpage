@@ -752,3 +752,25 @@ body[data-view=advanced] .jr-welcome { display: none; }
 .jr-toast { color: var(--green); font-size: .82rem; font-weight: 600; }
 @media (max-width: 720px) { .jr-in { font-size: .8rem; gap: 6px 10px; } .jr-dots i { width: 16px; } .jr-card-in h3 { font-size: 1.25rem; } }
 .jr-linkbox { width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--bg); color: var(--white); font-size: .8rem; }
+
+/* ── Round 9: choosable picks, savings card at the end of step 3, list opens below ── */
+.pick-rank { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+body[data-view=basic] .pick { cursor: pointer; transition: border-color .2s, background .2s, transform .15s, box-shadow .2s; }
+body[data-view=basic] .pick:first-child { border-color: var(--border); background: var(--bg-card); }
+body[data-view=basic] .pick:hover { border-color: var(--border-2); transform: translateY(-2px); }
+body[data-view=basic] .pick.chosen { border-color: rgba(249,168,37,.8); background: linear-gradient(180deg, rgba(249,168,37,.09), transparent 60%), var(--bg-card); box-shadow: 0 0 0 3px rgba(249,168,37,.14); }
+.pick-choice { font: 600 .7rem/1 var(--font-body); letter-spacing: .3px; text-transform: none; padding: 5px 10px; border-radius: 100px; border: 1px solid var(--border-2); color: var(--text-dim); }
+.pick.chosen .pick-choice { border-color: rgba(249,168,37,.6); background: var(--gold-glow); color: var(--gold); }
+.jr-card-host { margin-top: 56px; }
+.jr-card-host[hidden] { display: none; }
+body[data-view=advanced]:not([data-flow]) .jr-card-host { display: none; }
+/* the list opens below the journey */
+body[data-view=advanced][data-flow] #finder { order: 1; } body[data-view=advanced][data-flow] #calculator { order: 2; }
+body[data-view=advanced][data-flow=journey] #inflation-check { order: 3; } body[data-view=advanced][data-flow=fx] #fx-check { order: 3; }
+body[data-view=advanced][data-flow] #yields { order: 5; }
+body[data-view=advanced][data-flow=journey] #fx-check { order: 6; } body[data-view=advanced][data-flow=fx] #inflation-check { order: 6; }
+.fx-gtk { display: none; } body[data-view=advanced][data-flow=journey] .fx-gtk { display: inline; }
+/* A: one inflation section; the list keeps a one-line reminder */
+.infl.infl-slim { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 12px 18px; border-color: rgba(239,68,68,.28); font-size: .88rem; color: var(--text); }
+.infl-slim .infl-n { font-family: var(--font-display); font-weight: 800; color: #ef4444; font-size: 1.05rem; }
+.infl-slim a { color: var(--gold); font-weight: 600; margin-left: auto; white-space: nowrap; }
