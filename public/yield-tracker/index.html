@@ -6,17 +6,20 @@
 <script>(function(){try{var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('m-on');setTimeout(function(){if(!d.classList.contains('m-ready'))d.classList.remove('m-on')},5000)}catch(e){}})()</script>
 <title>TR Yield Tracker — Trading Republic</title>
 <meta name="description" content="Compare savings and earn rates across Philippine banks, digital banks, e-wallets and partner crypto exchanges. Caps, fine print, promo end dates and after-tax yields, each with its official source and the date we checked it.">
-<link rel="canonical" href="https://welcome.tradingrepublic.io/yield-tracker/index.html">
+<link rel="canonical" href="https://welcome.tradingrepublic.io/yield-tracker/">
 <meta property="og:type" content="website">
 <meta property="og:title" content="TR Yield Tracker — Trading Republic">
 <meta property="og:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
-<meta property="og:url" content="https://welcome.tradingrepublic.io/yield-tracker/index.html">
-<meta property="og:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
-<meta property="og:image:alt" content="Trading Republic logo">
-<meta name="twitter:card" content="summary">
+<meta property="og:url" content="https://welcome.tradingrepublic.io/yield-tracker/">
+<meta property="og:image" content="https://welcome.tradingrepublic.io/yield-tracker/og-yield-tracker.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="TR Yield Tracker: where should your money earn? Savings rates after tax, checked against official sources.">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="TR Yield Tracker — Trading Republic">
 <meta name="twitter:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
-<meta name="twitter:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
+<meta name="twitter:image" content="https://welcome.tradingrepublic.io/yield-tracker/og-yield-tracker.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How does the TR Yield Tracker rank savings rates?","acceptedAnswer":{"@type":"Answer","text":"By what your amount would earn over the next 12 months after the 20% Philippine tax on interest, with caps applied and promos counted only until they end. Partners get no boost."}},{"@type":"Question","name":"Is interest on Philippine savings accounts taxed?","acceptedAnswer":{"@type":"Answer","text":"Yes. Banks keep 20% of the interest you earn and pay it to the BIR, so a 4% rate pays you about 3.20%. Pag-IBIG MP2 dividends are tax-free."}},{"@type":"Question","name":"Are digital bank deposits insured?","acceptedAnswer":{"@type":"Answer","text":"Deposits at PDIC member banks, digital banks included, are insured up to ₱1,000,000 per depositor, per bank. Pag-IBIG MP2, crypto exchanges and DeFi are not PDIC-insured."}},{"@type":"Question","name":"How often are the rates checked?","acceptedAnswer":{"@type":"Answer","text":"Philippine rates are re-checked at the end of each month and crypto rates every two weeks. Every row links to its official source and shows the date we checked it."}},{"@type":"Question","name":"Does a dollar savings account pay after the exchange?","acceptedAnswer":{"@type":"Answer","text":"Only if you hold it long enough. Your bank sells you dollars at one rate and buys them back at a lower one; the tracker shows how many months of dollar interest it takes to cover that gap."}}]},{"@type":"Dataset","name":"TR Yield Tracker: Philippine savings and earn rates","description":"Savings and earn rates from Philippine banks, digital banks, e-wallets, Pag-IBIG MP2 and partner crypto exchanges, with caps, promo end dates, after-tax yields, and the official source and check date for each rate.","url":"https://welcome.tradingrepublic.io/yield-tracker/","creator":{"@type":"Organization","name":"Trading Republic","url":"https://welcome.tradingrepublic.io/"},"isAccessibleForFree":true,"spatialCoverage":"Philippines","inLanguage":"en"}]}</script>
 <link rel="icon" href="../tr-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tracker.css">
@@ -274,7 +277,7 @@
         <div class="sim-bar" id="simBar" aria-hidden="true"></div>
         <div class="sim-legend"><span><i class="sb-tax"></i>Tax</span><span><i class="sb-infl"></i>Inflation</span><span><i class="sb-real"></i>Real gain</span><span><i class="sb-loss"></i>Buying power lost</span></div>
         <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
-        <p class="sim-note">Real gain measures PHP buying power, shown in your selected currency at the fixed BSP reference rate. Caps, promo periods and published base rates apply; inflation is held constant and interest compounds annually. A comparison, not advice.</p>
+        <p class="sim-note">A comparison, not advice. How we calculate<a class="fn-ref" href="#fn-method" aria-label="Read the note">*</a></p>
       </div>
     </div>
   </div>
@@ -289,6 +292,7 @@
       <span class="eyebrow"><span class="step-tag" data-step-of="4"></span>Your next step</span>
       <h2>Want more <span class="gold">analytics</span>?</h2>
       <p>See every rate we track, each with its fine print: digital banks, e-wallets, government, crypto exchanges and DeFi. It opens right below, with Compare.</p>
+      <div class="next-top" id="nextTop" hidden></div>
       <div class="next-btns"><button type="button" class="btn gold" data-flow-list>See every rate, with its fine print ↓</button></div>
     </div>
   </div>
@@ -313,6 +317,7 @@
         </ul>
       </div>
       <div id="rulesBox"></div>
+      <div class="faq"><h3>Common questions</h3><details><summary>How does the TR Yield Tracker rank savings rates?</summary><p>By what your amount would earn over the next 12 months after the 20% Philippine tax on interest, with caps applied and promos counted only until they end. Partners get no boost.</p></details><details><summary>Is interest on Philippine savings accounts taxed?</summary><p>Yes. Banks keep 20% of the interest you earn and pay it to the BIR, so a 4% rate pays you about 3.20%. Pag-IBIG MP2 dividends are tax-free.</p></details><details><summary>Are digital bank deposits insured?</summary><p>Deposits at PDIC member banks, digital banks included, are insured up to ₱1,000,000 per depositor, per bank. Pag-IBIG MP2, crypto exchanges and DeFi are not PDIC-insured.</p></details><details><summary>How often are the rates checked?</summary><p>Philippine rates are re-checked at the end of each month and crypto rates every two weeks. Every row links to its official source and shows the date we checked it.</p></details><details><summary>Does a dollar savings account pay after the exchange?</summary><p>Only if you hold it long enough. Your bank sells you dollars at one rate and buys them back at a lower one; the tracker shows how many months of dollar interest it takes to cover that gap.</p></details></div>
     </div>
     </details>
   </div>
@@ -325,8 +330,19 @@
     <p>TR Yield Tracker — Compare. Calculate. Compound.</p>
     <div class="footnotes" id="partnerNotes"></div>
     <div class="legal" id="legal">
-      <p><b>Not financial advice.</b> This page is education. Rates change without notice and may differ from what you see in the app. Always confirm the rate, cap and terms on the provider's own page before you deposit.</p>
-      <p><b>Crypto is not a bank deposit.</b> It is not PDIC-insured, prices and rates move, and an exchange can fail or freeze withdrawals. Rules differ by country. Check with your local regulator (in the Philippines, the SEC) that this exchange is allowed where you live before you sign up. Exchange accounts are for adults (18+).</p>
+      <p class="legal-tags">Not financial advice<a class="fn-ref" href="#fn-advice" aria-label="Read the note">*</a> <span>·</span> Confirm every rate on the provider’s own page</p>
+      <details class="notes" id="notes">
+        <summary>Notes, sources and disclaimers</summary>
+        <ol class="fn-notes">
+          <li id="fn-advice"><b>Not financial advice.</b> This page is education. Rates change without notice and may differ from what you see in the app. Always confirm the rate, cap and terms on the provider’s own page before you deposit.</li>
+          <li id="fn-method"><b>How we calculate.</b> Your amount earns over 12 months (or the years you pick), after the 20% Philippine tax on interest where it applies. Interest compounds once a year; caps and tiers apply each year, and real crediting schedules differ. A promo counts only until its published end date; a boost with no date counts for year 1 only. Real gain is buying power in pesos at the latest BSP inflation rate, held constant, shown in dollars at the fixed BSP reference rate when you pick dollars. These are scenarios, not forecasts.</li>
+          <li id="fn-fx"><b>Dollar round trip.</b> We use each bank’s published dollar selling and buying rates and assume the exchange rate itself does not move. If the peso weakens you gain more; if it strengthens you can lose more. Simple interest, with 20% Philippine tax taken off the dollar interest. Not a forecast.</li>
+          <li id="fn-mp2"><b>Pag-IBIG MP2.</b> Not a bank deposit and not PDIC-insured. The rate shown is last year’s dividend (7.12% for 2025), not a promise. Money is locked for 5 years. Dividends are tax-free.</li>
+          <li id="fn-crypto"><b>Crypto exchanges.</b> Paid in the coin you deposit. Crypto is not a bank deposit and not PDIC-insured; prices and rates move, sometimes daily, and an exchange can fail or freeze withdrawals. Rules differ by country: check with your local regulator (in the Philippines, the SEC) that the exchange is allowed where you live before you sign up. Accounts are for adults (18 and over).</li>
+          <li id="fn-defi"><b>DeFi (Kamino and Jupiter Lend on Solana).</b> USDT, USDC and USDG pools over $2M, live from DefiLlama, so rates move every hour. Curated vaults are run by outside managers, not by Kamino or by us. Smart-contract risk: you could lose some or all of your money. No insurance and no support desk. For adults (18 and over).</li>
+          <li id="fn-partner"><b>Partner and referral links.</b> We may earn a commission or reward if you sign up through some links on this page. It does not change the rankings: partners get no boost, and we list the cons as well as the pros. The full list is under “Partner &amp; referral links” above.</li>
+        </ol>
+      </details>
     </div>
     <p class="credit">By <a href="https://zeefreaks.io" target="_blank" rel="noopener">Zeefreaks</a> and <a href="https://x.com/jayowtrades" target="_blank" rel="noopener">jayowtrades</a></p>
   </div>

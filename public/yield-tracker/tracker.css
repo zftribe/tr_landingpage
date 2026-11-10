@@ -838,3 +838,36 @@ details.np-more > .prov-card, details.np-more > .row { margin: 0 8px 8px; }
   .jr-btn { padding: 7px 10px; min-height: 32px; font-size: .76rem; white-space: nowrap; }
   #jrBack { font-size: 0; padding: 7px 11px; } #jrBack::before { content: '←'; font-size: .9rem; }
 }
+
+/* ── Round 13 A: top 3 left out, inside the step 4 card ── */
+.next-top { margin: 22px auto 6px; max-width: 980px; text-align: left; }
+.next-top-h { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 12px; margin: 0 0 12px; color: var(--white); font-weight: 700; font-size: .95rem; text-align: center; }
+.next-top-h span { color: var(--text-dim); font-weight: 500; font-size: .8rem; }
+.next-top-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.nt { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 6px 12px; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg-card-2, rgba(255,255,255,.03)); }
+.nt-txt { min-width: 0; } .nt-txt b { display: block; color: var(--white); font-size: .92rem; } .nt-txt small { display: block; color: var(--text-dim); font-size: .74rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nt-rate { font: 800 1.25rem/1 var(--font-display); color: var(--gold); text-align: right; } .nt-rate small { display: block; margin-top: 3px; font: 500 .68rem/1 var(--font-body); color: var(--text-dim); }
+.nt-why { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; } .nt-why span { font-size: .7rem; padding: 3px 8px; border-radius: 100px; border: 1px solid rgba(249,168,37,.35); color: var(--gold); }
+@media (max-width: 860px) { .next-top-row { grid-template-columns: 1fr; } }
+/* ── Round 13 B: the Basic steps line up with the full list on wide screens ── */
+@media (min-width: 1240px) {
+  #finder > .container, #calculator > .container, #inflation-check > .container, #fx-check > .container, #nextSteps > .container, #method > .container { max-width: 1320px; }
+  #finder .tree { max-width: 1100px; }
+}
+
+/* ── Round 14: footnote asterisks, collapsed notes, FAQ ── */
+a.fn-ref { color: var(--gold); text-decoration: none; font-weight: 700; padding: 0 2px; }
+a.fn-ref:hover { text-decoration: underline; }
+.legal-tags { color: var(--text-dim); font-size: .8rem; text-align: center; }
+.legal-tags span { margin: 0 6px; }
+details.notes { margin: 12px auto 0; max-width: 900px; border: 1px solid var(--border); border-radius: 12px; }
+details.notes > summary { cursor: pointer; padding: 12px 16px; color: var(--gold); font-weight: 600; font-size: .86rem; }
+.fn-notes { margin: 0; padding: 0 22px 16px 38px; display: grid; gap: 10px; color: var(--text-dim); font-size: .8rem; line-height: 1.55; text-align: left; }
+.fn-notes b { color: var(--white); }
+.fn-notes li { scroll-margin: 140px; border-radius: 8px; transition: background .6s; }
+.fn-notes li.fn-hi { background: rgba(249,168,37,.14); }
+.faq { margin-top: 18px; }
+.faq h3 { margin-bottom: 8px; }
+.faq details { border-top: 1px solid var(--border); padding: 10px 0; }
+.faq summary { cursor: pointer; color: var(--white); font-weight: 600; }
+.faq p { margin: 8px 0 0; color: var(--text-dim); font-size: .9rem; }
