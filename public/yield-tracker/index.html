@@ -171,10 +171,10 @@
           <select id="calcPick" class="calc-input"></select>
           <p class="calc-hint" id="calcHint"></p>
         </div>
-        <div class="calc-field calc-amount-readout">
-          <span class="eyebrow">Your amount</span>
-          <strong id="calcDepositLabel">₱100,000</strong>
-          <a href="#controls">Change amount ↑</a>
+        <div class="calc-field">
+          <label for="calcDeposit">Amount <span class="val" id="calcDepositLabel"></span></label>
+          <input type="text" class="calc-input" id="calcDeposit" value="100,000.00" inputmode="decimal" autocomplete="off">
+          <input type="range" class="calc-slider" id="calcDepositSlider" min="1000" max="5000000" step="1000" value="100000" aria-label="Amount slider">
         </div>
         <div class="calc-field">
           <label for="calcYears">Years <span class="val" id="calcYearsLabel"></span></label>
@@ -232,10 +232,10 @@
   <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="fx">Next: see everything →</button></div>
 </section>
 
-<section class="section adv-only" id="inflation-check">
+<section class="section" id="inflation-check">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">For savers in the Philippines</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="3"></span>For savers in the Philippines</span>
       <h2>Have you beaten <span class="gold">inflation</span>?</h2>
       <p class="subtitle">Interest is only half the story. Tax takes a slice, and rising prices take another. See what is really left.</p>
     </div>
@@ -264,6 +264,7 @@
       </div>
     </div>
   </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="infl">Next: see everything →</button></div>
 </section>
 
 <section class="section basic-only" id="nextSteps">

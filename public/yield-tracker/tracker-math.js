@@ -73,7 +73,8 @@
   }
   function project(r, pesos, years, rows, today, rules, applyTax = true) {
     const fx = rules.fx && rules.fx.usdphp;
-    const tax = applyTax && isPeso(r) && !r.taxExempt ? rules.tax.ratePeso / 100 : 0;
+    const phBank = ['traditional', 'digital', 'ewallet', 'government'].includes(r.category); // PH final tax: peso and dollar deposits alike
+    const tax = applyTax && phBank && !r.taxExempt ? rules.tax.ratePeso / 100 : 0;
     let grossBalance = pesos, balance = pesos, first = 0;
     for (let y = 0; y < years; y++) {
       const grossRate = yearRate(r, grossBalance, y, rows, today, fx);

@@ -316,12 +316,20 @@ function earnOf(r) {
   return p * (S.tax && taxable(r) ? y * (1 - TAX() / 100) : y) / 100
 }
 /* Round 6: Basic is a guided journey. Step 1 Finder, 2 Calculator + inflation, 3 Dollar round trip (pesos only), 4 See the full list. */
-const fxStep = () => S.tree.where === 'bank' && S.currency === 'PHP'
+const journey = () => {
+  const seq = ['#finder', '#calculator']
+  if (S.currency === 'USD' && S.tree.where === 'bank') seq.push('#fx-check') // dollars kept at a bank: the exchange round trip
+  else if (S.currency === 'PHP') seq.push('#inflation-check') // pesos: have you beaten inflation?
+  seq.push('#nextSteps'); return seq
+}
+const STEP_SECTIONS = ['#finder', '#calculator', '#fx-check', '#inflation-check', '#nextSteps']
+const NEXT_LABEL = { '#fx-check': 'Next: does a dollar account pay after the exchange? →', '#inflation-check': 'Next: have you beaten inflation? →', '#nextSteps': 'Next: see everything →' }
 function setStep(n, go) {
-  S.step = n; const b = document.body; b.dataset.step = n; b.dataset.fxstep = fxStep() ? 'on' : 'off'
-  const total = fxStep() ? 4 : 3
-  $$('[data-step-of]').forEach((el) => { let k = Number(el.dataset.stepOf); if (!fxStep() && k === 4) k = 3; el.textContent = 'Step ' + k + ' of ' + total + ' · ' })
-  const nb = $('#nextFromCalc'); if (nb) nb.textContent = fxStep() ? 'Next: what if you saved in dollars? →' : 'Next: see everything →'
+  S.step = n; const seq = journey()
+  STEP_SECTIONS.forEach((sel) => { const el = $(sel); if (!el) return; const i = seq.indexOf(sel)
+    el.classList.toggle('jhide', i < 0 || i >= n)
+    el.querySelectorAll('[data-step-of]').forEach((t) => (t.textContent = i < 0 ? '' : 'Step ' + (i + 1) + ' of ' + seq.length + ' · ')) })
+  const nb = $('#nextFromCalc'); if (nb) nb.textContent = NEXT_LABEL[seq[2]]
   if (go) { const el = $(go); if (el) { el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in'); setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60) } }
 }
 const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
@@ -566,7 +574,7 @@ function renderPicks() {
 function fillCalc() {
   const sel = $('#calcPick');
   const previous = sel.value;
-  const opts = ROWS.filter(r => rankable(r) && (isPeso(r) || r.stablecoin)).sort((a, b) => a.provider.localeCompare(b.provider) || b.rate - a.rate);
+  const opts = ROWS.filter(r => rankable(r) && (isPeso(r) || r.stablecoin || isUsdBank(r))).sort((a, b) => a.provider.localeCompare(b.provider) || b.rate - a.rate);
   sel.innerHTML = opts.map((r) => `<option value="${esc(r.id)}">${esc(r.provider)} · ${esc(r.product)} — ${r.upTo ? 'up to ' : ''}${pct2(r.rate)}</option>`).join('');
   sel.value = opts.some(r => r.id === previous) ? previous : (M.bestPlain(ROWS, TODAY_ISO) || opts[0] || {}).id || '';
 }
@@ -576,7 +584,7 @@ function calc() {
   const minMet = r && (!r.minDeposit || (units(r, A) || 0) >= r.minDeposit);
   const result = r && minMet ? M.project(r, A, Y, ROWS, TODAY_ISO, DATA.rules, S.tax) : null;
   const m = value => value == null ? 'Not available' : showMoney(value);
-  $('#calcDepositLabel').textContent = showMoney(A);
+  $('#calcDepositLabel').textContent = showMoney(A); { const cd = $('#calcDeposit'); if (cd && document.activeElement !== cd) cd.value = fmtAmount(S.amount); const sl = $('#calcDepositSlider'); if (sl) sl.value = Math.min(5000000, Math.max(1000, Math.round(amountPesos()))) }
   $('#calcYearsLabel').textContent = Y + (Y > 1 ? ' years' : ' year');
   $('#resBalance').textContent = m(result && result.balance);
   $('#resBalanceSub').textContent = `after ${Y} year${Y > 1 ? 's' : ''}`;
@@ -724,6 +732,7 @@ function renderAmountCard() {
 const fmtAmount = (n) => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const parseAmount = (t) => { const v = Number(String(t).replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')); return isFinite(v) && v > 0 ? v : 0 }
 function updateAmount() {
+  if (S.step) setTimeout(() => setStep(S.step), 0);
   $('#sharedAmount').value = fmtAmount(S.amount);
   $('#sharedAmount').setAttribute('aria-label', 'Amount in ' + (S.currency === 'USD' ? 'US dollars' : 'pesos'));
   $$('[data-currency]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.currency === S.currency)));
@@ -777,6 +786,10 @@ function wire() {
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
   $('#sharedAmount').addEventListener('input', e => { S.amount = parseAmount(e.target.value); renderAll(); if (DATA) sim(); });
   $('#sharedAmount').addEventListener('change', e => { e.target.value = fmtAmount(S.amount); });
+  { const cd = $('#calcDeposit'), sl = $('#calcDepositSlider')
+    const push = () => { const sa = $('#sharedAmount'); if (document.activeElement !== sa) sa.value = fmtAmount(S.amount); renderAll(); if (DATA) sim() }
+    if (cd) { cd.addEventListener('input', () => { S.amount = parseAmount(cd.value); push() }); cd.addEventListener('change', () => (cd.value = fmtAmount(S.amount))); cd.addEventListener('focus', () => cd.select()) }
+    if (sl) sl.addEventListener('input', () => { const pesos = Number(sl.value); S.amount = S.currency === 'USD' ? Math.round(pesos / (FX() || 1) * 100) / 100 : pesos; if (cd) cd.value = fmtAmount(S.amount); push() }) }
   $('#sharedAmount').addEventListener('focus', e => e.target.select());
   $$('[data-currency]').forEach(b => b.addEventListener('click', () => {
     if (S.currency === b.dataset.currency || !DATA) return;
@@ -832,10 +845,10 @@ async function init() {
   document.addEventListener('click', (e) => {
     const nx = e.target.closest('[data-step-next]')
     if (nx) {
-      const k = nx.dataset.stepNext
+      const k = nx.dataset.stepNext, seq = journey()
       if (k === 'finder') { if (S.topPick && $('#calcPick')) { $('#calcPick').value = S.topPick; calc() } setStep(Math.max(S.step, 2), '#calculator'); return }
-      if (k === 'calc') { if (fxStep()) { const fa = $('#fxAmt'); if (fa) fa.value = Math.round(amountPesos()); renderFx(); setStep(Math.max(S.step, 3), '#fx-check') } else setStep(4, '#nextSteps'); return }
-      if (k === 'fx') { setStep(4, '#nextSteps'); return }
+      if (k === 'calc') { if (seq[2] === '#fx-check') { const fa = $('#fxAmt'); if (fa) fa.value = Math.round(amountPesos()); renderFx() } setStep(Math.max(S.step, 3), seq[2]); return }
+      if (k === 'fx' || k === 'infl') { setStep(seq.length, '#nextSteps'); return }
     }
     const it = e.target.closest('#calcInflToggle'); if (it) { $('#calculator').classList.toggle('no-infl', !it.checked); return }
     const ra = e.target.closest('a[href="#yields"]'); if (ra && S.view === 'basic') { e.preventDefault(); setView('advanced'); setTimeout(() => $('#yields').scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60); return }

@@ -699,3 +699,9 @@ body[data-view=advanced] .step-tag, body[data-view=advanced] .step-next { displa
 #statsRow .stat-label sup { color: var(--gold); }
 #statsRow .stats-note { flex-basis: 100%; margin: -24px 0 0; font-size: .72rem; color: var(--text-dim); }
 @media (max-width: 720px) { #statsRow.stats-row { gap: 22px; margin-top: 30px; } #statsRow .stat-value { font-size: 1.4rem; } #statsRow .stats-note { margin-top: -10px; } }
+
+/* ── Round 7: journey sections hide until reached (Basic only); inflation check is a Basic step for pesos ── */
+body[data-view=basic] .jhide { display: none !important; }
+body[data-view=basic] #inflation-check { display: block; order: 3; }
+body[data-view=basic] #fx-check { order: 3; }
+body[data-view=basic] #nextSteps { order: 4; }
