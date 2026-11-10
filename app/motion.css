@@ -1,0 +1,62 @@
+/* ═══════════ MOTION · DIRECTION B: matched to georgeasibal.com ═══════════
+   The motion family of George's own site: headline words rise out of masks over a
+   slowly settling member mosaic, numbers count up, the nav blurs in on scroll, the
+   Republic line lights up word by word as you read, and cards wipe in. The candle
+   intro stays. One easing, the house curve. Gated on html.m-on (never set for
+   prefers-reduced-motion). Only opacity, transform and clip-path move. */
+:root { --m-ease: cubic-bezier(.2, .7, .1, 1); }
+
+/* Hero headline: each word rises out of its own mask (markup split on the server). */
+.m-split .m-w { display: inline-block; overflow: hidden; vertical-align: top; padding: .06em .02em .16em; margin: -.06em -.02em -.16em; }
+.m-split .m-w > span { display: inline-block; }
+.m-on .m-split .m-w > span { transform: translateY(112%); transition: transform 1.1s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 70ms); }
+.m-on.m-hero .m-split .m-w > span { transform: none; }
+
+/* The rest of the hero follows the headline. */
+.m-on #home .hero-content > :not(h1) { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); }
+.m-on #home .hero-content > :nth-child(2) { transition-delay: .38s; }
+.m-on #home .hero-content > :nth-child(3) { transition-delay: .48s; }
+.m-on #home .hero-content > :nth-child(4) { transition-delay: .58s; }
+.m-on.m-hero #home .hero-content > :not(h1) { opacity: 1; transform: none; }
+.m-on #home .hero-video { clip-path: inset(0 0 100% 0 round 20px); transition: clip-path 1.4s var(--m-ease) .3s; }
+.m-on.m-hero #home .hero-video { clip-path: inset(0 round 20px); }
+.m-on #home .hero-video img { transform: scale(1.12); transition: transform 2.4s var(--m-ease) .3s; }
+.m-on.m-hero #home .hero-video img { transform: none; }
+
+/* Member mosaic behind the hero: settles slowly (Ken Burns), then drifts. Decorative. */
+.m-mosaic { position: absolute; inset: 0; overflow: hidden; z-index: 0; pointer-events: none;
+  -webkit-mask-image: radial-gradient(120% 95% at 72% 42%, #000 18%, transparent 78%); mask-image: radial-gradient(120% 95% at 72% 42%, #000 18%, transparent 78%); }
+.m-mosaic-grid { position: absolute; inset: -6%; display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 6px; align-content: start;
+  opacity: 0; transform: scale(1.14); filter: grayscale(1) contrast(1.05);
+  transition: opacity 1.8s var(--m-ease), transform 2.4s var(--m-ease); }
+.m-mosaic-grid i { aspect-ratio: 1; border-radius: 10px; background: #15151d center / cover no-repeat; }
+.m-hero .m-mosaic-grid { opacity: .13; transform: none; }
+.m-mosaic-drift { position: absolute; inset: 0; animation: m-drift 48s var(--m-ease) 2.4s infinite alternate; }
+@keyframes m-drift { to { transform: translate3d(-2.5%, -3%, 0) scale(1.03); } }
+
+/* Nav: clear over the hero, blurs in once you scroll (legacy.js toggles .scrolled at 60 px). */
+.m-on .nav { transition: background-color .6s var(--m-ease), border-color .6s var(--m-ease), backdrop-filter .6s var(--m-ease), -webkit-backdrop-filter .6s var(--m-ease); }
+.m-on .nav:not(.scrolled) { background-color: rgba(11, 11, 15, 0); border-bottom-color: transparent; backdrop-filter: blur(0); -webkit-backdrop-filter: blur(0); }
+
+/* Text rises 34 px; section headings rise out of a mask; cards wipe in. */
+.m-on [data-m] { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms); }
+.m-on [data-m].m-in { opacity: 1; transform: none; }
+.m-mask { overflow: hidden; padding-bottom: .14em; margin-bottom: -.14em; }
+.m-line { display: block; }
+.m-on .m-mask:not(.m-in) .m-line { transform: translateY(105%); }
+.m-on .m-mask .m-line { transition: transform 1.1s var(--m-ease); }
+.m-on [data-mw] { clip-path: inset(0 0 100% 0); transform: translateY(34px); transition: clip-path 1.4s var(--m-ease), transform 1.1s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms); }
+.m-on [data-mw].m-in { clip-path: inset(-40px -40px -40px -40px); transform: none; }
+.m-on [data-mw] .wxA-img img, .m-on [data-mw] .yt-thumb img { transform: scale(1.12); transition: transform 1.6s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms + .1s); }
+.m-on [data-mw].m-in .wxA-img img, .m-on [data-mw].m-in .yt-thumb img { transform: none; }
+
+/* Republic line: words light up as you read. */
+.m-read .m-word { opacity: .22; transition: opacity .35s linear; }
+.m-read .m-word.lit { opacity: 1; }
+
+.fx-proof b, .ring span { font-variant-numeric: tabular-nums; }
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .fx-pillars > article, .hwB > li, .wxA-card, .tk, .pc-card { transition: border-color .4s var(--m-ease), box-shadow .4s var(--m-ease), translate .4s var(--m-ease); }
+  .fx-pillars > article:hover, .hwB > li:hover, .wxA-card:hover, .tk:not(.torn):hover, .pc-card:hover { translate: 0 -4px; border-color: rgba(249, 168, 37, .45); box-shadow: 0 18px 40px rgba(0, 0, 0, .35); }
+}
