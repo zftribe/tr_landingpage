@@ -187,7 +187,7 @@ document.addEventListener('click', (e) => {
 (() => {
   const more = document.getElementById('tk-more'), btn = document.querySelector('.tk-morebtn');
   if (!more || !btn) return;
-  const n = more.querySelectorAll('.tk').length, label = 'See ' + n + ' more exchanges ▾';
+  const n = document.querySelectorAll('#exchanges .tk').length, label = 'See all ' + n + ' exchanges ▾';
   more.hidden = true; btn.hidden = false;
   btn.addEventListener('click', () => {
     const open = more.hidden;
@@ -230,3 +230,29 @@ document.addEventListener('click', (e) => {
 
 // FAQ topic tabs: one topic shows at a time (all are in the page).
 (() => { document.querySelectorAll('.faq-tab').forEach((t) => t.addEventListener('click', () => { document.querySelectorAll('.faq-tab').forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); document.getElementById(x.getAttribute('aria-controls')).hidden = !on; }); })); })();
+
+// Phone: each exchange ticket starts as a compact row (logo, name, score and offer); "Details & claim" opens it.
+// Without this script every ticket shows in full.
+(() => {
+  const tickets = document.querySelectorAll('#exchanges .tk');
+  if (!tickets.length) return;
+  document.documentElement.classList.add('tk-js');
+  tickets.forEach((tk) => {
+    const head = tk.querySelector('.tk-head'), main = tk.querySelector('.tk-main'), off = tk.querySelector('.tk-off');
+    if (!head || !main || !off) return;
+    const line = document.createElement('p');
+    line.className = 'tk-line';
+    line.textContent = [...off.childNodes].map((n) => n.textContent.trim()).filter(Boolean).join(' ');
+    head.after(line);
+    const btn = document.createElement('button');
+    const name = tk.querySelector('.tk-title h3')?.lastChild?.textContent?.trim() || 'exchange';
+    btn.type = 'button'; btn.className = 'tk-expand'; btn.setAttribute('aria-expanded', 'false');
+    btn.textContent = 'Details & claim ▾'; btn.setAttribute('aria-label', 'Show details and claim for ' + name);
+    btn.addEventListener('click', () => {
+      const open = tk.classList.toggle('tk-open');
+      btn.setAttribute('aria-expanded', String(open));
+      btn.textContent = open ? 'Hide details ▴' : 'Details & claim ▾';
+    });
+    main.append(btn);
+  });
+})();

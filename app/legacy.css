@@ -1,8 +1,9 @@
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --font-display: 'Plus Jakarta Sans', sans-serif;
-      --font-body: 'DM Sans', -apple-system, sans-serif;
+      /* Self-hosted by next/font in app/layout.tsx (with size-matched fallbacks); the names are a last resort. */
+      --font-display: var(--tr-font-display, 'Plus Jakarta Sans'), sans-serif;
+      --font-body: var(--tr-font-body, 'DM Sans'), -apple-system, sans-serif;
       --bg: #0b0b0f;
       --bg-2: #101016;
       --bg-3: #15151d;
@@ -1382,8 +1383,8 @@ html, body { overflow-x: clip; }
 /* Arrow and play buttons use the site font instead of Arial. */
 button { font-family: inherit; }
 /* Small labels: nothing under 11 px, so tags and badges stay readable on phones. */
-.program-tag, .tier-badge, .pc-price .save, .yt-badge, .wb-tag, .tk-badge, .tk-off small, .tk-codewrap small, .sxA2-tile small { font-size: 11px !important; }
-.pc-coin { font-size: 10.5px; } .fx-app .fx-coin { font-size: 8px; }
+.program-tag, .tier-badge, .pc-price .save, .yt-badge, .wb-tag, .tk-badge, .tk-off small, .tk-codewrap small, .sxA2-tile small { font-size: 12px !important; }
+.pc-coin { font-size: 12px; } .fx-app .fx-coin { font-size: 10px; }
 /* Student quotes in the site's own font (DM Sans italic) instead of a third, serif font. */
 #students blockquote { font-family: var(--font-body, 'DM Sans'), sans-serif !important; font-style: italic; font-weight: 400; font-size: .95rem !important; line-height: 1.6 !important; }
 
@@ -1458,3 +1459,87 @@ section.section + section.section::before { content: ''; position: absolute; top
 .fx-founder { max-width: none !important; margin-top: 16px !important; border-radius: var(--radius) !important; padding: 16px 22px !important; }
 @media (max-width: 900px) { .fx-pillars { grid-template-columns: 1fr 1fr !important; } .fx-wide { grid-column: 1 / -1; } }
 @media (max-width: 600px) { .fx-pillars { grid-template-columns: 1fr !important; } .fx-wide-cols { grid-template-columns: 1fr; gap: 0; } }
+
+
+/* ═══════════ WELCOME FIXES (audit 10 Nov 2026, kael/welcome-fixes) ═══════════ */
+
+/* Candle intro's hand-lettered face, self-hosted (was the Google Fonts stylesheet). */
+@font-face { font-family: 'Lilita One'; font-style: normal; font-weight: 400; font-display: swap; src: url('/fonts/lilita-one-latin.woff2') format('woff2'); }
+
+/* 3. No load jump: the hero holds its shape while fonts and the thumbnail arrive. */
+.hero-video { min-height: 0; contain: layout paint; }
+.fx-hero .hero-content { min-height: 1px; }
+.partners-strip { contain: layout; }
+.wxA-img img, .fx-founder img { height: 100%; }
+
+/* 7. Hero stats: one even row of three, thin dividers. */
+.fx-proof { display: grid; grid-template-columns: repeat(3, minmax(0, max-content)); gap: 0; font-size: .8125rem; line-height: 1.35; }
+.fx-proof li { padding: 0 20px; border-left: 1px solid var(--border-2); }
+.fx-proof li:first-child { padding-left: 0; border-left: 0; }
+.fx-proof b { display: block; font-size: 1.1rem; margin-bottom: 2px; }
+@media (max-width: 520px) {
+  .fx-proof { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .fx-proof li { padding: 0 12px; }
+}
+
+/* 8. A 12 px floor for labels; "of 5" in sentence case. */
+.ring small { font-size: .75rem; letter-spacing: 0; font-weight: 500; margin-top: 2px; }
+.ring span { font-size: 1rem; }
+.fx-step-n, .fx-app, .tk-pc h4 { font-size: .75rem; }
+.fx-app .fx-coin { width: 22px; height: 22px; }
+.footer p { font-size: .75rem !important; }
+
+/* 6. Tap targets: 44 px on touch. */
+.footer a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 6px; }
+#faq .faq-go, .fx-step-link { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 768px) {
+  .mobile-toggle { min-width: 44px; min-height: 44px; padding: 10px 12px; }
+  .pc-curriculum { min-height: 44px; }
+  .nav-brand { min-height: 44px; }
+}
+
+/* 5. Notch phones: keep the bar, menu and footer clear of the safe areas. */
+.nav { padding-top: env(safe-area-inset-top); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+.mobile-menu { top: calc(72px + env(safe-area-inset-top)); padding-bottom: calc(32px + env(safe-area-inset-bottom)); }
+.footer { padding-bottom: calc(48px + env(safe-area-inset-bottom)); padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+
+/* 9. Programs rail: runs to the screen edge with a soft fade and page dots. */
+.pc-hint-sub { color: var(--dim); }
+.pc-dots { display: none; }
+@media (max-width: 768px) {
+  .pc-rail { margin: 0 -32px; padding-left: 32px; padding-right: 32px; scroll-padding-left: 32px;
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent); }
+  .pc-hint-sub { display: none; }
+  .pc-dots { display: flex; justify-content: center; gap: 6px; margin-top: 12px; }
+  .pc-dots i { width: 6px; height: 6px; border-radius: 6px; background: rgba(255,255,255,.2); transition: width .3s cubic-bezier(.16,1,.3,1), background .3s; }
+  .pc-dots i.on { width: 18px; background: var(--gold); }
+}
+
+/* 4a. Phone: Webinars become a swipe rail like the YouTube row. */
+@media (max-width: 760px) {
+  #webinars .wxA { display: grid; grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 78%; gap: 12px;
+    overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none;
+    margin: 0 -32px; padding: 0 32px 6px; scroll-padding-left: 32px;
+    -webkit-mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent); mask-image: linear-gradient(90deg, #000 0, #000 88%, transparent); }
+  #webinars .wxA::-webkit-scrollbar { display: none; }
+  #webinars .wxA-card { scroll-snap-align: start; }
+}
+
+/* 4b. Phone: exchanges as compact rows that open into the full ticket (script adds .tk-js). */
+.tk-off-neutral { font-size: 1.5rem; }
+.tk-line, .tk-expand { display: none; }
+@media (max-width: 760px) {
+  .tk-js #exchanges .tk:not(.tk-open) :is(.tk-pc, .tk-stats, .tk-news, .tk-stub, .tk-claimed) { display: none; }
+  .tk-js #exchanges .tk:not(.tk-open) .tk-main { gap: 10px; }
+  .tk-js #exchanges .tk:not(.tk-open)::before, .tk-js #exchanges .tk:not(.tk-open)::after { display: none; }
+  .tk-js #exchanges .tk-line { display: block; margin: 0; color: #FFD36A; font-family: var(--font-display); font-weight: 700; font-size: .9rem; }
+  .tk-js #exchanges .tk.tk-open .tk-line { display: none; }
+  .tk-js #exchanges .tk-expand { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; width: 100%;
+    border: 1px solid var(--border-2); border-radius: 999px; background: transparent; color: var(--white);
+    font: 600 .875rem var(--font-display); cursor: pointer; }
+  .tk-js #exchanges .tk-expand:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+  .tk-js #exchanges .tk.tk-open .tk-expand { order: 99; }
+}
+.tk-stats span { font-size: .75rem; }
+.fx-proof b { white-space: nowrap; }
+@media (max-width: 520px) { .fx-proof b { font-size: 1rem; } }
