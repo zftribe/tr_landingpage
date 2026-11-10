@@ -1,0 +1,64 @@
+/* ═══════════ MOTION · DIRECTION C: bold cinematic chapters ═══════════
+   Opens like a film (a curtain parts when the candle intro isn't playing), type blurs
+   into focus, and "Start free. Go deeper" pins while the journey plays in three chapters
+   (Explorer, Learner, Citizen) on a gold progress rail, with parallax depth in the hero.
+   Regulars skip it: from the second visit (or after "Skip the story") the page opens
+   straight and the chapters sit side by side as usual. A skip-to-content link is always
+   first in the tab order. Gated on html.m-on (never set for prefers-reduced-motion). */
+:root { --m-ease: cubic-bezier(.16, 1, .3, 1); --m-house: cubic-bezier(.2, .7, .1, 1); }
+
+.m-skiplink { position: fixed; left: 16px; top: -64px; z-index: 3100; background: var(--gold); color: #141006; font: 700 14px var(--font-display); padding: 12px 18px; border-radius: 999px; transition: top .2s; }
+.m-skiplink:focus { top: calc(12px + env(safe-area-inset-top)); outline: 3px solid #fff; outline-offset: 2px; }
+
+/* Curtain: two panels part along a gold seam. */
+.m-curtain body::before, .m-curtain body::after { content: ''; position: fixed; left: 0; right: 0; height: 50.5vh; background: #07070a; z-index: 3000; pointer-events: none; transition: transform 1.1s var(--m-house); }
+.m-curtain body::before { top: 0; box-shadow: 0 1px 0 rgba(249, 168, 37, .75), 0 6px 30px rgba(249, 168, 37, .25); }
+.m-curtain body::after { bottom: 0; box-shadow: 0 -1px 0 rgba(249, 168, 37, .75), 0 -6px 30px rgba(249, 168, 37, .25); }
+.m-curtain.m-open body::before { transform: translateY(-102%); }
+.m-curtain.m-open body::after { transform: translateY(102%); }
+
+/* Hero: blur-in, one line after another, then parallax as you scroll away. */
+.m-on #home .hero-content > *, .m-on #home .hero-video { opacity: 0; filter: blur(14px); transform: translateY(18px) scale(1.02);
+  transition: opacity 1.1s var(--m-ease), filter 1.1s var(--m-ease), transform 1.1s var(--m-ease); }
+.m-on #home .hero-content > :nth-child(2) { transition-delay: .14s; }
+.m-on #home .hero-content > :nth-child(3) { transition-delay: .28s; }
+.m-on #home .hero-content > :nth-child(4) { transition-delay: .42s; }
+.m-on #home .hero-video { transition-delay: .3s; }
+.m-on.m-hero #home .hero-content > *, .m-on.m-hero #home .hero-video { opacity: 1; filter: none; transform: none; }
+.m-on #home .hero-content { translate: 0 calc(var(--m-y, 0) * .12px); }
+.m-on #home .hero-video { translate: 0 calc(var(--m-y, 0) * -.06px); }
+.m-on #home .hero-glow-orb { translate: 0 calc(var(--m-y, 0) * .35px); }
+.m-on #home .hero-glow-orb-2 { translate: 0 calc(var(--m-y, 0) * .2px); }
+
+/* Headings blur into focus; cards rise with a soft blur. */
+.m-on [data-mb] { opacity: 0; filter: blur(12px); transform: translateY(20px); transition: opacity 1s var(--m-ease), filter 1s var(--m-ease), transform 1s var(--m-ease); }
+.m-on [data-m] { opacity: 0; filter: blur(6px); transform: translateY(40px); transition: opacity .9s var(--m-ease), filter .9s var(--m-ease), transform .9s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms); }
+.m-on [data-mb].m-in, .m-on [data-m].m-in { opacity: 1; filter: none; transform: none; }
+
+/* Gold progress line across the top. */
+.m-on .scroll-progress { box-shadow: 0 0 12px rgba(249, 168, 37, .6); }
+
+/* Pinned chapters: Explorer → Learner → Citizen. */
+.m-chap #how { height: 300vh; height: 300svh; padding: 0; }
+.m-chap #how > .container { position: sticky; top: 72px; height: calc(100vh - 72px); height: calc(100svh - 72px); display: flex; flex-direction: column; justify-content: center; padding-top: 16px; padding-bottom: 16px; }
+.m-chap #how .mb-56 { margin-bottom: 18px; }
+.m-chap #how .hwB { display: grid; grid-template-columns: 1fr; gap: 0; max-width: 560px; width: 100%; margin: 0 auto; }
+.m-chap #how .hwB::before { display: none; }
+.m-chap #how .hwB > li { grid-area: 1 / 1; margin-top: 38px; opacity: 0; transform: translateY(56px) scale(.96); filter: blur(8px); pointer-events: none;
+  transition: opacity .8s var(--m-ease), transform .8s var(--m-ease), filter .8s var(--m-ease); }
+.m-chap:not(.m-chap-js) #how .hwB > li:first-child, .m-chap #how .hwB > li.m-cur { opacity: 1; transform: none; filter: none; pointer-events: auto; }
+.m-chap #how .hwB > li.m-past { transform: translateY(-56px) scale(.96); }
+.m-chap #how .hw-cta { margin-top: 22px; }
+.m-rail { display: none; }
+.m-chap .m-rail { display: flex; align-items: center; gap: 12px; max-width: 560px; width: 100%; margin: 0 auto; }
+.m-rail b { font: 700 12px var(--font-display); letter-spacing: .16em; color: var(--gold); white-space: nowrap; }
+.m-rail i { flex: 1; height: 2px; border-radius: 2px; background: rgba(255, 255, 255, .12); position: relative; overflow: hidden; }
+.m-rail i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, #FFE29A, #F9A825); transform-origin: left; transform: scaleX(var(--m-p, 0)); box-shadow: 0 0 10px rgba(249, 168, 37, .6); }
+.m-rail button { border: 1px solid var(--border-2); background: transparent; color: var(--text); font: 600 12px var(--font-display); border-radius: 999px; padding: 0 14px; min-height: 44px; cursor: pointer; white-space: nowrap; }
+.m-rail button:hover, .m-rail button:focus-visible { color: var(--white); border-color: rgba(249, 168, 37, .5); }
+@media (max-width: 760px) {
+  .m-chap #how .heading-lg { font-size: 1.7rem; }
+  .m-chap #how .hwB > li { padding-top: 60px; }
+  .m-chap #how .hw-cta { margin-top: 14px; }
+  .m-chap #how .hw-cta .btn { padding-top: 12px; padding-bottom: 12px; }
+}
