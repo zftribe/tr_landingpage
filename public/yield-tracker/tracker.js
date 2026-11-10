@@ -4,7 +4,9 @@
 const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const TODAY = new Date(new Date().toISOString().slice(0, 10));
+const M = window.YieldMath;
+const TODAY_ISO = M.manilaDate();
+const TODAY = new Date(TODAY_ISO + 'T00:00:00Z');
 const DAY = 864e5;
 const daysBetween = (a, b) => Math.round((b - a) / DAY);
 const PH_CATS = ['traditional', 'digital', 'ewallet', 'government'];
@@ -21,7 +23,7 @@ const DEFI = { projects: { 'kamino-lend': ['Kamino', 'https://app.kamino.finance
 
 let DATA = null, ROWS = [];
 const S = {
-  view: 'basic', tax: true, real: false,
+  view: 'basic', tax: true, real: false, currency: 'PHP', amount: 100000,
   f: { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }, q: '',
   tree: {}, open: new Set(), openProv: new Set(),
 };
@@ -40,7 +42,13 @@ function net(rate, r) {
 }
 // Amounts are in pesos; crypto caps are in coins, so convert with the BSP rate (stablecoins ≈ US$1).
 const FX = () => (DATA && DATA.rules && DATA.rules.fx && DATA.rules.fx.usdphp) || null;
-function units(r, pesos) { return isPeso(r) ? pesos : (r.stablecoin && FX() ? pesos / FX() : null); }
+function units(r, pesos) { return M.units(r, pesos, FX()); }
+const amountPesos = () => M.toPesos(S.amount, S.currency, FX());
+const showMoney = pesos => {
+  const n = M.fromPesos(pesos, S.currency, FX());
+  return n == null ? 'Not available' : (n < 0 ? '−' : '') + (S.currency === 'USD' ? '$' : '₱') + Math.abs(n).toLocaleString('en-PH', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+};
+const scrollMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
 // "Have you beaten inflation?" (Advanced view, peso savers in the Philippines)
 const afterTax = (r) => (r.rate == null ? null : taxable(r) ? r.rate * (1 - TAX() / 100) : r.rate);
 const realYield = (r) => (isPeso(r) && INFL() != null && r.rate != null ? afterTax(r) - INFL() : null);
@@ -78,7 +86,7 @@ function fillSim() {
   const sel = $('#simPick'); if (!sel) return;
   const rows = simRows();
   sel.innerHTML = rows.map((r) => `<option value="${esc(r.id)}">${esc(r.provider)} · ${esc(r.product)} — ${r.upTo ? 'up to ' : ''}${pct2(r.rate)}${r.kind === 'promo' ? ' (promo)' : ''}</option>`).join('') + '<option value="">My own rate…</option>';
-  const def = rows.find((r) => r.kind === 'standard' && !r.strings && !r.upTo && !r.tiers && !(r.minDeposit > 100000) && r.category !== 'government') || rows[0];
+  const def = M.bestPlain(ROWS, TODAY_ISO) || rows[0];
   if (def) { sel.value = def.id; $('#simRate').value = def.rate; }
   const i = INFL(); if (i != null) $('#simInfl').value = i;
   const h = ((DATA.rules || {}).inflation || {});
@@ -89,16 +97,18 @@ function fillSim() {
   sim();
 }
 function sim() {
-  const A = Math.max(0, Number($('#simAmt').value) || 0), Y = Math.max(1, Number($('#simYears').value) || 1);
+  const A = amountPesos(), Y = Math.max(1, Math.min(30, Number($('#simYears').value) || 1));
   const pick = ROWS.find((x) => x.id === $('#simPick').value);
   const r = (Number($('#simRate').value) || 0) / 100, i = (Number($('#simInfl').value) || 0) / 100;
   const taxFree = pick ? !taxable(pick) : false, t = $('#simTax').checked && !taxFree ? TAX() / 100 : 0;
   $('#simTaxNote').textContent = taxFree ? '(this one is tax-free)' : '';
-  const gross = A * (Math.pow(1 + r, Y) - 1);
-  const netBal = A * Math.pow(1 + r * (1 - t), Y), net = netBal - A, tax = Math.max(0, gross - net);
-  const realBal = netBal / Math.pow(1 + i, Y), realGain = realBal - A, inflEat = net - realGain;
-  const m = (n) => (n < 0 ? '−' : '') + '₱' + Math.round(Math.abs(n)).toLocaleString('en-PH');
-  $('#simGross').textContent = m(gross); $('#simTaxAmt').textContent = t ? '−' + m(tax) : '₱0';
+  const custom = { rate: r * 100, category: 'digital', currency: 'PHP', kind: 'standard' };
+  const minMet = !pick || !pick.minDeposit || (units(pick, A) || 0) >= pick.minDeposit;
+  const result = minMet ? M.project(pick || custom, A, Y, ROWS, TODAY_ISO, { ...DATA.rules, inflation: { value: i * 100 } }, $('#simTax').checked) : null;
+  if (!result) { ['simGross', 'simTaxAmt', 'simInflAmt', 'simReal'].forEach(id => $('#' + id).textContent = 'Not available'); $('#simVerdict').textContent = !minMet ? 'Your amount is below the published minimum deposit. Choose another product or increase your amount.' : 'A required rate is not published for this amount or period. Choose another product.'; $('#simBar').innerHTML = ''; return; }
+  const { gross, balance: netBal, net, tax, realBalance: realBal, realGain, inflationLoss: inflEat } = result;
+  const m = showMoney;
+  $('#simGross').textContent = m(gross); $('#simTaxAmt').textContent = t ? '−' + m(tax) : m(0);
   $('#simInflAmt').textContent = '−' + m(inflEat); $('#simReal').textContent = (realGain >= 0 ? '+' : '') + m(realGain);
   $('#simRealTile').dataset.good = String(realGain >= 0);
   const tot = Math.max(gross, tax + inflEat, 1), w = (n) => Math.max(0, n / tot * 100).toFixed(1) + '%';
@@ -108,30 +118,13 @@ function sim() {
     : `<b class="bad">Inflation wins.</b> After ${Y} year${Y > 1 ? 's' : ''}, your ${m(A)} grows to ${m(netBal)} after tax, but prices rise faster. It will buy only what ${m(realBal)} buys today: <b>${m(-realGain)} less</b> than now.`;
 }
 function blended(r, pesos) {
-  if (r.rate == null) return null;
-  const amount = units(r, pesos);
-  if (!amount || amount <= 0) return r.rate;
-  if (r.tiers) { // [[upTo, rate], ..., [null, rate]] — each band earns its own rate
-    let left = amount, prev = 0, earn = 0;
-    for (const [upTo, rate] of r.tiers) { const band = upTo == null ? left : Math.min(left, upTo - prev); earn += band * rate; left -= band; prev = upTo; if (left <= 0) break; }
-    return earn / amount;
-  }
-  const limit = r.cap != null ? r.cap : null;
-  if (limit != null && amount > limit) {
-    const after = r.rateAfterCap != null ? r.rateAfterCap : 0;
-    return (limit * r.rate + (amount - limit) * after) / amount;
-  }
-  return r.rate;
+  return M.blended(r, pesos, FX());
 }
 // Rate over the next 12 months: a promo pays its rate until its end date, then the rate after the promo.
 function yearRate(r, amount) {
-  const b = blended(r, amount);
-  if (b == null || r.kind !== 'promo' || !(r.promoEnds || r.promoDays)) return b; // ongoing boosts with no end date: assume they continue
-  const d = Math.max(0, Math.min(365, r.promoEnds ? daysLeft(r) + 1 : Infinity, r.promoDays || Infinity));
-  const after = r.rateAfterPromo != null ? r.rateAfterPromo : 0;
-  return (b * d + after * (365 - d)) / 365;
+  return M.yearRate(r, amount, 0, ROWS, TODAY_ISO, FX());
 }
-const ended = (r) => r.kind === 'promo' && r.promoEnds && new Date(r.promoEnds) <= TODAY; // treat the end date itself as ended (Legal docket 27)
+const ended = (r) => M.ended(r, TODAY_ISO); // keep the established end-date convention in Manila time
 const daysLeft = (r) => (r.promoEnds ? daysBetween(TODAY, new Date(r.promoEnds)) : null);
 const staleLimit = (r) => (r.category === 'cex' ? 16 : r.category === 'dex' ? 2 : 35);
 const age = (r) => (r.checkedOn ? daysBetween(new Date(r.checkedOn), TODAY) : 999);
@@ -143,7 +136,7 @@ const rankable = (r) => usable(r) && !r.teaser && !r.vipOnly;
 const pct = (n, d = 2) => (n == null ? '—' : n.toFixed(d).replace(/\.?0+$/, (m) => (m.startsWith('.') ? '' : m)) + '%');
 const pct2 = (n) => (n == null ? '—' : n.toFixed(2) + '%');
 const money = (n, ccy = '₱') => ccy + Math.round(n).toLocaleString('en-PH');
-const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—');
+const fmtDate = (s) => (s ? new Date(s).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }) : '—');
 function logo(r) {
   const n = (r.provider || '').toLowerCase() + ' ';
   for (const k in LOGOS) if (n.includes(k)) return `<img src="logos/${LOGOS[k]}.png" alt="" loading="lazy" onerror="this.remove()">`;
@@ -211,7 +204,8 @@ function visibleRows() {
     if (S.view === 'advanced' && S.f.lock === 'flexible' && locked(r)) return false;
     if (S.view === 'advanced' && S.f.lock === 'locked' && !locked(r)) return false;
     if (q && !(`${r.provider} ${r.product}`.toLowerCase().includes(q))) return false;
-    if (S.view === 'basic' && (r.rate == null || ended(r) || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin))) return false;
+    if (S.view === 'basic' && !/^Bitget$/i.test(r.provider) && (r.rate == null || ended(r) || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin))) return false;
+    if (S.view === 'basic' && /^Bitget$/i.test(r.provider) && (r.kind === 'promo' || r.vipOnly)) return false;
     return true;
   });
 }
@@ -220,9 +214,16 @@ function visibleRows() {
 function rowHTML(r) {
   const n = net(r.rate, r), id = esc(r.id);
   const p = partner(r);
-  const rateCell = r.rate == null
-    ? '<div class="rate na">Not published<small>check in the app</small></div>'
-    : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.tax && taxable(r) ? '<small>after tax</small>' : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
+  const base = r.kind === 'promo' ? M.baseProduct(r, ROWS) : null;
+  const unavailable = r.rate == null || ended(r);
+  const estimate = unavailable ? null : yearRate(r, amountPesos());
+  const minMet = !r.minDeposit || (units(r, amountPesos()) || 0) >= r.minDeposit;
+  const earn = estimate == null || !minMet ? null : amountPesos() * (S.tax && taxable(r) ? estimate * (1 - TAX() / 100) : estimate) / 100;
+  const ry = !unavailable && isPeso(r) ? realYield(r) : null;
+  const earning = !minMet ? 'Below the minimum deposit' : earn == null ? 'Annual estimate unavailable' : `${r.upTo ? 'Up to ' : ''}${showMoney(earn)} / year${S.tax && taxable(r) ? ' after tax' : ''}`;
+  const rateCell = unavailable
+    ? `<div class="rate na">No current rate published${ended(r) ? '<small>Promo ended ' + fmtDate(r.promoEnds) + '</small>' : ''}</div>`
+    : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.real && isPeso(r) ? '<small>rate − PH CPI' + (S.tax && taxable(r) ? ', after tax' : '') + '</small>' : S.tax && taxable(r) ? '<small>after tax</small>' : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
   const ins = r.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r.category === 'cex' || r.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   const st = stale(r) ? '<span class="badge stale">Needs re-check</span>' : '';
   const facts = [
@@ -231,7 +232,7 @@ function rowHTML(r) {
     S.view === 'advanced' && realYield(r) != null ? ['Real yield', `${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} (after tax − ${INFL()}% inflation${r.kind === 'promo' ? '; only while the promo lasts' : ''})`] : null,
     r.taxExempt ? ['Tax', esc(r.taxNote || 'Tax-exempt')] : null,
     ['Type', r.kind === 'promo' ? `Promo${r.promoStarts ? ' from ' + fmtDate(r.promoStarts) : ''}${r.promoEnds ? ' until ' + fmtDate(r.promoEnds) : ''}` : 'Standard (ongoing, can change)'],
-    r.kind === 'promo' && r.rateAfterPromo != null ? ['After the promo', pct2(r.rateAfterPromo)] : null,
+    r.kind === 'promo' ? ['After the promo', base ? pct2(base.rate) : 'No current rate published'] : null,
     ['Cap', capText(r).replace(/<small>/, ' · ').replace('</small>', '')],
     ['Access', esc(r.lockup || '—')],
     r.minDeposit ? ['Minimum', (isPeso(r) ? '₱' : '') + Number(r.minDeposit).toLocaleString('en-PH')] : null,
@@ -240,16 +241,16 @@ function rowHTML(r) {
     ['Insurance', r.pdic ? 'PDIC member bank: up to ₱1,000,000 per depositor, per bank, counting all your accounts at that bank together' : r.category === 'government' ? 'Not PDIC; backed by the agency' : 'None. Not a bank deposit'],
     ['Checked', `${fmtDate(r.checkedOn)}${stale(r) ? ' (older than our schedule)' : ''}`],
   ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
-  return `<div class="row${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
+  return `<div class="row${(r.history || []).length >= 2 ? ' has-trend' : ''}${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
   <button class="row-main" aria-expanded="${S.open.has(r.id)}" aria-controls="m-${id}">
-    <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}</span></div></div>
+    <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}</span><span class="row-earn">${earning}</span>${ry != null ? `<span class="row-earn ${ry < 0 ? 'bad' : 'good'}">${ry >= 0 ? '+' : ''}${pct2(ry)} vs ${INFL()}% PH inflation</span>` : ''}</div></div>
     ${rateCell}
     <div class="adv-only c-adv cell-s">${r.rate == null ? '' : `${pct2(r.rate)}<small>${isPeso(r) ? 'before tax' : 'as shown'}</small>`}</div>
     <div class="c-kind">${kindBadge(r)} ${st} ${inflBadge(r)}</div>
     <div class="c-cap cell-s">${capText(r)}</div>
     <div class="adv-only c-adv cell-s">${esc(locked(r) ? r.lockup : 'Anytime')}<small>${ins.replace(/<[^>]+>/g, '')}</small></div>
     <div class="adv-only c-adv cell-s">${fmtDate(r.checkedOn)}<small>${stale(r) ? '<span style="color:var(--red)">re-check due</span>' : 'on schedule'}</small></div>
-    <div class="adv-only c-adv">${spark(r.history)}</div>
+    ${(r.history || []).length >= 2 ? `<div class="adv-only c-adv c-trend">${spark(r.history)}</div>` : ''}
     <div class="c-badges">${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''} ${ins} ${st} ${inflBadge(r)}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
@@ -290,7 +291,7 @@ function provHTML({ k, rs }) {
   return `<div class="prov-card${open ? ' open' : ''}" data-prov="${esc(k)}">
   <button class="prov-head" aria-expanded="${open}" aria-controls="${kid}">
     <div class="prov"><div class="logo">${logo(r0)}</div><div class="prov-txt"><span class="prov-name">${esc(r0.provider)}</span><span class="prov-prod">${rs.length} products · tap to compare</span></div></div>
-    <div class="rate">${top ? '<small>best</small>' + pct2(net(top.rate, top)) : '<span class="na">—</span>'}</div>
+    <div class="rate">${top ? '<small>best' + (top.upTo || top.tiers ? ' up to' : '') + '</small>' + pct2(net(top.rate, top)) : '<span class="na">No current rate published</span>'}</div>
     <div class="prov-sum">${bits} ${ins}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
@@ -300,8 +301,8 @@ function provHTML({ k, rs }) {
 function renderRates() {
   const list = visibleRows();
   const sortKey = (r) => (r.rate == null ? -1 : ended(r) ? -0.5 : net(r.rate, r));
-  const headFor = (cat) => S.view === 'advanced'
-    ? `<div class="row-main" style="cursor:default;padding-top:0;padding-bottom:0;font-size:.68rem;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim)" aria-hidden="true"><div>Provider</div><div>${S.tax && PH_CATS.includes(cat) && cat !== 'government' ? 'Net rate' : 'Rate'}</div><div class="c-adv">Gross</div><div class="c-kind">Type</div><div class="c-cap">Cap</div><div class="c-adv">Access</div><div class="c-adv">Checked</div><div class="c-adv">Trend</div><div></div></div>`
+  const headFor = (cat, history) => S.view === 'advanced'
+    ? `<div class="rate-columns${history ? ' has-trend' : ''}"><div class="row-main" aria-hidden="true"><div>Provider / Your year</div><div>${S.real && PH_CATS.includes(cat) ? 'Rate − CPI' : S.tax && PH_CATS.includes(cat) && cat !== 'government' ? 'Net rate' : 'Rate'}</div><div class="c-adv">Gross</div><div class="c-kind">Type</div><div class="c-cap">Cap</div><div class="c-adv">Access</div><div class="c-adv">Checked</div>${history ? '<div class="c-adv c-trend">Trend</div>' : ''}<div></div></div></div>`
     : '';
   let html = '';
   for (const cat of ORDER) {
@@ -309,7 +310,7 @@ function renderRates() {
     if (!g.length) continue;
     { const np = new Set(g.map((r) => r.provider)).size; html += `<div class="rgroup-title">${CAT_LABEL[cat]} <span>${np} provider${np > 1 ? 's' : ''} · ${g.length} rate${g.length > 1 ? 's' : ''}</span></div>`; }
     if (CAT_NOTE[cat]) html += `<p class="rgroup-note">${CAT_NOTE[cat]}</p>`;
-    html += headFor(cat) + groupByProvider(g).map(provHTML).join('');
+    html += headFor(cat, g.some(r => (r.history || []).length >= 2)) + groupByProvider(g).map(provHTML).join('');
   }
   $('#rates').innerHTML = html || '<p class="no-picks">No rates match these filters.</p>';
   const hidden = ROWS.filter((r) => r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin)).length;
@@ -318,24 +319,17 @@ function renderRates() {
 
 /* ── finder (tech tree) ───────────────────── */
 const TREE = [
-  { key: 'ccy', label: 'Currency', sub: 'What you save in', nodes: [
-    ['php', '₱', 'Pesos (PHP)', 'Banks, digital banks, MP2'],
-    ['usd', '$', 'US dollars (USD)', 'Stablecoins: USDT, USDC, USDG'],
-  ] },
-  { key: 'where', label: 'Where', sub: 'Pick your world', nodes: () => S.tree.ccy === 'usd' ? [
+  { key: 'where', label: 'Where', sub: 'Pick your world', nodes: () => [
+    ['bank', '₱', 'Peso savings', 'Banks, digital banks, MP2'],
     ['crypto', '🪙', 'Crypto exchange', 'OKX, Bybit, Gate and more'],
     ['defi', '🧩', 'DeFi on Solana', 'Kamino, Jupiter · advanced'],
-    ['both', '⚖️', 'Show me both', 'Compare side by side'],
-  ] : [
-    ['bank', '🏦', 'Bank or government', 'Pesos, PDIC-insured banks'],
-    ['both', '⚖️', 'Banks + crypto', 'Crypto pays in dollars'],
+    ['both', '↔', 'Compare both', 'Different currencies and risks'],
   ] },
   { key: 'access', label: 'Access', sub: 'When you need it back', nodes: [
     ['flex', '🔓', 'Anytime', 'Withdraw whenever'],
     ['lock', '🔒', 'I can lock it', 'Months or longer'],
     ['any', '↔️', 'Either is fine', ''],
   ] },
-  { key: 'amount', label: 'Amount', sub: 'How much to park', amount: () => (S.tree.ccy === 'usd' ? [100, 1000, 5000, 10000] : [10000, 100000, 500000, 1000000]) },
   { key: 'promo', label: 'Promos', sub: 'Short boosts or steady', nodes: [
     ['ok', '⚡', 'Promos are fine', 'I will move my money'],
     ['no', '🌳', 'Steady rates only', 'No end dates'],
@@ -351,13 +345,7 @@ function renderTree() {
     if (!reached) return;
     const val = S.tree[t.key];
     html += `<div class="tier${val != null ? ' dim' : ''}" data-tier="${t.key}"><div class="tier-label">${i + 1}. ${t.label}<small>${t.sub}</small></div>`;
-    if (t.amount) {
-      const usd = S.tree.ccy === 'usd', sym = usd ? '$' : '₱', amts = t.amount();
-      const chip = (a) => (usd ? (a >= 10000 ? '$10k+' : a >= 1000 ? '$' + a / 1000 + 'k' : '$' + a) : (a >= 1e6 ? '₱1M+' : '₱' + a / 1000 + 'k'));
-      html += `<div class="amount-row">${amts.map((a) => `<button class="node" data-k="amount" data-v="${a}" aria-pressed="${val === a}"><span class="ic">${sym}</span><b>${chip(a)}</b></button>`).join('')}<input type="number" inputmode="numeric" min="${usd ? 10 : 1000}" step="${usd ? 10 : 1000}" placeholder="Other amount" aria-label="Other amount in ${usd ? 'US dollars' : 'pesos'}" id="treeAmt" value="${val && !amts.includes(val) ? val : ''}"></div>`;
-    } else {
-      html += `<div class="nodes">${(typeof t.nodes === 'function' ? t.nodes() : t.nodes).map(([v, ic, b, s]) => `<button class="node" data-k="${t.key}" data-v="${v}" aria-pressed="${val === v}"><span class="ic" aria-hidden="true">${ic}</span><span><b>${b}</b>${s ? `<span class="sub">${s}</span>` : ''}</span></button>`).join('')}</div>`;
-    }
+    html += `<div class="nodes">${(typeof t.nodes === 'function' ? t.nodes() : t.nodes).map(([v, ic, b, s]) => `<button class="node" data-k="${t.key}" data-v="${v}" aria-pressed="${val === v}"><span class="ic" aria-hidden="true">${ic}</span><span><b>${b}</b>${s ? `<span class="sub">${s}</span>` : ''}</span></button>`).join('')}</div>`;
     html += '</div>';
     reached = val != null;
   });
@@ -367,38 +355,41 @@ function renderTree() {
   if (done) renderPicks();
 }
 function renderPicks() {
-  const T = S.tree, usd = T.ccy === 'usd', amt = (Number(T.amount) || 0) * (usd ? (FX() || 1) : 1); // amt is always pesos inside
-  const show = (p) => (usd ? '$' + Math.round(p / (FX() || 1)).toLocaleString('en-US') : money(p));
+  const T = S.tree, usd = S.currency === 'USD', amt = amountPesos();
+  const show = showMoney;
   const pool = ROWS.filter((r) => {
     if (!rankable(r)) return false;
     if ((r.category === 'cex' || r.category === 'dex') && !r.stablecoin) return false;
-    if (usd && !((r.category === 'cex' || r.category === 'dex') && r.stablecoin)) return false;
     if (T.where === 'bank' && !PH_CATS.includes(r.category)) return false;
     if (T.where === 'crypto' && r.category !== 'cex') return false;
     if (T.where === 'defi' && r.category !== 'dex') return false;
-    if (T.where === 'both' && !usd && !(PH_CATS.includes(r.category) || r.category === 'cex')) return false;
+    if (r.category === 'dex' && S.view !== 'advanced') return false;
     if (T.access === 'flex' && locked(r)) return false;
     if (T.access === 'lock' && !locked(r)) return false;
     if (T.promo === 'no' && r.kind === 'promo') return false;
     if (T.strings === 'no' && r.strings) return false;
-    if (r.minDeposit && amt && amt < r.minDeposit && isPeso(r)) return false;
+    if (r.minDeposit && (units(r, amt) || 0) < r.minDeposit) return false;
     if (r.maxDeposit && amt && amt > r.maxDeposit && isPeso(r)) return false;
     return true;
-  }).map((r) => ({ r, b: blended(r, amt), y: yearRate(r, amt) })).map((x) => ({ ...x, n: net(x.b, x.r), ny: net(x.y, x.r) }))
+  }).map((r) => ({ r, b: blended(r, amt), y: yearRate(r, amt) })).filter(x => x.y != null).map((x) => {
+    const factor = S.tax && taxable(x.r) ? 1 - TAX() / 100 : 1;
+    return { ...x, n: x.b * factor, ny: x.y * factor };
+  })
     .sort((a, b) => b.ny - a.ny);
   const seen = new Set(), top = [];
   for (const x of pool) { const k = x.r.provider; if (seen.has(k)) continue; seen.add(k); top.push(x); if (top.length === 3) break; }
-  const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); if (t.amount) return (usd ? '$' : '₱') + Number(v).toLocaleString('en-PH'); const n = (typeof t.nodes === 'function' ? t.nodes() : t.nodes).find((x) => x[0] === v); return n ? n[2] : v; };
+  const lbl = (k, v) => { const t = TREE.find((x) => x.key === k); const n = (typeof t.nodes === 'function' ? t.nodes() : t.nodes).find((x) => x[0] === v); return n ? n[2] : v; };
   const path = TREE.map((t) => `<span class="step">${lbl(t.key, S.tree[t.key])}</span>`).join('<span aria-hidden="true">→</span>');
   const ranks = ['Best fit', 'Runner-up', 'Also good'];
   const cards = top.map((x, i) => {
     const r = x.r, p = partner(r), yr = amt * x.ny / 100;
+    const base = r.kind === 'promo' ? M.baseProduct(r, ROWS) : null;
     const why = [r.kind === 'promo' ? (r.promoEnds ? `Promo ends ${fmtDate(r.promoEnds)}` : r.promoDays ? `Promo lasts ${r.promoDays} days` : 'Promo, no end date set') : 'Standard rate', r.tiers ? 'tiered rate, blended for your amount' : capped(r) && (units(r, amt) || 0) > (r.cap || Infinity) ? `cap ${isPeso(r) ? '₱' : ''}${Number(r.cap).toLocaleString('en-PH')}${isPeso(r) ? '' : ' ' + r.currency}, rest earns ${pct(r.rateAfterCap || 0)}` : capped(r) ? 'within the cap' : 'no cap', locked(r) ? r.lockup : 'withdraw anytime', r.pdic ? 'PDIC-insured' : r.category === 'cex' ? 'not insured' : ''].filter(Boolean).join(' · ');
     return `<article class="pick">
       <div class="pick-rank">${ranks[i]}</div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
-      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' && (r.promoEnds || r.promoDays) ? ` <span class="tag">(${pct2(x.n)} ${r.promoEnds ? 'until ' + fmtDate(r.promoEnds) : 'for your first ' + r.promoDays + ' days'}, then ${pct2(net(r.rateAfterPromo || 0, r))}; that is ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. Not adjusted for tax${usd ? '' : ` or the exchange rate (shown at the BSP rate of ₱${FX()} per dollar)`}. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
+      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months${r.kind === 'promo' ? ` <span class="tag">(${r.promoEnds ? 'ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'first ' + r.promoDays + ' days' : 'modeled for year 1 only'}, then ${base ? pct2(net(base.rate, r)) : 'base not published'}; ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. No tax adjustment. Stablecoins modeled at US$1${usd ? '' : `, converted at BSP ₱${FX()}/US$1`}. Future FX changes excluded. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
       <div class="actions"><a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
@@ -411,56 +402,64 @@ function renderPicks() {
 /* ── calculator ───────────────────────────── */
 function fillCalc() {
   const sel = $('#calcPick');
-  const opts = ROWS.filter(rankable).sort((a, b) => a.provider.localeCompare(b.provider) || b.rate - a.rate);
-  sel.innerHTML = '<option value="">Custom rate: 5%</option>' + opts.map((r) => `<option value="${esc(r.id)}">${esc(r.provider)} · ${esc(r.product)} — ${r.upTo ? 'up to ' : ''}${pct2(r.rate)}</option>`).join('');
+  const previous = sel.value;
+  const opts = ROWS.filter(r => rankable(r) && (isPeso(r) || r.stablecoin)).sort((a, b) => a.provider.localeCompare(b.provider) || b.rate - a.rate);
+  sel.innerHTML = opts.map((r) => `<option value="${esc(r.id)}">${esc(r.provider)} · ${esc(r.product)} — ${r.upTo ? 'up to ' : ''}${pct2(r.rate)}</option>`).join('');
+  sel.value = opts.some(r => r.id === previous) ? previous : (M.bestPlain(ROWS, TODAY_ISO) || opts[0] || {}).id || '';
 }
 function calc() {
   const r = ROWS.find((x) => x.id === $('#calcPick').value);
-  const A = Math.max(0, Number($('#calcDeposit').value) || 0), Y = Number($('#calcYears').value) || 1;
-  const ccy = '₱';
-  let bal = A, first = 0;
-  for (let y = 0; y < Y; y++) {
-    const b = r ? (y === 0 ? yearRate(r, bal) : blended({ ...r, rate: r.kind === 'promo' && r.promoEnds ? (r.rateAfterPromo || 0) : r.rate }, bal)) : 5; const n = r ? net(b, r) : (S.tax ? 5 * (1 - TAX() / 100) : 5);
-    const e = bal * n / 100; if (y === 0) first = e; bal += e;
-  }
-  $('#resBalance').textContent = money(bal, ccy);
-  $('#resBalanceSub').textContent = `after ${Y} year${Y > 1 ? 's' : ''}`;
-  $('#resProfit').textContent = '+' + money(bal - A, ccy);
-  $('#resProfitSub').textContent = S.tax && (!r || taxable(r)) ? 'after 20% tax' : r && r.taxExempt ? 'tax-free' : 'before any tax';
-  $('#resMonth').textContent = money(first / 12, ccy);
-  $('#resYear').textContent = money(first, ccy);
-  $('#resRate').textContent = A ? pct2(first / A * 100) : '—';
-  $('#calcDepositLabel').textContent = money(A, ccy);
+  const A = amountPesos(), Y = Number($('#calcYears').value) || 1;
+  const minMet = r && (!r.minDeposit || (units(r, A) || 0) >= r.minDeposit);
+  const result = r && minMet ? M.project(r, A, Y, ROWS, TODAY_ISO, DATA.rules, S.tax) : null;
+  const m = value => value == null ? 'Not available' : showMoney(value);
+  $('#calcDepositLabel').textContent = showMoney(A);
   $('#calcYearsLabel').textContent = Y + (Y > 1 ? ' years' : ' year');
+  $('#resBalance').textContent = m(result && result.balance);
+  $('#resBalanceSub').textContent = `after ${Y} year${Y > 1 ? 's' : ''}`;
+  $('#resProfit').textContent = result ? m(result.net) : 'Not available';
+  $('#resProfitSub').textContent = S.tax && r && taxable(r) ? `after ${TAX()}% tax` : r && r.taxExempt ? 'tax-free' : 'before any tax';
+  $('#resMonth').textContent = m(result && result.first / 12);
+  $('#resYear').textContent = m(result && result.first);
+  $('#resRate').textContent = result && A ? pct2(result.first / A * 100) : '—';
+  $('#calcGross').textContent = m(result && result.gross);
+  $('#calcTax').textContent = result ? '−' + m(result.tax) : 'Not available';
+  $('#calcInflation').textContent = result && result.inflationLoss != null ? '−' + m(result.inflationLoss) : 'Not compared';
+  $('#calcReal').textContent = m(result && result.realGain);
+  $('#calcReal').className = result && result.realGain != null && result.realGain < 0 ? 'bad' : 'good';
+  $('#calcRealNote').textContent = r && isPeso(r) ? `Buying power at ${INFL()}% PH inflation${S.currency === 'USD' ? ', for a PHP deposit shown in USD at the fixed reference rate' : ''}. ${Y > 1 ? 'Tax includes its compounding effect. ' : ''}Rates and inflation are scenarios, not forecasts.` : 'PH inflation is not a measure of dollar buying power. Crypto returns are not adjusted for tax or inflation.';
   let hint = '';
   if (r) {
-    if (r.kind === 'promo') hint += `Promo until ${fmtDate(r.promoEnds)}, then ${pct(r.rateAfterPromo || 0)}. The estimate uses the promo rate only until it ends. `;
-    if (r.cap != null && isPeso(r) && A > r.cap) hint += `Only the first ${ccy}${Number(r.cap).toLocaleString('en-PH')} earns ${pct(r.rate)}; the rest earns ${pct(r.rateAfterCap || 0)}. `;
+    if (r.kind === 'promo') { const base = M.baseProduct(r, ROWS); hint += `${r.promoEnds ? 'Promo ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'Promo lasts ' + r.promoDays + ' days' : 'No published end date: boost modeled for year 1 only'}, then ${base ? pct(base.rate) : 'base rate not published'}. `; }
+    if (r.cap != null && (units(r, A) || 0) > r.cap) hint += `The first ${r.currency === 'PHP' ? '₱' : ''}${Number(r.cap).toLocaleString('en-PH')} ${r.currency === 'PHP' ? '' : r.currency + ' '}earns ${pct(r.rate)}; excess ${r.rateAfterCap == null ? 'rate is not published' : 'earns ' + pct(r.rateAfterCap)}. `;
     if (r.upTo) hint += 'This is the top “up to” rate; you may get less. ';
-    if (!isPeso(r)) hint += `Paid in ${r.currency}. Shown in pesos at the BSP rate of ₱${FX()} per dollar; the peso value moves with the dollar.`;
+    if (!isPeso(r)) hint += `Paid in ${r.currency}; stablecoins are modeled at US$1. `;
+    if ((isPeso(r) && S.currency === 'USD') || (!isPeso(r) && S.currency === 'PHP')) hint += `Converted at BSP ₱${FX()}/US$1; future exchange-rate changes are excluded. `;
+    if (!minMet) hint += 'Your amount is below the published minimum deposit. ';
+    if (!result && minMet) hint += 'A required rate is unpublished; a complete estimate is unavailable. ';
   }
-  $('#calcHint').textContent = hint;
-  $('#calcNote').textContent = 'Interest is added once a year in this estimate. Real banks credit daily or monthly, so actual numbers differ slightly.';
+  $('#calcHint').innerHTML = esc(hint) + (r && r.source ? ` <a href="${esc(r.source)}" target="_blank" rel="noopener">Official source ↗</a>` : '');
+  $('#calcNote').textContent = 'Interest compounds annually in this estimate. Caps and tiers are applied each year; actual crediting schedules differ. A promo ends at its published date or duration; undated boosts are limited to year 1.';
 }
 
 /* ── header, rules ────────────────────────── */
 function renderStats() {
   const u = ROWS.filter((r) => rankable(r) && r.category !== 'dex');
-  const peso = u.filter(isPeso).map((r) => net(r.rate, r));
-  const std = u.filter((r) => isPeso(r) && r.kind === 'standard' && !r.strings && !locked(r)).map((r) => net(r.rate, r));
-  const promoTop = u.filter((r) => r.kind === 'promo').map((r) => net(r.rate, r));
-  const promos = u.filter((r) => r.kind === 'promo').length;
-  const providers = new Set(ROWS.filter((r) => r.category !== 'dex').map((r) => r.provider)).size;
-  const stat = (v, l) => `<div class="stat-item"><div class="stat-value">${v}</div><div class="stat-label">${l}</div></div>`;
-  $('#statsRow').innerHTML = stat(providers, 'Providers') + stat(std.length ? pct2(Math.max(...std)) : '—', `Best steady savings${S.tax ? ', after tax' : ''}`) + stat(promoTop.length ? pct2(Math.max(...promoTop)) : '—', `Top promo rate${S.tax ? ' after tax' : ''} (short-term, conditions apply)`) + stat(promos, 'Live promos');
+  const plain = M.bestPlain(ROWS, TODAY_ISO);
+  const promo = u.filter(r => isPeso(r) && r.kind === 'promo').sort((a, b) => afterTax(b) - afterTax(a))[0];
+  const usd = u.filter(r => r.stablecoin && r.kind === 'standard' && !r.strings && !r.upTo && !locked(r)).sort((a, b) => b.rate - a.rate)[0];
+  const card = (r, label, primary) => {
+    if (!r) return `<article class="best-card"><p class="best-label">${label}</p><p>No current rate published</p></article>`;
+    const catches = [r.minDeposit ? `Minimum ${r.currency === 'PHP' ? '₱' : ''}${Number(r.minDeposit).toLocaleString('en-PH')} ${r.currency === 'PHP' ? '' : r.currency}` : 'No minimum deposit',
+      r.cap != null ? `First ${r.currency === 'PHP' ? '₱' : ''}${Number(r.cap).toLocaleString('en-PH')} ${r.currency === 'PHP' ? 'only' : r.currency + ' only'}` : 'No cap',
+      /select users/i.test(r.finePrint || '') ? 'Select users completing tasks; most get a lower tier' : r.strings ? 'Eligibility and tasks apply' : '',
+      !isPeso(r) ? 'Not a bank deposit; not insured' : '',
+      r.promoEnds ? `Ends ${fmtDate(r.promoEnds)}` : r.kind === 'standard' ? 'Variable standard rate' : ''].filter(Boolean).join(' · ');
+    return `<article class="best-card ${primary ? 'best-primary' : 'best-small'}" data-best-id="${esc(r.id)}"><p class="best-label">${label}</p><div class="best-rate">${r.upTo ? '<small>Up to </small>' : ''}${pct2(afterTax(r))}</div><p class="best-net">${taxable(r) ? `After ${TAX()}% tax · ${pct2(r.rate)} gross` : r.taxExempt ? 'Tax-free · past dividend' : esc(r.rateBasis || 'APR') + ' · paid in ' + esc(r.currency)}</p><h3 class="best-product">${esc(r.provider)}<span>${esc(r.product)}</span></h3><p class="best-catch">${esc(catches)}</p>${r.source ? `<a class="best-source" href="${esc(r.source)}" target="_blank" rel="noopener">Official source ↗</a>` : '<p>Source not available</p>'}</article>`;
+  };
+  $('#statsRow').innerHTML = card(plain, 'Best today · plain peso savings', true) + card(promo, 'Best peso promo · conditions apply', false) + card(usd, 'Best USD · standard stablecoin rate', false);
   const ph = DATA.checked && DATA.checked.ph, cx = DATA.checked && DATA.checked.crypto;
-  // Verified seal: last check per group and the next scheduled check (PH: 28th = end of month; crypto: 1st and 15th).
-  const nextPh = (() => { const d = new Date(TODAY); if (d.getDate() >= 28) d.setMonth(d.getMonth() + 1, 28); else d.setDate(28); return d; })();
-  const nextCx = (() => { const d = new Date(TODAY); if (d.getDate() < 15) d.setDate(15); else d.setMonth(d.getMonth() + 1, 1); return d; })();
-  const dm = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-  const late = (iso, days) => iso && daysBetween(new Date(iso), TODAY) > days;
-  $('#verifyChecked').innerHTML = `<span class="vc">Peso rates checked <b>${fmtDate(ph)}</b></span><span class="vsep"> · </span><span class="vc">Crypto checked <b>${fmtDate(cx)}</b></span>`;
-  $('#verifyNext').innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Next update: <span class="vc">peso rates <b>${dm(nextPh)}</b> (end of every month)</span><span class="vsep"> · </span><span class="vc">crypto <b>${dm(nextCx)}</b> (every 2 weeks)</span>${late(ph, 35) || late(cx, 16) ? ' · <span class="verify-late">a re-check is overdue</span>' : ''}`;
+  $('#verifyChecked').textContent = `Peso rates checked ${fmtDate(ph)} · Crypto checked ${fmtDate(cx)} · Sources on every row`;
 }
 function renderRules() {
   const R = DATA.rules || {};
@@ -483,6 +482,7 @@ function setView(v) {
   try { localStorage.setItem('trYieldView', v); } catch (e) {}
   if (v === 'basic') { if (S.f.cat === 'dex') S.f.cat = 'all'; S.real = false; $('#realToggle').checked = false; syncChips(); }
   renderAll();
+  if (v === 'advanced' && DATA) ensureDefi();
 }
 function syncChips() { $$('.chips').forEach((c) => $$('button', c).forEach((b) => b.setAttribute('aria-pressed', String(S.f[c.dataset.key] === b.dataset.v)))); syncFilterUi(); }
 
@@ -518,7 +518,13 @@ function syncFilterUi() {
   cnt.hidden = !act.length; cnt.textContent = act.length;
   $('#fActive').innerHTML = act.length ? act.map((k) => `<button class="f-pill" data-clear="${k}" aria-label="Clear ${FLABEL[k]} filter">${FLABEL[k]}: ${optLabel(k, S.f[k])} <span aria-hidden="true">×</span></button>`).join('') + (act.length > 1 ? '<button class="f-pill f-clear" data-clear="*">Clear all</button>' : '') : '';
 }
-function renderAll() { renderStats(); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
+function renderAll() { if (!DATA) return; renderStats(); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
+function updateAmount() {
+  $('#sharedAmount').value = Number(S.amount.toFixed(6));
+  $('#sharedAmount').setAttribute('aria-label', 'Amount in ' + (S.currency === 'USD' ? 'US dollars' : 'pesos'));
+  $$('[data-currency]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.currency === S.currency)));
+  renderAll(); if (DATA) sim();
+}
 function wire() {
   $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
   $('#taxToggle').addEventListener('change', (e) => { S.tax = e.target.checked; renderAll(); });
@@ -535,28 +541,28 @@ function wire() {
   $('#ratesFoot').addEventListener('click', (e) => { if (e.target.matches('[data-goadv]')) { e.preventDefault(); setView('advanced'); } });
   $('#tree').addEventListener('click', (e) => {
     const b = e.target.closest('.node'); if (!b) return;
-    const k = b.dataset.k, v = k === 'amount' ? Number(b.dataset.v) : b.dataset.v;
+    const k = b.dataset.k, v = b.dataset.v;
     const idx = TREE.findIndex((t) => t.key === k);
-    if (k === 'ccy' && S.tree.ccy !== v) { delete S.tree.where; delete S.tree.amount; }
+    if (k === 'where' && v === 'defi') setView('advanced');
     S.tree[k] = v;
     renderTree();
     const next = $(`.tier[data-tier="${(TREE[idx + 1] || {}).key}"]`) || $('#treeResult');
-    if (next && next.getBoundingClientRect().top > innerHeight - 120) next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (next && next.getBoundingClientRect().top > innerHeight - 120) next.scrollIntoView({ behavior: scrollMotion(), block: 'center' });
   });
-  $('#tree').addEventListener('change', (e) => { if (e.target.id === 'treeAmt') { const v = Number(e.target.value); if (v > 0) { S.tree.amount = v; renderTree(); } } });
   $('#treeResult').addEventListener('click', (e) => {
     const a = e.target.closest('[data-show]'); if (!a) return;
     e.preventDefault(); const id = a.dataset.show; const r = ROWS.find((x) => x.id === id);
     S.f = { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }; S.q = ''; $('#searchInput').value = ''; syncChips(); S.open.add(id); { const rr = ROWS.find((x) => x.id === id); if (rr) S.openProv.add(rr.category + '|' + rr.provider); } renderRates();
-    const el = $(`.row[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const el = $(`.row[data-id="${CSS.escape(id)}"]`); if (el) el.scrollIntoView({ behavior: scrollMotion(), block: 'center' });
   });
   document.addEventListener('click', (e) => {
     const a = e.target.closest('.fn-link');
-    if (a) { e.preventDefault(); const t = document.getElementById(a.dataset.fn); if (t) { t.scrollIntoView({ behavior: 'smooth', block: 'center' }); t.classList.remove('fn-hit'); void t.offsetWidth; t.classList.add('fn-hit'); } return; }
+    if (a) { e.preventDefault(); const t = document.getElementById(a.dataset.fn); if (t) { t.scrollIntoView({ behavior: scrollMotion(), block: 'center' }); t.classList.remove('fn-hit'); void t.offsetWidth; t.classList.add('fn-hit'); } return; }
     const c = e.target.closest('.fn-copy');
     if (c) { const done = () => { c.textContent = 'Copied ✓'; setTimeout(() => (c.textContent = 'Copy code'), 1800); }; try { navigator.clipboard.writeText(c.dataset.copy).then(done, done); } catch (err) { done(); } }
   });
-  ['simAmt', 'simYears', 'simRate', 'simInfl', 'simTax'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', sim); });
+  ['simYears', 'simInfl', 'simTax'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', sim); });
+  $('#simRate').addEventListener('input', () => { $('#simPick').value = ''; sim(); });
   const sp = $('#simPick'); if (sp) sp.addEventListener('change', () => { const r = ROWS.find((x) => x.id === sp.value); if (r) $('#simRate').value = r.rate; sim(); });
   document.addEventListener('click', (e) => {
     const t = e.target.closest('#fnToggle'); if (!t) return;
@@ -565,13 +571,18 @@ function wire() {
     t.innerHTML = (open ? 'Hide links' : 'Show all ' + body.querySelectorAll('li').length + ' links') + ' <span aria-hidden="true">' + (open ? '▴' : '▾') + '</span>';
   });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
-  $('#calcDeposit').addEventListener('input', (e) => { $('#calcDepositSlider').value = e.target.value; calc(); });
-  $('#calcDepositSlider').addEventListener('input', (e) => { $('#calcDeposit').value = e.target.value; calc(); });
+  $('#sharedAmount').addEventListener('input', e => { S.amount = Math.max(0, Number(e.target.value) || 0); renderAll(); if (DATA) sim(); });
+  $$('[data-currency]').forEach(b => b.addEventListener('click', () => {
+    if (S.currency === b.dataset.currency || !DATA) return;
+    const pesos = amountPesos(); S.currency = b.dataset.currency;
+    S.amount = M.fromPesos(pesos, S.currency, FX()); updateAmount();
+  }));
 }
 async function loadDefi() {
   try {
     const res = await fetch('https://yields.llama.fi/pools'); const pools = (await res.json()).data || [];
-    const today = new Date().toISOString().slice(0, 10);
+    if (!res.ok) throw new Error('Rate feed unavailable');
+    const today = TODAY_ISO;
     return pools.filter((p) => DEFI.projects[p.project] && p.chain === 'Solana' && DEFI.symbols.includes(p.symbol) && (p.tvlUsd || 0) >= DEFI.minTvl)
       .sort((a, b) => (b.tvlUsd || 0) - (a.tvlUsd || 0))
       .map((p) => {
@@ -581,13 +592,33 @@ async function loadDefi() {
         const rew = p.apyReward > 0.05;
         const avg = p.apyMean30d != null ? ` 30-day average ${p.apyMean30d.toFixed(2)}%.` : '';
         return { id: `dex-${p.pool}`, provider: prov, product: `${meta} · ${p.symbol}`, category: 'dex', currency: p.symbol, stablecoin: true,
-          rate: Math.round((p.apy || 0) * 100) / 100, rateBasis: 'APY', kind: rew ? 'promo' : 'standard', lockup: 'flexible',
+          rate: p.apy == null ? null : Math.round(p.apy * 100) / 100, rateBasis: 'APY', kind: rew ? 'promo' : 'standard', rateAfterPromo: rew ? p.apyBase : null, lockup: 'flexible',
           capText: `Pool size $${((p.tvlUsd || 0) / 1e6).toFixed(1)}M`,
           finePrint: `Live from DefiLlama: ${(p.apyBase || 0).toFixed(2)}% from borrowers${rew ? ` + ${p.apyReward.toFixed(2)}% in reward tokens (rewards can stop anytime)` : ''}.${avg} The rate moves with demand to borrow.${rwa ? ' This vault lends against real-world assets, which adds credit risk outside crypto.' : ''}`,
           cons: 'Smart-contract, oracle and stablecoin risk. No insurance. You need your own Solana wallet; there is no support desk if you make a mistake.',
-          source: link, checkedOn: today, verified: true, history: p.apyMean30d != null ? [{ d: '30-day average', r: Math.round(p.apyMean30d * 100) / 100 }, { d: 'today', r: Math.round((p.apy || 0) * 100) / 100 }] : [] };
+          source: link, checkedOn: today, verified: true, history: [] }; // A 30-day average is not a second historical snapshot.
       });
-  } catch (e) { return []; }
+  } catch (e) { return null; }
+}
+let defiPromise;
+function ensureDefi() {
+  if (defiPromise) return defiPromise;
+  const status = $('#defiStatus'), key = 'trYieldDefi-v1:' + DATA.generated;
+  status.textContent = 'Loading live DeFi rates…';
+  defiPromise = (async () => {
+    let rows, saved;
+    try { saved = sessionStorage.getItem(key); } catch (e) {}
+    if (saved != null) { try { rows = JSON.parse(saved); } catch (e) { rows = null; } }
+    else {
+      rows = await loadDefi();
+      try { sessionStorage.setItem(key, JSON.stringify(rows)); } catch (e) {}
+    }
+    if (!rows) { status.textContent = 'Live DeFi feed unavailable. Saved official rates remain available; no live DeFi estimate is shown.'; return; }
+    ROWS = ROWS.concat(rows);
+    status.textContent = `${rows.length} live Solana pools · DefiLlama · loaded once this session. Averages are not historical snapshots.`;
+    fillCalc(); renderAll();
+  })();
+  return defiPromise;
 }
 async function init() {
   setupFilters();
@@ -597,16 +628,16 @@ async function init() {
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
   renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi();
-  const u = ROWS.filter((r) => usable(r) && isPeso(r)).sort((a, b) => b.rate - a.rate)[0];
+  const u = M.bestPlain(ROWS, TODAY_ISO);
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder and opens the first row, for screenshots.
   const Q = new URLSearchParams(location.search);
-  if (Q.get('demo')) { S.tree = Q.get('ccy') === 'usd' ? { ccy: 'usd', where: 'both', access: 'flex', amount: 1000, promo: 'ok', strings: 'no' } : { ccy: 'php', where: 'bank', access: 'flex', amount: 100000, promo: 'ok', strings: 'no' }; renderTree(); const f = ROWS.find((r) => usable(r) && r.kind === 'promo' && isPeso(r)); if (f) { S.open.add(f.id); renderRates(); } }
+  if (Q.get('demo')) { S.tree = { where: Q.get('ccy') === 'usd' ? 'crypto' : 'bank', access: 'flex', promo: 'ok', strings: 'no' }; renderTree(); }
   if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
   if (Q.get('scrollto')) { const el = document.getElementById(Q.get('scrollto')); if (el) { document.documentElement.style.scrollBehavior = 'auto'; window.scrollTo(0, el.getBoundingClientRect().top + window.scrollY - 130); } }
-  const dex = await loadDefi(); if (dex.length) { ROWS = ROWS.concat(dex); renderRates(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); }
+  if (S.view === 'advanced') ensureDefi();
 }
 init();
 })();
