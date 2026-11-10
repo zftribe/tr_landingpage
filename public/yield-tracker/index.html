@@ -5,7 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TR Yield Tracker — Trading Republic</title>
 <meta name="description" content="Compare savings and earn rates across Philippine banks, digital banks, e-wallets and partner crypto exchanges. Caps, fine print, promo end dates and after-tax yields, each with its official source and the date we checked it.">
-<link rel="icon" href="../TR logo.png">
+<link rel="canonical" href="https://welcome.tradingrepublic.io/yield-tracker/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="TR Yield Tracker — Trading Republic">
+<meta property="og:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
+<meta property="og:url" content="https://welcome.tradingrepublic.io/yield-tracker/index.html">
+<meta property="og:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
+<meta property="og:image:alt" content="Trading Republic logo">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="TR Yield Tracker — Trading Republic">
+<meta name="twitter:description" content="Where should your money earn? Philippine savings and USD earn rates with caps, catches, after-tax yields and the official source on every row.">
+<meta name="twitter:image" content="https://welcome.tradingrepublic.io/tr-logo.png">
+<link rel="icon" href="../tr-logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tracker.css">
 </head>
@@ -13,17 +24,17 @@
 
 <nav class="nav" id="nav">
   <div class="nav-inner">
-    <a href="../" class="nav-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></a>
+    <a href="../" class="nav-brand"><img src="../tr-logo.png" alt=""><span>Trading Republic</span></a>
     <div class="nav-links">
+      <a href="#yields">Rates</a>
       <a href="#finder">Finder</a>
-      <a href="#yields">All rates</a>
       <a href="#calculator">Calculator</a>
       <a href="../">Main site</a>
     </div>
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" id="best">
   <div class="container">
     <div class="verify" id="verify" role="note" aria-label="Rates verified against official sources">
       <svg class="seal" width="44" height="44" viewBox="0 0 48 48" aria-hidden="true"><g fill="#16a34a"><circle cx="42.60" cy="24.00" r="4.6"/><circle cx="41.18" cy="31.12" r="4.6"/><circle cx="37.15" cy="37.15" r="4.6"/><circle cx="31.12" cy="41.18" r="4.6"/><circle cx="24.00" cy="42.60" r="4.6"/><circle cx="16.88" cy="41.18" r="4.6"/><circle cx="10.85" cy="37.15" r="4.6"/><circle cx="6.82" cy="31.12" r="4.6"/><circle cx="5.40" cy="24.00" r="4.6"/><circle cx="6.82" cy="16.88" r="4.6"/><circle cx="10.85" cy="10.85" r="4.6"/><circle cx="16.88" cy="6.82" r="4.6"/><circle cx="24.00" cy="5.40" r="4.6"/><circle cx="31.12" cy="6.82" r="4.6"/><circle cx="37.15" cy="10.85" r="4.6"/><circle cx="41.18" cy="16.88" r="4.6"/><circle cx="24" cy="24" r="19.4"/></g><circle cx="24" cy="24" r="16.2" fill="#22c55e"/><circle cx="24" cy="24" r="14.6" fill="none" stroke="#ffffff" stroke-opacity=".55" stroke-width="1.1"/><path d="M17.2 24.6l4.6 4.6 9.4-9.8" fill="none" stroke="#ffffff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -35,13 +46,24 @@
     </div>
     <h1>Where should your money <span class="gold">earn</span>?</h1>
     <p class="subtitle">Savings and earn rates from Philippine banks, digital banks, e-wallets and our partner crypto exchanges. Every rate shows its cap, its catches, whether it is a promo, and the day we checked it.</p>
-    <div class="stats-row" id="statsRow"></div>
+    <div class="stats-row" id="statsRow" aria-label="Today's rate highlights"></div>
   </div>
 </header>
 
 <!-- Controls shared by every section -->
 <div class="controls" id="controls">
   <div class="container-wide controls-inner">
+    <div class="shared-amount">
+      <label for="sharedAmount">Your amount</label>
+      <div class="amount-input-group">
+        <div class="currency-switch" role="group" aria-label="Amount currency">
+          <button type="button" data-currency="PHP" aria-pressed="true" aria-label="Philippine pesos">₱</button>
+          <button type="button" data-currency="USD" aria-pressed="false" aria-label="US dollars">$</button>
+        </div>
+        <input id="sharedAmount" type="text" value="100,000.00" inputmode="decimal" autocomplete="off" aria-describedby="amountScope">
+      </div>
+    </div>
+    <p id="amountScope" class="amount-scope">One amount for rates, Finder and calculators.</p>
     <div class="seg" role="group" aria-label="View">
       <button data-view="basic" aria-pressed="true">Basic</button>
       <button data-view="advanced" aria-pressed="false">Advanced</button>
@@ -59,20 +81,15 @@
   </div>
 </div>
 
-<main>
-<!-- ═══════════ FINDER (tech tree) ═══════════ -->
-<section class="section" id="finder">
-  <div class="container">
-    <div class="sec-head">
-      <span class="eyebrow">Finder</span>
-      <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
-      <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
-    </div>
-    <div class="tree" id="tree"></div>
-    <div class="tree-result" id="treeResult" hidden></div>
+<div class="jr-strip basic-only" id="jrStrip" hidden>
+  <div class="jr-in">
+    <b id="jrStep">Step 1 of 4</b><span id="jrLabel">Finder</span>
+    <span class="jr-dots" id="jrDots" aria-hidden="true"></span>
+    <span class="jr-btns"><button type="button" class="jr-btn" id="jrBack">← Back</button><button type="button" class="jr-btn gold" id="jrRestart">↺ Start over</button></span>
   </div>
-</section>
+</div>
 
+<main>
 <!-- ═══════════ ALL RATES ═══════════ -->
 <section class="section" id="yields">
   <div class="container-wide">
@@ -115,8 +132,39 @@
       </div>
     </div>
 
+    <section class="cmp-panel" id="cmpPanel" hidden aria-label="Comparison">
+      <div class="cmp-top"><h3>Compare side by side</h3><button type="button" class="btn" id="cmpClose">Close</button></div>
+      <div class="cmp-form">
+        <div class="seg" role="group" aria-label="Currency"><button type="button" data-ccy="php" aria-pressed="true">₱ Pesos</button><button type="button" data-ccy="usd" aria-pressed="false">$ Dollars</button></div>
+        <label class="cmp-amt"><span id="cmpSym">₱</span><input id="cmpAmt" type="number" inputmode="numeric" min="0" value="100000" aria-label="Amount"></label>
+        <label class="switch"><input type="checkbox" id="cmpPromo" checked><span class="switch-ui" aria-hidden="true"></span><span>Promos OK</span></label>
+        <label class="switch"><input type="checkbox" id="cmpTasks" checked><span class="switch-ui" aria-hidden="true"></span><span>Tasks OK</span></label>
+        <label class="switch"><input type="checkbox" id="cmpIns"><span class="switch-ui" aria-hidden="true"></span><span>Insured only</span></label>
+        <label class="switch"><input type="checkbox" id="cmpFlex"><span class="switch-ui" aria-hidden="true"></span><span>Must withdraw anytime</span></label>
+      </div>
+      <div id="cmpBody"></div>
+    </section>
+
     <div class="rates" id="rates"><div class="loading-spinner"></div></div>
     <p class="rates-foot" id="ratesFoot"></p>
+    <p id="defiStatus" class="rates-foot adv-only" role="status"></p>
+  </div>
+</section>
+
+<!-- ═══════════ FINDER (tech tree) ═══════════ -->
+<section class="section" id="finder">
+  <div class="container">
+    <div class="jr-welcome" id="jrWelcome" hidden role="region" aria-label="Continue where you stopped">
+      <div><b id="jrWelcomeTitle">Welcome back!</b><span id="jrWelcomeSub"></span></div>
+      <div class="jr-welcome-act"><button type="button" class="btn gold" id="jrContinue">Continue where I stopped</button><button type="button" class="btn" id="jrFresh">Start over</button></div>
+    </div>
+    <div class="sec-head">
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="1"></span>Finder</span>
+      <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
+      <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
+    </div>
+    <div class="tree" id="tree"></div>
+    <div class="tree-result" id="treeResult" hidden></div>
   </div>
 </section>
 
@@ -124,7 +172,7 @@
 <section class="section" id="calculator">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">Calculator</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="2"></span>Calculator</span>
       <h2>What would it <span class="gold">earn</span>?</h2>
       <p class="subtitle">Caps are applied: money above a cap earns the rate after the cap.</p>
     </div>
@@ -137,7 +185,7 @@
         </div>
         <div class="calc-field">
           <label for="calcDeposit">Amount <span class="val" id="calcDepositLabel"></span></label>
-          <input type="number" class="calc-input" id="calcDeposit" value="100000" min="0" step="1000" inputmode="numeric">
+          <input type="text" class="calc-input" id="calcDeposit" value="100,000.00" inputmode="decimal" autocomplete="off">
           <input type="range" class="calc-slider" id="calcDepositSlider" min="1000" max="5000000" step="1000" value="100000" aria-label="Amount slider">
         </div>
         <div class="calc-field">
@@ -155,17 +203,51 @@
           <div class="breakdown-item"><div class="breakdown-label">Per year</div><div class="breakdown-value" id="resYear">—</div></div>
           <div class="breakdown-item"><div class="breakdown-label">Blended rate</div><div class="breakdown-value" id="resRate">—</div></div>
         </div>
+        <div class="calc-infl-bar">
+          <label class="switch"><input type="checkbox" id="calcInflToggle" checked><span class="switch-ui" aria-hidden="true"></span><span>After inflation</span></label>
+          <span class="dim" id="calcInflRate"></span>
+        </div>
+        <div class="infl-verdict" id="inflVerdict" role="status" aria-live="polite"></div>
+        <div class="calc-ledger" aria-label="From interest to real gain">
+          <div><span>Interest earned</span><strong id="calcGross">—</strong></div>
+          <div><span>Minus tax</span><strong id="calcTax">—</strong></div>
+          <div><span>Minus inflation</span><strong id="calcInflation">—</strong></div>
+          <div class="ledger-total"><span>Real gain or loss</span><strong id="calcReal">—</strong></div>
+        </div>
+        <p class="calc-note" id="calcRealNote"></p>
         <p class="calc-note" id="calcNote"></p>
       </div>
     </div>
   </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="calc" id="nextFromCalc">Next →</button></div>
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
+
+<section class="section" id="fx-check">
+  <div class="container-wide">
+    <div class="sec-head">
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="3"></span><span class="fx-gtk">Good to know · </span>Dollar round trip</span>
+      <h2>Does a dollar account pay <span class="gold">after the exchange</span>?</h2>
+      <p class="subtitle">Your bank sells you dollars at one rate and buys them back at a lower one. See how long the dollar interest takes to cover that gap.</p>
+    </div>
+    <div class="fx-card">
+      <div class="fx-form">
+        <label class="sf"><span>Pesos to convert</span><input id="fxAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+        <label class="sf sf-wide"><span>Bank dollar account</span><select id="fxPick"></select></label>
+        <label class="sf"><span>How long you hold</span><select id="fxMonths"><option value="3">3 months</option><option value="6">6 months</option><option value="12" selected>12 months</option><option value="24">2 years</option><option value="36">3 years</option><option value="60">5 years</option></select></label>
+      </div>
+      <div id="fxOut" role="status" aria-live="polite"></div>
+    </div>
+    <details class="fx-board-wrap"><summary>Every bank's dollar buying and selling rate</summary><div class="cmp-scroll" id="fxBoard"></div></details>
+  </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="fx">Next: more analytics →</button></div>
+</section>
+
 <section class="section" id="inflation-check">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">For savers in the Philippines</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="3"></span>For savers in the Philippines</span>
       <h2>Have you beaten <span class="gold">inflation</span>?</h2>
       <p class="subtitle">Interest is only half the story. Tax takes a slice, and rising prices take another. See what is really left.</p>
     </div>
@@ -174,7 +256,7 @@
       <div class="sim-box">
         <h3>Simulator</h3>
         <div class="sim-fields">
-          <label class="sf"><span>Amount</span><input id="simAmt" type="number" inputmode="numeric" min="0" step="1000" value="100000"></label>
+          <p class="sf sf-wide sim-shared-note">Uses your amount from the shared control above. <a href="#controls">Change amount ↑</a></p>
           <label class="sf"><span>Years</span><input id="simYears" type="number" inputmode="numeric" min="1" max="30" step="1" value="5"></label>
           <label class="sf sf-wide"><span>Where you save</span><select id="simPick"></select></label>
           <label class="sf"><span>Rate (% a year)</span><input id="simRate" type="number" inputmode="decimal" min="0" max="100" step="0.05" value="4"></label>
@@ -190,15 +272,35 @@
         <div class="sim-bar" id="simBar" aria-hidden="true"></div>
         <div class="sim-legend"><span><i class="sb-tax"></i>Tax</span><span><i class="sb-infl"></i>Inflation</span><span><i class="sb-real"></i>Real gain</span><span><i class="sb-loss"></i>Buying power lost</span></div>
         <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
-        <p class="sim-note">"What you really gain" is in today's pesos. Assumes the rate and inflation stay the same every year, and interest is added once a year. A comparison, not advice; past inflation doesn't predict future inflation.</p>
+        <p class="sim-note">Real gain measures PHP buying power, shown in your selected currency at the fixed BSP reference rate. Caps, promo periods and published base rates apply; inflation is held constant and interest compounds annually. A comparison, not advice.</p>
       </div>
+    </div>
+  </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="infl">Next: more analytics →</button></div>
+</section>
+
+<div class="container jr-card-host" id="jrCardHost"><div class="jr-card" id="jrCard" aria-live="polite"></div></div>
+
+<section class="section basic-only" id="nextSteps">
+  <div class="container">
+    <div class="next-card">
+      <span class="eyebrow"><span class="step-tag" data-step-of="4"></span>Your next step</span>
+      <h2>Want more <span class="gold">analytics</span>?</h2>
+      <p>See every rate we track, each with its fine print: digital banks, e-wallets, government, crypto exchanges and DeFi. It opens right below, with Compare.</p>
+      <div class="next-btns"><button type="button" class="btn gold" data-flow-list>See every rate, with its fine print ↓</button></div>
     </div>
   </div>
 </section>
 
 <section class="section section-tight" id="method">
   <div class="container">
-    <div class="method">
+    <details class="method-fold">
+      <summary>
+        <span class="mf-title">How we keep this honest</span>
+        <span class="mf-tags"><span>Official sources only</span><span>Philippine tax on interest</span><span>PDIC cover</span><span>Checked monthly</span></span>
+        <span class="mf-more" aria-hidden="true"><span class="mf-closed">Show</span><span class="mf-open">Hide</span> ▾</span>
+      </summary>
+      <div class="method">
       <div>
         <h3>How we keep this honest</h3>
         <ul>
@@ -210,13 +312,14 @@
       </div>
       <div id="rulesBox"></div>
     </div>
+    </details>
   </div>
 </section>
 </main>
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand"><img src="../TR logo.png" alt=""><span>Trading Republic</span></div>
+    <div class="footer-brand"><img src="../tr-logo.png" alt=""><span>Trading Republic</span></div>
     <p>TR Yield Tracker — Compare. Calculate. Compound.</p>
     <div class="footnotes" id="partnerNotes"></div>
     <div class="legal" id="legal">
@@ -227,6 +330,17 @@
   </div>
 </footer>
 
+<div class="cmp-tray" id="cmpTray" hidden role="region" aria-label="Compare tray">
+  <div class="cmp-tray-in"><b>Compare <span id="cmpCount">0 of 3</span></b><span id="cmpNames" class="cmp-names"></span>
+  <button type="button" class="btn gold" id="cmpOpen">Compare side by side</button><button type="button" class="btn" id="cmpClear">Clear</button></div>
+</div>
+<nav class="phone-nav" aria-label="Jump to section">
+  <a href="#best"><span aria-hidden="true">✧</span>Best</a>
+  <a href="#yields"><span aria-hidden="true">≡</span>Rates</a>
+  <a href="#finder"><span aria-hidden="true">⌕</span>Finder</a>
+  <a href="#calculator"><span aria-hidden="true">＋</span>Calc</a>
+</nav>
+<script src="tracker-math.js"></script>
 <script src="tracker.js"></script>
 </body>
 </html>

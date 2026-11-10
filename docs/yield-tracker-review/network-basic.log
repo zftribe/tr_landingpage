@@ -1,0 +1,4 @@
+### Result
+7. [GET] http://127.0.0.1:3197/yield-tracker/yields.json => [200] OK
+
+Note: 18 static requests not shown, run with --static option to see them.
