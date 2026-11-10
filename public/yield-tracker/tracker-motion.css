@@ -1,0 +1,112 @@
+/* ═══════════ MOTION · same family as Welcome direction B ═══════════
+   House curve, gated on html.m-on (never set for prefers-reduced-motion).
+   Only opacity and transform move. Space is reserved, so CLS stays 0.
+   If motion.js never marks html.m-ready, the inline gate drops m-on after 5s. */
+:root { --m-ease: cubic-bezier(.2, .7, .1, 1); }
+
+/* Hero headline: each word rises out of its own mask. */
+.m-split .m-w { display: inline-block; overflow: hidden; vertical-align: top; padding: .06em .02em .16em; margin: -.06em -.02em -.16em; }
+.m-split .m-w > span { display: inline-block; }
+.m-on .m-split .m-w > span { transform: translateY(112%); transition: transform 1.1s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 70ms); }
+.m-on.m-hero .m-split .m-w > span { transform: none; }
+
+/* Verified seal (the live stamp) and the rest of the hero follow the headline. */
+.m-on .hero .verify,
+.m-on .hero .subtitle,
+.m-on .hero #statsRow { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); }
+.m-on .hero .verify { transition-delay: .08s; }
+.m-on .hero .subtitle { transition-delay: .38s; }
+.m-on .hero #statsRow { transition-delay: .48s; }
+.m-on.m-hero .hero .verify,
+.m-on.m-hero .hero .subtitle,
+.m-on.m-hero .hero #statsRow { opacity: 1; transform: none; }
+
+.m-on .verify .seal { opacity: 0; transform: scale(.72) rotate(-10deg); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); transition-delay: .2s; }
+.m-on.m-hero .verify .seal { opacity: 1; transform: none; }
+
+/* Soft pulse on the checked dates after the stamp lands. */
+@keyframes m-pulse { 50% { opacity: .55; } }
+.m-on.m-hero #verifyChecked b { animation: m-pulse 2.2s var(--m-ease) 1.6s 3; }
+
+/* Slight gold glow behind the hero (first-paint ::before, so it cannot shift layout). Parallax via --m-par. */
+.hero { position: relative; --m-par: 0px; }
+.hero > .container { position: relative; z-index: 1; }
+.hero::before {
+  content: ''; position: absolute; left: 0; right: 0; top: -8%; height: 78%;
+  pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse at 50% 18%, rgba(249,168,37,.18) 0%, rgba(249,168,37,.05) 38%, transparent 70%);
+  opacity: 0; transform: translate3d(0, calc(22px + var(--m-par)), 0) scale(1.08);
+  transition: opacity 1.8s var(--m-ease), transform 2.4s var(--m-ease);
+}
+.m-hero .hero::before { opacity: 1; transform: translate3d(0, var(--m-par), 0); }
+.m-hero.m-glow-live .hero::before { animation: m-glow-drift 48s var(--m-ease) infinite alternate; }
+@keyframes m-glow-drift { to { transform: translate3d(2.5%, calc(3% + var(--m-par, 0px)), 0) scale(1.04); } }
+
+/* Counted figures keep a stable width. */
+.stat-value, .result-card-value, .breakdown-value, .calc-ledger strong, .st b, .fx-tiles b { font-variant-numeric: tabular-nums; }
+
+/* Sections, cards and rate groups rise in on scroll. */
+.m-on [data-m] { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms); }
+.m-on [data-m].m-in { opacity: 1; transform: none; }
+
+/* Rate groups and provider cards: fade and slide in, staggered. */
+.m-on #rates > .est-note,
+.m-on #rates > .rgroup-title,
+.m-on #rates > .rgroup-note,
+.m-on #rates > .rate-columns,
+.m-on #rates > .prov-card,
+.m-on #rates > .no-picks { opacity: 0; transform: translateY(34px); transition: opacity .9s var(--m-ease), transform .9s var(--m-ease); transition-delay: calc(var(--m-i, 0) * 90ms); }
+.m-on #rates > .est-note.m-in,
+.m-on #rates > .rgroup-title.m-in,
+.m-on #rates > .rgroup-note.m-in,
+.m-on #rates > .rate-columns.m-in,
+.m-on #rates > .prov-card.m-in,
+.m-on #rates > .no-picks.m-in { opacity: 1; transform: none; }
+/* Prefer the family motion over the shorter swap animation. */
+.m-on #rates.swap > * { animation: none; }
+
+/* Sparklines and inflation charts draw in from the left. */
+.m-on .spark, .m-on .infl-spark { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s var(--m-ease); }
+.m-on .spark.m-in, .m-on .infl-spark.m-in { transform: none; }
+
+/* Comparison / inflation bars: width is set instantly (no layout shift); they grow with scaleX. */
+.m-on .sim-bar span { transform: scaleX(0); transform-origin: left center; transition: transform 1.1s var(--m-ease), width 0s; }
+.m-on .sim-bar.m-in span { transform: none; }
+.m-on .sim-bar.m-in span:nth-child(2) { transition-delay: .08s; }
+.m-on .sim-bar.m-in span:nth-child(3) { transition-delay: .16s; }
+.m-on .sim-bar.m-in span:nth-child(4) { transition-delay: .24s; }
+
+/* PHP / USD, Basic / Advanced, and category chips ease their selected state. */
+.m-on .currency-switch button,
+.m-on .seg button,
+.m-on .chips button { transition: background-color .4s var(--m-ease), color .4s var(--m-ease), border-color .4s var(--m-ease); }
+
+/* Live-data shimmer while the rates list or DeFi feed is loading. */
+@keyframes m-shimmer { to { transform: translateX(100%); } }
+.m-on #rates:has(.loading-spinner) { position: relative; overflow: hidden; }
+.m-on #rates:has(.loading-spinner)::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(249,168,37,.14), transparent);
+  transform: translateX(-100%); animation: m-shimmer 1.4s linear infinite;
+}
+.m-on #defiStatus.m-loading { position: relative; overflow: hidden; }
+.m-on #defiStatus.m-loading::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(249,168,37,.14), transparent);
+  transform: translateX(-100%); animation: m-shimmer 1.4s linear infinite;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .m-on #rates > .prov-card,
+  .m-on .result-card,
+  .m-on .fx-tiles .st,
+  .m-on .sim-tiles .st,
+  .m-on .pick,
+  .m-on .best-card { transition: translate .4s var(--m-ease), border-color .4s var(--m-ease), box-shadow .4s var(--m-ease); }
+  .m-on #rates > .prov-card:hover,
+  .m-on .result-card:hover,
+  .m-on .fx-tiles .st:hover,
+  .m-on .sim-tiles .st:hover,
+  .m-on .pick:hover,
+  .m-on .best-card:hover { translate: 0 -4px; border-color: rgba(249,168,37,.45); box-shadow: 0 18px 40px rgba(0,0,0,.35); }
+}
