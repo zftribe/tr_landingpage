@@ -356,7 +356,7 @@ function renderStrip() {
   const seq = journey(), n = document.body.dataset.flow ? seq.length : Math.min(S.step || 1, seq.length)
   st.hidden = !(S.step >= 2 || document.body.dataset.flow)
   $('#jrStep').textContent = 'Step ' + n + ' of ' + seq.length
-  $('#jrLabel').textContent = document.body.dataset.flow ? 'Every rate, with its fine print' : (STEP_LABEL[seq[n - 1]] || '')
+  $('#jrLabel').textContent = document.body.dataset.flow ? (innerWidth < 720 ? 'Every rate' : 'Every rate, with its fine print') : (STEP_LABEL[seq[n - 1]] || '')
   $('#jrDots').innerHTML = seq.map((_, i) => '<i class="' + (i < n ? 'on' : '') + '"></i>').join('')
   const ctl = $('#controls'), nav = document.querySelector('.nav'), stickyCtl = ctl && getComputedStyle(ctl).position === 'sticky'
   st.style.top = ((nav ? nav.offsetHeight : 0) + (stickyCtl ? ctl.offsetHeight : 0)) + 'px'
@@ -641,11 +641,11 @@ function renderNextTop() {
   const seen = new Set(), top = []
   for (const x of pool) { if (seen.has(x.r.provider)) continue; seen.add(x.r.provider); top.push(x); if (top.length === 3) break }
   if (!top.length) { box.hidden = true; return }
-  const why = (r) => [r.kind === 'promo' ? (r.promoEnds ? 'Promo until ' + fmtDate(r.promoEnds) : 'Promo') : '', r.strings ? 'Has tasks' : '', locked(r) ? 'Locked in' : '', r.category === 'cex' || r.category === 'dex' ? 'Not insured' : ''].filter(Boolean)
+  const why = (r) => [r.category === 'government' ? 'Past dividend' : '', r.kind === 'promo' ? (r.promoEnds ? 'Promo until ' + fmtDate(r.promoEnds) : 'Promo') : '', r.strings ? 'Has tasks' : '', locked(r) ? 'Locked in' : '', r.category === 'cex' || r.category === 'dex' ? 'Not insured' : ''].filter(Boolean)
   box.hidden = false
   box.innerHTML = '<p class="next-top-h">The top 3 your answers left out <span>each has a catch, so check it in the list</span></p><div class="next-top-row">' + top.map((x) => {
     const r = x.r, w = why(r)
-    return '<div class="nt"><div class="logo">' + logo(r) + '</div><div class="nt-txt"><b>' + esc(r.provider) + '</b><small>' + esc(r.product || '') + '</small></div><div class="nt-rate">' + pct2(x.ny) + '<small>' + (S.tax && taxable(r) ? 'after tax' : 'a year') + '</small></div>' + (w.length ? '<div class="nt-why">' + w.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>' : '') + '</div>'
+    return '<div class="nt"><div class="logo">' + logo(r) + '</div><div class="nt-txt"><b>' + esc(r.provider) + '</b><small>' + esc(r.product || '') + '</small></div><div class="nt-rate">' + pct2(x.ny) + '<small>' + (taxable(r) ? (S.tax ? 'after tax' : 'a year') : 'tax-free') + '</small></div>' + (w.length ? '<div class="nt-why">' + w.map((t) => '<span>' + esc(t) + '</span>').join('') + '</div>' : '') + '</div>'
   }).join('') + '</div>'
 }
 function renderPicks() {
