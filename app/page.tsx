@@ -32,6 +32,8 @@ export default async function Home() {
     <>
       {/* Tap-the-candle intro (George, 10 Nov): decided before first paint; once a day, never for crawlers. */}
       <script dangerouslySetInnerHTML={{ __html: "(function(){try{var d=document.documentElement,q=/[?&]intro=1/.test(location.search),bot=/bot|crawl|spider|slurp|lighthouse|headless|facebookexternalhit|embedly|preview/i.test(navigator.userAgent),seen=null;try{seen=localStorage.getItem('tr-intro-day')}catch(e){}if(q||(!bot&&seen!==new Date().toDateString()))d.classList.add('intro-on')}catch(e){}})()" }} />
+      {/* Motion direction A (subtle polish): decided before first paint; nothing moves for prefers-reduced-motion. */}
+      <script dangerouslySetInnerHTML={{ __html: "(function(){try{var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('m-on');setTimeout(function(){if(!d.classList.contains('m-ready'))d.classList.remove('m-on')},5000)}catch(e){}})()" }} />
       <div id="tr-intro" aria-label="Welcome intro" />
       <Script src="/intro/candle-intro.js" strategy="afterInteractive" />
       <script
@@ -42,6 +44,7 @@ export default async function Home() {
       <Programs />
       <div dangerouslySetInnerHTML={{ __html: bottom }} />
       <Script src="/legacy.js" strategy="afterInteractive" />
+      <Script src="/motion/motion.js" strategy="afterInteractive" />
     </>
   )
 }
