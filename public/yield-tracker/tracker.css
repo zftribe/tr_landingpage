@@ -639,3 +639,54 @@ body[data-view=advanced] .prov-head { grid-template-columns: minmax(200px, 2fr) 
 .prov-head .rate .na { display: block; font-family: var(--font-body); font-size: .82rem; font-weight: 600; color: var(--text-dim); line-height: 1.35; }
 @media (max-width: 720px) { .prov-head .rate .na { max-width: 110px; text-align: right; font-size: .74rem; } }
 .best-def { font-size: .72rem; color: var(--text-dim); margin: 2px 0 0; line-height: 1.4; }
+
+/* ── Round 6 (George, 11 Nov): guided Basic, full-list Advanced, compact aligned rows ── */
+main { display: flex; flex-direction: column; }
+main > section { order: 8; }
+body[data-view=basic] #finder { order: 1; } body[data-view=basic] #calculator { order: 2; } body[data-view=basic] #fx-check { order: 3; } body[data-view=basic] #nextSteps { order: 4; }
+body[data-view=basic] #yields, body[data-view=basic] #inflation-check { display: none; }
+body[data-view=advanced] #yields { order: 1; } body[data-view=advanced] #calculator { order: 2; } body[data-view=advanced] #inflation-check { order: 3; } body[data-view=advanced] #fx-check { order: 4; } body[data-view=advanced] #finder { order: 5; }
+main > #method { order: 20; }
+body[data-view=basic][data-step="1"] #calculator, body[data-view=basic][data-step="1"] #fx-check, body[data-view=basic][data-step="1"] #nextSteps,
+body[data-view=basic][data-step="2"] #fx-check, body[data-view=basic][data-step="2"] #nextSteps,
+body[data-view=basic][data-step="3"] #nextSteps,
+body[data-view=basic][data-fxstep=off] #fx-check { display: none; }
+body[data-view=advanced] .step-tag, body[data-view=advanced] .step-next { display: none; }
+.step-tag { color: var(--gold); }
+.step-next { display: flex; justify-content: center; padding-top: 22px; }
+.step-next .btn { min-height: 46px; padding: 12px 22px; }
+@keyframes stepIn { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.step-in { animation: stepIn .55s cubic-bezier(.2,.8,.2,1) both; }
+.next-card { text-align: center; display: grid; gap: 12px; justify-items: center; padding: 34px 22px; border: 1px solid rgba(249,168,37,.45); border-radius: var(--radius); background: linear-gradient(180deg, rgba(249,168,37,.07), transparent 70%), var(--bg-card); }
+.next-card p { color: var(--text-dim); max-width: 56ch; margin: 0; }
+.next-btns { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+/* calculator: inflation toggle + verdict */
+.calc-infl-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 14px 0 8px; }
+.infl-verdict { margin: 0 0 12px; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-2); background: var(--bg); font-size: .9rem; line-height: 1.5; animation: stepIn .4s ease both; }
+.infl-verdict:empty { display: none; }
+.infl-verdict b { display: block; font-family: var(--font-display); font-size: 1.05rem; }
+.infl-verdict.up { border-color: rgba(34,197,94,.45); } .infl-verdict.up b { color: var(--green); }
+.infl-verdict.down { border-color: rgba(239,68,68,.45); } .infl-verdict.down b { color: var(--red); }
+#calculator.no-infl .infl-verdict, #calculator.no-infl .calc-ledger > div:nth-child(3), #calculator.no-infl .calc-ledger .ledger-total, #calculator.no-infl #calcRealNote { display: none; }
+/* compact rows: the same seven columns for single rows, bank summaries and headings */
+#rates .row-main, #rates .prov-head { grid-template-columns: minmax(200px, 2.4fr) 1fr 1.15fr 1.25fr 1fr .9fr 24px !important; gap: 14px; }
+#rates .prov-head .prov-sum { grid-column: 4 / 7; font-size: .8rem; color: var(--text-dim); }
+#rates .c-est { font-weight: 700; color: var(--white); font-variant-numeric: tabular-nums; }
+#rates .c-est small { display: block; font-weight: 500; color: var(--text-dim); font-size: .7rem; }
+#rates .c-est sup { color: var(--gold); font-size: .7em; margin-left: 1px; }
+#rates .c-acc small { display: block; color: var(--text-dim); font-size: .7rem; }
+#rates .prov-prod .badge { margin-left: 4px; vertical-align: 1px; }
+#rates .m-est { display: none; }
+.est-note { font-size: .76rem; color: var(--text-dim); margin: 0 0 10px; }
+#rates .rate-columns .row-main > div { white-space: nowrap; }
+@media (max-width: 1080px) {
+  #rates .row-main, #rates .prov-head { grid-template-columns: minmax(170px, 2fr) 1fr 1.1fr 1.2fr 24px !important; }
+  #rates .c-acc, #rates .c-chk { display: none; }
+  #rates .prov-head .prov-sum { grid-column: 4 / 5; }
+}
+@media (max-width: 720px) {
+  #rates .row-main, #rates .prov-head { grid-template-columns: 1fr auto 18px !important; gap: 10px; }
+  #rates .c-est, #rates .c-cap, #rates .c-acc, #rates .c-chk, #rates .prov-sum, #rates .rate-columns { display: none !important; }
+  #rates .m-est { display: block; color: var(--white); font-weight: 600; }
+  .calc-infl-bar { flex-wrap: wrap; }
+}

@@ -217,6 +217,9 @@ function visibleRows() {
 }
 
 /* ── rate list ────────────────────────────── */
+/* Round 6: compact estimate cells (the asterisk points to the note above the list). */
+const estCell = (earn, minMet, r) => earn != null ? (r.upTo ? '<small>up to</small>' : '') + '≈ ' + showMoney(earn) + '<sup>*</sup>' : '<small>' + (minMet ? '—' : 'Below minimum') + '</small>'
+const estMobile = (earn, minMet, r) => earn != null ? '<small class="m-est">≈ ' + showMoney(earn) + '*</small>' : ''
 function rowHTML(r) {
   const n = net(r.rate, r), id = esc(r.id);
   const p = partner(r);
@@ -228,7 +231,7 @@ function rowHTML(r) {
   const ry = !unavailable && isPeso(r) && S.view === 'advanced' ? realYield(r) : null;
   const earning = !minMet ? 'Below the minimum deposit' : earn == null ? 'Annual estimate unavailable' : `${r.upTo ? 'Up to ' : ''}${showMoney(earn)} in 12 months${S.tax && taxable(r) ? ' after tax' : ''}, if the rate stays the same`;
   const rateCell = unavailable
-    ? `<div class="rate na">No current rate published${ended(r) ? '<small>Promo ended ' + fmtDate(r.promoEnds) + '</small>' : ''}</div>`
+    ? `<div class="rate na">Not published${ended(r) ? '<small>Promo ended ' + fmtDate(r.promoEnds) + '</small>' : ''}</div>`
     : `<div class="rate">${r.upTo ? '<small>up to</small>' : ''}${pct2(n)}${S.real && isPeso(r) ? '<small>rate − PH CPI' + (S.tax && taxable(r) ? ', after tax' : '') + '</small>' : S.tax && taxable(r) ? `<small>after tax${isPeso(r) ? '' : ' · ' + esc(r.currency)}</small>` : r.category === 'government' && r.taxExempt ? '<small>tax-free</small>' : isPeso(r) ? '' : `<small>${esc(r.rateBasis || 'APR')} · ${esc(r.currency)}</small>`}</div>`;
   const ins = r.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r.category === 'cex' || r.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   const st = stale(r) ? '<span class="badge stale">Needs re-check</span>' : '';
@@ -250,15 +253,12 @@ function rowHTML(r) {
   ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
   return `<div class="row${TREND_GROUP ? ' has-trend' : ''}${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
   <button class="row-main" aria-expanded="${S.open.has(r.id)}" aria-controls="m-${id}">
-    <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}</span><span class="row-earn">${earning}</span>${ry != null ? `<span class="row-earn ${ry < 0 ? 'bad' : 'good'}">${ry >= 0 ? '+' : ''}${pct2(ry)} vs ${INFL()}% PH inflation</span>` : ''}</div></div>
-    ${rateCell}
-    <div class="adv-only c-adv cell-s">${r.rate == null ? '' : `${pct2(r.rate)}<small>${isPeso(r) ? 'before tax' : 'as shown'}</small>`}</div>
-    <div class="c-kind">${kindBadge(r)} ${st} ${inflBadge(r)}</div>
+    <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}${r.kind === 'promo' ? ' <span class="badge promo">Promo</span>' : ''}${stale(r) ? ' <span class="badge stale">Re-check</span>' : ''}</span></div></div>
+    ${rateCell.replace('</div>', estMobile(earn, minMet, r) + '</div>')}
+    <div class="c-est">${estCell(earn, minMet, r)}</div>
     <div class="c-cap cell-s">${capText(r)}</div>
-    <div class="adv-only c-adv cell-s">${esc(locked(r) ? r.lockup : 'Anytime')}<small>${ins.replace(/<[^>]+>/g, '')}</small></div>
-    <div class="adv-only c-adv cell-s">${fmtDate(r.checkedOn)}<small>${stale(r) ? '<span style="color:var(--red)">re-check due</span>' : 'on schedule'}</small></div>
-    ${TREND_GROUP ? `<div class="adv-only c-adv c-trend">${spark(r.history)}</div>` : ''}
-    <div class="c-badges">${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''} ${ins} ${st} ${inflBadge(r)}</div>
+    <div class="c-acc cell-s">${esc(locked(r) ? r.lockup : 'Anytime')}<small>${r.pdic ? 'PDIC ₱1M' : r.category === 'government' ? 'Agency-backed' : 'Not insured'}</small></div>
+    <div class="c-chk cell-s">${fmtDate(r.checkedOn)}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
   <div class="row-more" id="m-${id}">
@@ -293,15 +293,15 @@ function provHTML({ k, rs }) {
   const open = S.openProv.has(k), kid = 'p-' + k.replace(/[^a-z0-9]+/gi, '-');
   const earns = ok.map(earnOf).filter((v) => v != null), bestEarn = earns.length ? Math.max(...earns) : null;
   const bits = [
-    std ? `Steady up to <b>${pct2(net(std.rate, std))}</b>` : '',
-    promo ? `Promo up to <b>${pct2(net(promo.rate, promo))}</b>${promo.promoEnds ? ' · ends ' + fmtDate(promo.promoEnds) : ''}` : '',
-    rs.some((r) => locked(r)) && rs.some((r) => !locked(r)) ? (isPeso(r0) ? 'Savings + time deposits' : 'Flexible + fixed terms') : rs.every(locked) ? 'Time deposits' : '',
+    std ? `Steady <b>${pct2(net(std.rate, std))}</b>` : '',
+    promo ? `Promo <b>${pct2(net(promo.rate, promo))}</b>` : '',
   ].filter(Boolean).join(' <span class="dot">·</span> ');
   const ins = r0.pdic ? '<span class="badge ins" title="PDIC insures up to ₱1,000,000 per depositor, per bank, across all your accounts at that bank">PDIC ₱1M</span>' : r0.category === 'cex' || r0.category === 'dex' ? '<span class="badge noins">No insurance</span>' : '';
   return `<div class="prov-card${open ? ' open' : ''}" data-prov="${esc(k)}">
   <button class="prov-head" aria-expanded="${open}" aria-controls="${kid}">
-    <div class="prov"><div class="logo">${logo(r0)}</div><div class="prov-txt"><span class="prov-name">${esc(r0.provider)}</span><span class="prov-prod">${rs.length} products · tap to compare</span></div></div>
-    <div class="rate">${top ? '<small>best' + (top.upTo || top.tiers ? ' up to' : '') + '</small>' + pct2(net(top.rate, top)) + (bestEarn != null ? '<span class="prov-earn">' + (ok.some((r) => r.upTo) ? 'up to ' : '') + showMoney(bestEarn) + ' in 12 months</span>' : '') : '<span class="na">No current rate published</span>'}</div>
+    <div class="prov"><div class="logo">${logo(r0)}</div><div class="prov-txt"><span class="prov-name">${esc(r0.provider)}</span><span class="prov-prod">${rs.length} products</span></div></div>
+    <div class="rate">${top ? '<small>best' + (top.upTo || top.tiers ? ' up to' : '') + '</small>' + pct2(net(top.rate, top)) + (bestEarn != null ? '<small class="m-est">≈ ' + showMoney(bestEarn) + '*</small>' : '') : '<span class="na">Not published</span>'}</div>
+    <div class="c-est">${bestEarn != null ? (ok.some((r) => r.upTo) ? '<small>up to</small>' : '') + '≈ ' + showMoney(bestEarn) + '<sup>*</sup>' : '<small>—</small>'}</div>
     <div class="prov-sum">${bits} ${ins}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
@@ -315,13 +315,20 @@ function earnOf(r) {
   if (y == null || (r.minDeposit && (units(r, p) || 0) < r.minDeposit)) return null
   return p * (S.tax && taxable(r) ? y * (1 - TAX() / 100) : y) / 100
 }
+/* Round 6: Basic is a guided journey. Step 1 Finder, 2 Calculator + inflation, 3 Dollar round trip (pesos only), 4 See the full list. */
+const fxStep = () => S.tree.where === 'bank' && S.currency === 'PHP'
+function setStep(n, go) {
+  S.step = n; const b = document.body; b.dataset.step = n; b.dataset.fxstep = fxStep() ? 'on' : 'off'
+  const total = fxStep() ? 4 : 3
+  $$('[data-step-of]').forEach((el) => { let k = Number(el.dataset.stepOf); if (!fxStep() && k === 4) k = 3; el.textContent = 'Step ' + k + ' of ' + total + ' · ' })
+  const nb = $('#nextFromCalc'); if (nb) nb.textContent = fxStep() ? 'Next: what if you saved in dollars? →' : 'Next: see everything →'
+  if (go) { const el = $(go); if (el) { el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in'); setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60) } }
+}
 const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
 function renderRates() {
   const list = visibleRows();
   const sortKey = (r) => (r.rate == null ? -1 : ended(r) ? -0.5 : net(r.rate, r));
-  const headFor = (cat, history) => S.view === 'advanced'
-    ? `<div class="rate-columns${history ? ' has-trend' : ''}"><div class="row-main" aria-hidden="true"><div>Provider / Your year</div><div>${S.real && PH_CATS.includes(cat) ? 'Rate − CPI' : S.tax && PH_CATS.includes(cat) && cat !== 'government' ? 'Net rate' : 'Rate'}</div><div class="c-adv">Gross</div><div class="c-kind">Type</div><div class="c-cap">Cap</div><div class="c-adv">Access</div><div class="c-adv">Checked</div>${history ? '<div class="c-adv c-trend">Trend</div>' : ''}<div></div></div></div>`
-    : '';
+  const headFor = (cat) => `<div class="rate-columns"><div class="row-main" aria-hidden="true"><div>Provider</div><div>${S.real && PH_CATS.includes(cat) ? 'Rate − CPI' : S.tax && PH_CATS.includes(cat) && cat !== 'government' ? 'After tax' : 'Rate'}</div><div class="c-est">Your 12 months*</div><div class="c-cap">Cap</div><div class="c-acc">Access</div><div class="c-chk">Checked</div><div></div></div></div>`;
   let html = '';
   for (const cat of ORDER) {
     const sk = S.view === 'advanced' && SORTS[S.sort] ? SORTS[S.sort] : sortKey
@@ -333,7 +340,7 @@ function renderRates() {
     html += headFor(cat, TREND_GROUP) + groupByProvider(g).map(provHTML).join('');
     TREND_GROUP = false;
   }
-  $('#rates').innerHTML = html || '<p class="no-picks">No rates match these filters.</p>';
+  $('#rates').innerHTML = html ? '<p class="est-note">* What ' + showMoney(amountPesos()) + ' would earn in 12 months, after the 20% PH tax where it applies, if the rate stays the same.</p>' + html : '<p class="no-picks">No rates match these filters.</p>';
   const hidden = ROWS.filter((r) => r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin)).length;
   $('#ratesFoot').innerHTML = S.view === 'basic' && hidden ? `Basic view hides ${hidden} rows: VIP-only offers, tiny-cap teasers, and products that only show a rate inside their app. <a href="#" data-goadv>Switch to Advanced</a> to see them.` : '';
 }
@@ -505,6 +512,7 @@ function renderTree() {
   if (done) renderPicks();
 }
 function renderPicks() {
+  if (S.step) setStep(S.step);
   const T = S.tree, usd = S.currency === 'USD', amt = amountPesos();
   const show = showMoney;
   const pool = ROWS.filter((r) => {
@@ -549,8 +557,9 @@ function renderPicks() {
       <div class="actions">${cmpBtn(r)}<a class="btn" href="#yields" data-show="${esc(r.id)}">Fine print</a>${r.source ? `<a class="btn" href="${esc(r.source)}" target="_blank" rel="noopener">Official page ↗</a>` : ''}${p ? fnLink(p) : ''}</div>
     </article>`;
   }).join('');
+  S.topPick = top[0] ? top[0].r.id : null;
   $('#treeResult').innerHTML = `<div class="path">${path}</div><p class="rank-note">Ranked only by your answers and the rate after tax. Partners get no boost. This is a comparison, not advice.</p>${top.length ? `<div class="picks">${cards}</div>` : '<div class="no-picks">Nothing matches every choice. Try “Either is fine” or allow promos.</div>'}
-    <p class="rates-foot">Ranked by what your amount earns over the next 12 months${S.tax ? ' after tax' : ''}: caps applied, and promos count only until they end. Only rates we could check on an official page. Not financial advice.</p>`;
+    <p class="rates-foot">Ranked by what your amount earns over the next 12 months${S.tax ? ' after tax' : ''}: caps applied, and promos count only until they end. Only rates we could check on an official page. Not financial advice.</p>${top.length ? '<div class="step-next basic-only"><button type="button" class="btn gold" data-step-next="finder">Next: what would it earn? →</button></div>' : ''}`;
 }
 
 /* ── calculator ───────────────────────────── */
@@ -581,6 +590,7 @@ function calc() {
   $('#calcInflation').textContent = result && result.inflationLoss != null ? '−' + m(result.inflationLoss) : 'Not compared';
   $('#calcReal').textContent = m(result && result.realGain);
   $('#calcReal').className = result && result.realGain != null && result.realGain < 0 ? 'bad' : 'good';
+  { const v = $('#inflVerdict'), g = result && result.realGain; $('#calcInflRate').textContent = INFL() != null ? 'PH inflation ' + INFL() + '%' : ''; if (v) v.innerHTML = g == null ? '' : g >= 0 ? '<b class="good">✓ You beat inflation</b> Your money keeps about ' + m(g) + ' more buying power.' : '<b class="bad">✕ Inflation wins</b> You lose about ' + m(-g) + ' in buying power, even after interest.'; if (v) v.className = 'infl-verdict ' + (g == null ? '' : g >= 0 ? 'up' : 'down') }
   $('#calcRealNote').textContent = r && isPeso(r) ? `Buying power at ${INFL()}% PH inflation${S.currency === 'USD' ? ', for a PHP deposit shown in USD at the fixed reference rate' : ''}. ${Y > 1 ? 'Tax includes its compounding effect. ' : ''}Rates and inflation are scenarios, not forecasts.` : 'PH inflation is not a measure of dollar buying power. Crypto returns are not adjusted for tax or inflation.';
   let hint = '';
   if (r) {
@@ -702,8 +712,10 @@ function renderAmountCard() {
   countTo($('#amtEarn'), e == null ? 0 : e, (v) => (e == null ? '—' : showMoney(v)))
   $('#amtWhere').innerHTML = best ? (e == null ? 'Below the minimum deposit for ' + esc(best.provider) : esc(best.provider) + ' · ' + esc(best.product) + ', ' + pct2(net(best.rate, best)) + (S.tax && taxable(best) ? ' after tax' : isPeso(best) ? '' : ' APR · not insured')) : 'No current rate published'
 }
+const fmtAmount = (n) => Number(n || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+const parseAmount = (t) => { const v = Number(String(t).replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1')); return isFinite(v) && v > 0 ? v : 0 }
 function updateAmount() {
-  $('#sharedAmount').value = Number(S.amount.toFixed(6));
+  $('#sharedAmount').value = fmtAmount(S.amount);
   $('#sharedAmount').setAttribute('aria-label', 'Amount in ' + (S.currency === 'USD' ? 'US dollars' : 'pesos'));
   $$('[data-currency]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.currency === S.currency)));
   renderAll(); renderAmountCard(); if (DATA) sim();
@@ -754,7 +766,9 @@ function wire() {
     t.innerHTML = (open ? 'Hide links' : 'Show all ' + body.querySelectorAll('li').length + ' links') + ' <span aria-hidden="true">' + (open ? '▴' : '▾') + '</span>';
   });
   ['calcPick', 'calcYears'].forEach((i) => $('#' + i).addEventListener('input', calc));
-  $('#sharedAmount').addEventListener('input', e => { S.amount = Math.max(0, Number(e.target.value) || 0); renderAll(); if (DATA) sim(); });
+  $('#sharedAmount').addEventListener('input', e => { S.amount = parseAmount(e.target.value); renderAll(); if (DATA) sim(); });
+  $('#sharedAmount').addEventListener('change', e => { e.target.value = fmtAmount(S.amount); });
+  $('#sharedAmount').addEventListener('focus', e => e.target.select());
   $$('[data-currency]').forEach(b => b.addEventListener('click', () => {
     if (S.currency === b.dataset.currency || !DATA) return;
     const pesos = amountPesos(); S.currency = b.dataset.currency;
@@ -807,8 +821,17 @@ function ensureDefi() {
 async function init() {
   wireCmp();
   document.addEventListener('click', (e) => {
+    const nx = e.target.closest('[data-step-next]')
+    if (nx) {
+      const k = nx.dataset.stepNext
+      if (k === 'finder') { if (S.topPick && $('#calcPick')) { $('#calcPick').value = S.topPick; calc() } setStep(Math.max(S.step, 2), '#calculator'); return }
+      if (k === 'calc') { if (fxStep()) { const fa = $('#fxAmt'); if (fa) fa.value = Math.round(amountPesos()); renderFx(); setStep(Math.max(S.step, 3), '#fx-check') } else setStep(4, '#nextSteps'); return }
+      if (k === 'fx') { setStep(4, '#nextSteps'); return }
+    }
+    const it = e.target.closest('#calcInflToggle'); if (it) { $('#calculator').classList.toggle('no-infl', !it.checked); return }
+    const ra = e.target.closest('a[href="#yields"]'); if (ra && S.view === 'basic') { e.preventDefault(); setView('advanced'); setTimeout(() => $('#yields').scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60); return }
     const c = e.target.closest('[data-amt]'); if (c) { S.amount = Number(c.dataset.amt); updateAmount(); return }
-    const g = e.target.closest('[data-goadv]'); if (g && !e.target.closest('#ratesFoot')) { e.preventDefault(); setView('advanced'); $('#yields').scrollIntoView({ behavior: scrollMotion(), block: 'start' }); return }
+    const g = e.target.closest('[data-goadv]'); if (g && !e.target.closest('#ratesFoot')) { e.preventDefault(); setView('advanced'); const to = $(g.dataset.go || '#yields'); setTimeout(() => to && to.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60); return }
     const t = e.target.closest('[data-tool="compare"]'); if (t && !CMP.open) { e.preventDefault(); const tip = $('#advCmpTip'); tip.hidden = false; $('#rates').scrollIntoView({ behavior: scrollMotion(), block: 'start' }) }
   })
   const big = $('#amtBig'); if (big) big.addEventListener('input', () => { const v = Number(big.value); if (isFinite(v) && v >= 0) { S.amount = v; $('#sharedAmount').value = v; renderAll(); renderAmountCard(); if (DATA) sim() } })
@@ -820,7 +843,7 @@ async function init() {
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); renderAmountCard(); syncFilterUi(); fillFx(); renderFx();
+  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi(); fillFx(); renderFx(); setStep(1); $('#sharedAmount').value = fmtAmount(S.amount);
   const u = M.bestPlain(ROWS, TODAY_ISO);
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder (ccy=usd switches to dollars; where/access override), ?cmp=id,id opens Compare.

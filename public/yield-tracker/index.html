@@ -55,7 +55,7 @@
           <button type="button" data-currency="PHP" aria-pressed="true" aria-label="Philippine pesos">₱</button>
           <button type="button" data-currency="USD" aria-pressed="false" aria-label="US dollars">$</button>
         </div>
-        <input id="sharedAmount" type="number" value="100000" min="0" step="any" inputmode="decimal" aria-describedby="amountScope">
+        <input id="sharedAmount" type="text" value="100,000.00" inputmode="decimal" autocomplete="off" aria-describedby="amountScope">
       </div>
     </div>
     <p id="amountScope" class="amount-scope">One amount for rates, Finder and calculators.</p>
@@ -85,27 +85,6 @@
       <h2>Every rate, with its <span class="gold">fine print</span></h2>
       <p class="subtitle" id="ratesSub">Tap a row for the catches and the official source.</p>
     </div>
-    <div class="amt-card basic-only" id="amtCard">
-      <div class="amt-q">
-        <label for="amtBig">How much will you put in?</label>
-        <div class="amt-big"><span id="amtSym" aria-hidden="true">₱</span><input id="amtBig" type="number" inputmode="decimal" min="0" step="any" value="100000" aria-describedby="amtWhere"></div>
-        <div class="amt-chips" role="group" aria-label="Quick amounts" id="amtChips"></div>
-      </div>
-      <div class="amt-out" aria-live="polite">
-        <small>At the best plain rate today (highest after-tax standard rate with no minimum, no tasks, withdraw anytime), in 12 months</small>
-        <b id="amtEarn">—</b>
-        <span id="amtWhere"></span>
-        <span class="amt-hint">An estimate if the rate stays the same. Every rate below shows what this amount would earn in 12 months.</span>
-      </div>
-    </div>
-    <nav class="adv-tools adv-only" aria-label="Advanced tools">
-      <span class="adv-tools-label">Tools</span>
-      <a href="#rates">All rates</a><a href="#cmpPanel" data-tool="compare">Compare</a><a href="#calculator">Calculator</a><a href="#fx-check">Dollar round trip</a><a href="#inflation-check">Inflation check</a>
-      <label class="adv-sort">Sort by
-        <select id="sortBy"><option value="rate">Best rate</option><option value="earn">Most earned on your amount</option><option value="min">Lowest minimum</option><option value="checked">Most recently checked</option></select>
-      </label>
-    </nav>
-    <p class="adv-cmp-tip adv-only" id="advCmpTip" hidden>Tap <b>+ Compare</b> on two or three rates below, then press <b>Compare side by side</b>.</p>
 
     <div class="infl adv-only" id="inflPanel"></div>
 
@@ -163,7 +142,7 @@
 <section class="section" id="finder">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">Finder</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="1"></span>Finder</span>
       <h2>Answer a few taps. Get your <span class="gold">best fit</span>.</h2>
       <p class="subtitle">Each choice opens the next branch, like a skill tree. Change any earlier choice and your picks update.</p>
     </div>
@@ -176,7 +155,7 @@
 <section class="section" id="calculator">
   <div class="container">
     <div class="sec-head">
-      <span class="eyebrow">Calculator</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="2"></span>Calculator</span>
       <h2>What would it <span class="gold">earn</span>?</h2>
       <p class="subtitle">Caps are applied: money above a cap earns the rate after the cap.</p>
     </div>
@@ -207,6 +186,11 @@
           <div class="breakdown-item"><div class="breakdown-label">Per year</div><div class="breakdown-value" id="resYear">—</div></div>
           <div class="breakdown-item"><div class="breakdown-label">Blended rate</div><div class="breakdown-value" id="resRate">—</div></div>
         </div>
+        <div class="calc-infl-bar">
+          <label class="switch"><input type="checkbox" id="calcInflToggle" checked><span class="switch-ui" aria-hidden="true"></span><span>After inflation</span></label>
+          <span class="dim" id="calcInflRate"></span>
+        </div>
+        <div class="infl-verdict" id="inflVerdict" role="status" aria-live="polite"></div>
         <div class="calc-ledger" aria-label="From interest to real gain">
           <div><span>Interest earned</span><strong id="calcGross">—</strong></div>
           <div><span>Minus tax</span><strong id="calcTax">—</strong></div>
@@ -218,22 +202,15 @@
       </div>
     </div>
   </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="calc" id="nextFromCalc">Next →</button></div>
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
-<section class="section section-tight basic-only" id="moreTools">
-  <div class="container">
-    <div class="more-tools">
-      <div><b>Want to dig deeper?</b><span>Advanced view adds Compare with a best match, sorting, the peso to dollar round trip, and the inflation check.</span></div>
-      <button type="button" class="btn gold" data-goadv>Switch to Advanced</button>
-    </div>
-  </div>
-</section>
 
-<section class="section adv-only" id="fx-check">
+<section class="section" id="fx-check">
   <div class="container-wide">
     <div class="sec-head">
-      <span class="eyebrow">Dollar round trip</span>
+      <span class="eyebrow"><span class="step-tag basic-only" data-step-of="3"></span>Dollar round trip</span>
       <h2>Does a dollar account pay <span class="gold">after the exchange</span>?</h2>
       <p class="subtitle">Your bank sells you dollars at one rate and buys them back at a lower one. See how long the dollar interest takes to cover that gap.</p>
     </div>
@@ -247,6 +224,7 @@
     </div>
     <details class="fx-board-wrap"><summary>Every bank's dollar buying and selling rate</summary><div class="cmp-scroll" id="fxBoard"></div></details>
   </div>
+  <div class="container step-next basic-only"><button type="button" class="btn gold" data-step-next="fx">Next: see everything →</button></div>
 </section>
 
 <section class="section adv-only" id="inflation-check">
@@ -279,6 +257,17 @@
         <p class="sim-verdict" id="simVerdict" role="status" aria-live="polite"></p>
         <p class="sim-note">Real gain measures PHP buying power, shown in your selected currency at the fixed BSP reference rate. Caps, promo periods and published base rates apply; inflation is held constant and interest compounds annually. A comparison, not advice.</p>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="section basic-only" id="nextSteps">
+  <div class="container">
+    <div class="next-card">
+      <span class="eyebrow"><span class="step-tag" data-step-of="4"></span>Your next step</span>
+      <h2>Want more <span class="gold">analytics</span>?</h2>
+      <p>See every rate we track: digital banks, e-wallets, government, crypto exchanges and DeFi, plus Compare and the inflation check.</p>
+      <div class="next-btns"><button type="button" class="btn gold" data-goadv data-go="#yields">See the full list</button><button type="button" class="btn" data-goadv data-go="#inflation-check">More analytics</button></div>
     </div>
   </div>
 </section>
