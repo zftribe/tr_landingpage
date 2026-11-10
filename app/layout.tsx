@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { DM_Sans, Plus_Jakarta_Sans } from 'next/font/google'
 import './legacy.css'
 import './programs.css'
+import './motion.css'
 import { DESCRIPTION, SITE_NAME, SITE_URL, TITLE } from '@/lib/seo'
 
 // Self-hosted at build time with size-matched fallbacks, so the hero no longer
