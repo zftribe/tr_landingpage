@@ -117,6 +117,10 @@
 .pc-top .program-tag { white-space: normal; text-align: right; }
 @media (max-width: 380px) { .pc-logo { width: 32px; height: 32px; } .pc-logo img { width: 22px; height: 22px; } .pc-logo img[src$=".svg"] { width: 32px; height: 32px; } .pc-coin { width: 24px; height: 24px; font-size: 9px; } }
 
+/* LP Masterclass (9 Nov): "Includes the LP Masterclass" note on WEB3 cards; disabled Buy on a preview placeholder. */
+.pc-includes li.pc-incl-note { color: var(--gold); font-size: 12px; }
+.pc-includes li.pc-incl-note::before { content: "+"; }
+.pc-soon { opacity: .55; cursor: default; pointer-events: none; }
 /* Trader-or-investor assessment (George's picks, 10 Nov): replaces the two-question quiz. */
 .as-card { display: grid; grid-template-columns: 1.15fr .85fr; gap: 32px; align-items: center; margin-bottom: 40px; padding: 30px; border-radius: 20px; border: 1px solid rgba(249,168,37,.35); background: linear-gradient(180deg, rgba(249,168,37,.06), rgba(255,255,255,.02)); }
 .as-card-title { font-family: var(--font-display); color: var(--white); font-size: 26px; line-height: 1.25; margin: 6px 0 0; }
