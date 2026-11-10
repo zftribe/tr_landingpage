@@ -11,10 +11,12 @@ const DAY = 864e5;
 const daysBetween = (a, b) => Math.round((b - a) / DAY);
 const PH_CATS = ['traditional', 'digital', 'ewallet', 'government'];
 const CAT_LABEL = { traditional: 'Banks', digital: 'Digital banks', ewallet: 'E-wallets', government: 'Government', cex: 'Crypto exchanges', dex: 'DeFi · Kamino + Jupiter (live)' };
+const FN = (id) => '<a class="fn-ref" href="#fn-' + id + '" aria-label="Read the note">*</a>'
+document.addEventListener('click', (e) => { const a = e.target.closest && e.target.closest('a.fn-ref'); if (!a) return; const t = document.querySelector(a.getAttribute('href')); if (!t) return; e.preventDefault(); const d = t.closest('details'); if (d) d.open = true; t.classList.remove('fn-hi'); void t.offsetWidth; t.classList.add('fn-hi'); t.scrollIntoView({ behavior: scrollMotion(), block: 'center' }) })
 const CAT_NOTE = {
-  cex: 'Paid in the coin you deposit. Not a bank deposit and not PDIC-insured. Rates change often, sometimes daily. Rules differ by country: check with your local regulator (in the Philippines, the SEC) that an exchange is allowed where you live. Adults (18+) only.',
-  dex: 'Kamino (its lending markets and curated vaults) and Jupiter Lend on Solana. USDT, USDC and USDG only, pools over $2M. Live from DefiLlama, so rates move every hour. Curated vaults are run by outside managers, not Kamino or us. Smart-contract risk: you could lose some or all of your money. No insurance and no support desk. Adults (18+) only.',
-  government: 'Not a bank deposit and not PDIC-insured. The rate is last year’s dividend (7.12% for 2025), not a promise. Money is locked for 5 years. Tax-free.',
+  cex: 'Paid in the coin you deposit · Rates change often · Not insured' + FN('crypto') + ' · Rules differ by country' + FN('crypto'),
+  dex: 'Kamino and Jupiter Lend on Solana · Live rates, they move every hour · Not insured' + FN('defi') + ' · Smart-contract risk' + FN('defi'),
+  government: 'Last year’s dividend, not a promise · Locked for 5 years · Tax-free · Not PDIC-insured' + FN('mp2'),
 };
 const ORDER = ['digital', 'ewallet', 'traditional', 'government', 'cex', 'dex'];
 const LOGOS = { gcash: 'gcash', maribank: 'maribank', gotyme: 'gotyme', maya: 'maya', cimb: 'cimb', ownbank: 'ownbank', uniondigital: 'uniondigital', 'uno ': 'uno', tonik: 'tonik', ofbank: 'ofbank', 'overseas filipino': 'ofbank', netbank: 'netbank', komo: 'komo', diskartech: 'diskartech', bpi: 'bpi', metrobank: 'metrobank', rcbc: 'rcbc', 'security bank': 'securitybank', landbank: 'landbank', dbp: 'dbp', 'development bank': 'dbp', pnb: 'pnb', 'philippine national': 'pnb', psbank: 'psbank', bdo: 'bdo', eastwest: 'eastwest', unionbank: 'unionbank', aub: 'aub', 'asia united': 'aub', 'china bank': 'chinabank', 'pag-ibig': 'pagibig', okx: 'okx', bybit: 'bybit', bitget: 'bitget', mexc: 'mexc', gate: 'gate', kamino: 'kamino', jupiter: 'jupiter' };
@@ -77,14 +79,8 @@ function renderInfl() {
   const peso = ROWS.filter((r) => rankable(r) && isPeso(r) && !ended(r));
   const beat = peso.filter((r) => realYield(r) >= 0);
   const beatSteady = beat.filter((r) => r.kind !== 'promo' && !r.strings && !locked(r));
-  const h = (i.history || []).slice(-24);
-  el.classList.toggle('infl-slim', INFL_MODE === 'a');
-  if (INFL_MODE === 'a') { el.innerHTML = `<span class="infl-n">${i.value}%</span><span>PH inflation, ${esc(i.label || i.month)} (<a href="${esc(i.source)}" target="_blank" rel="noopener" style="margin:0">BSP</a>)</span><span class="sep">·</span><span><b>${beat.length} of ${peso.length}</b> peso rates beat it after tax${beatSteady.length ? '' : ', none without a promo, task or lock-up'}</span><span class="sep">·</span><span>Each row shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span></span><a href="#inflation-check">Run the inflation check</a>`; return }
-  el.innerHTML = `<div class="infl-head"><div><span class="eyebrow">For savers in the Philippines</span><h3>Have you beaten inflation?</h3>
-      <p>Prices rose <b>${i.value}%</b> in the year to ${esc(i.label || i.month)}. To keep your buying power, your rate <b>after tax</b> has to be at least that.
-      <b>${beat.length} of ${peso.length}</b> peso rate${peso.length === 1 ? "" : "s"} ${beat.length === 1 ? "does" : "do"} it today${beatSteady.length ? `, and only ${beatSteady.length} without a promo, task or lock-up` : ', and none without a promo, task or lock-up'}.</p></div>
-    <div class="infl-chart"><div class="infl-now"><b>${i.value}%</b><small>PH inflation, ${esc(i.label || i.month)}</small></div>${inflSpark(h)}<small class="infl-src">Last 24 months · Source: <a href="${esc(i.source)}" target="_blank" rel="noopener">BSP</a> (CPI ${esc(i.base || '')}) · checked ${fmtDate(i.checkedOn)}</small></div></div>
-    <p class="infl-foot">Real yield = rate after tax − inflation. Each peso rate below shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span>. Crypto is paid in dollars, so it isn't compared. This is a comparison, not advice; past inflation doesn't predict future inflation.</p>`;
+  el.classList.add('infl-slim');
+  { el.innerHTML = `<span class="infl-n">${i.value}%</span><span>PH inflation, ${esc(i.label || i.month)} (<a href="${esc(i.source)}" target="_blank" rel="noopener" style="margin:0">BSP</a>)</span><span class="sep">·</span><span><b>${beat.length} of ${peso.length}</b> peso rates beat it after tax${beatSteady.length ? '' : ', none without a promo, task or lock-up'}</span><span class="sep">·</span><span>Each row shows <span class="badge std">Beats inflation ✓</span> or <span class="badge stale">Below inflation</span></span><a href="#inflation-check">Run the inflation check</a>`; return }
 }
 /* ── "Have you beaten inflation?" simulator (Basic + Advanced) ── */
 function simRows() { return ROWS.filter((r) => rankable(r) && isPeso(r) && !locked(r) || (rankable(r) && r.category === 'government')).sort((a, b) => b.rate - a.rate); }
@@ -165,7 +161,7 @@ const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, 
 // Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
 const fnLink = (p) => p.code
   ? `<span class="ref-code"><span class="ref-lbl">Referral code</span><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="ref-how">${esc(p.codeHow || 'Enter this referral code when you sign up.')}</span>`
-  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a>${p.kind === 'bank' ? '' : '<span class="ref-how">Adults (18+) only</span>'}`;
+  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a><span class="ref-how">We may earn a commission' + FN('partner') + '</span>`;
 function renderFootnotes() {
   const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
@@ -179,7 +175,7 @@ function renderFootnotes() {
     <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
     <div class="fn-cols" id="fnBody" hidden>
       <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
-      <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. Where a fee rebate or discount applies, it is named next to the exchange; check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
+      <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. Where a fee rebate or discount applies, it is named next to the exchange; check the offer's terms and availability. Trading involves risk; this is education, not advice. Accounts are for adults (18 and over).</p></div>
     </div>`;
 }
 function spark(h) {
@@ -323,12 +319,10 @@ function earnOf(r) {
   return p * (S.tax && taxable(r) ? y * (1 - TAX() / 100) : y) / 100
 }
 /* Round 6: Basic is a guided journey. Step 1 Finder, 2 Calculator + inflation, 3 Dollar round trip (pesos only), 4 See the full list. */
-const INFL_MODE = new URLSearchParams(location.search).get('infl') === 'b' ? 'b' : 'a'
-document.body.dataset.infl = INFL_MODE
 const journey = () => {
   const seq = ['#finder', '#calculator']
   if (S.currency === 'USD' && S.tree.where === 'bank') seq.push('#fx-check') // dollars kept at a bank: the exchange round trip
-  else if (S.currency === 'PHP' && INFL_MODE === 'a') seq.push('#inflation-check') // pesos: have you beaten inflation?
+  else if (S.currency === 'PHP') seq.push('#inflation-check') // pesos: have you beaten inflation?
   seq.push('#nextSteps'); return seq
 }
 const STEP_LABEL = { '#finder': 'Finder', '#calculator': 'What would it earn?', '#fx-check': 'Dollar round trip', '#inflation-check': 'Have you beaten inflation?', '#nextSteps': 'More analytics' }
@@ -509,7 +503,7 @@ function renderFx() {
     '<p class="fx-verdict ' + (x.net >= 0 ? 'up' : 'down') + '">' + (isFinite(x.be) ? 'You need ' + beText(x.be) + ' of interest just to cover the exchange spread. ' : 'At this rate the interest never covers the exchange spread. ') +
     'Holding ' + months + ' months: ' + (x.net >= 0 ? 'about <b>' + money(x.net) + ' net gain</b>.' : 'you\'d lose about <b>' + money(-x.net) + ' net</b>.') + '</p>' +
     '<ul class="fx-ladder" aria-label="Net result by holding time">' + ladder + '</ul>' +
-    '<p class="fx-note">' + esc(r.provider) + ' sells dollars at ₱' + r.fxSell.toFixed(2) + ' and buys them back at ₱' + r.fxBuy.toFixed(2) + ' (' + esc(r.fxBasis || 'board rate') + ', checked ' + fmtDate(r.fxAsOf) + (r.fxSource ? ', <a href="' + esc(r.fxSource) + '" target="_blank" rel="noopener">official page ↗</a>' : '') + '). <b>This assumes the exchange rate itself does not move.</b> If the peso weakens you gain more; if it strengthens you can lose more. It is not a forecast. Simple interest, 20% PH tax taken off the dollar interest.</p>';
+    '<p class="fx-note">' + esc(r.provider) + ' sells dollars at ₱' + r.fxSell.toFixed(2) + ' and buys them back at ₱' + r.fxBuy.toFixed(2) + ' (' + esc(r.fxBasis || 'board rate') + ', checked ' + fmtDate(r.fxAsOf) + (r.fxSource ? ', <a href="' + esc(r.fxSource) + '" target="_blank" rel="noopener">official page ↗</a>' : '') + '). Assumes the exchange rate stays the same' + FN('fx') + '</p>';
 }
 function fillFx() {
   const sel = $('#fxPick'); if (!sel) return;
@@ -690,7 +684,7 @@ function renderPicks() {
       <div class="pick-rank"><span>${ranks[i]}</span><span class="pick-choice basic-only">${on ? '✓ Your choice' : 'Choose this'}</span></div>
       <div class="pick-head"><div class="logo">${logo(r)}</div><div><div class="pick-prov">${esc(r.provider)}</div><div class="pick-prod">${esc(r.product)}</div></div></div>
       <div class="pick-rate">${r.upTo && !r.tiers ? "<small>up to</small> " : ""}${pct2(x.n)} <small>${S.tax && taxable(r) ? 'after tax' : r.taxExempt ? 'tax-free' : isPeso(r) ? 'p.a.' : esc(r.rateBasis || 'APR')}${x.b !== r.rate ? ' blended' : ''}</small></div>
-      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months if the rate stays the same${r.kind === 'promo' ? ` <span class="tag">(${r.promoEnds ? 'ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'first ' + r.promoDays + ' days' : 'modeled for year 1 only'}, then ${base ? pct2(net(base.rate, r)) : 'base not published'}; ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. No tax adjustment. Stablecoins modeled at US$1${usd ? '' : `, converted at BSP ₱${FX()}/US$1`}. Future FX changes excluded. Not insured.${r.category === 'dex' ? ' Smart-contract risk: you could lose some or all of it. Adults (18+) only.' : ''}</div>` : ''}
+      <div class="pick-earn">On ${show(amt)}: about <b>${show(yr)}</b> over the next 12 months if the rate stays the same${r.kind === 'promo' ? ` <span class="tag">(${r.promoEnds ? 'ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'first ' + r.promoDays + ' days' : 'modeled for year 1 only'}, then ${base ? pct2(net(base.rate, r)) : 'base not published'}; ${pct2(x.ny)} over the year)</span>` : ''}</div>${r.category === 'cex' || r.category === 'dex' ? `<div class="why">Paid in ${esc(r.currency)}. No tax adjustment. Stablecoins modeled at US$1${usd ? '' : `, converted at BSP ₱${FX()}/US$1`}. Future FX changes excluded. Not insured${FN(r.category === 'dex' ? 'defi' : 'crypto')}${r.category === 'dex' ? ' · Smart-contract risk' + FN('defi') : ''}</div>` : ''}
       <div class="why">${esc(why)}</div>
       <div>${kindBadge(r)} ${stale(r) ? '<span class="badge stale">Needs re-check</span>' : ''} ${inflBadge(r)}</div>${S.view === 'advanced' && realYield(r) != null ? `<div class="why">Real yield ${realYield(r) >= 0 ? '+' : ''}${pct2(realYield(r))} after tax and ${INFL()}% inflation.</div>` : ''}
       ${isUsdBank(r) && usd ? (() => { const q = roundTrip(r, amt, 12); return q ? `<div class="why fx-why">Starting with pesos? The exchange round trip here costs about ${money(q.cost)} (${q.costPct.toFixed(2)}%). Break-even: ${beText(q.be)}. <a href="#fx-check" data-fx="${esc(r.id)}">Check it</a></div>` : `<div class="why fx-why">We could not find this bank's published exchange rate. Ask for it before converting pesos.</div>`; })() : ''}
@@ -734,7 +728,7 @@ function calc() {
   $('#calcReal').textContent = m(result && result.realGain);
   $('#calcReal').className = result && result.realGain != null && result.realGain < 0 ? 'bad' : 'good';
   { const v = $('#inflVerdict'), g = result && result.realGain; $('#calcInflRate').textContent = INFL() != null ? 'PH inflation ' + INFL() + '%' : ''; if (v) v.innerHTML = g == null ? '' : g >= 0 ? '<b class="good">✓ You beat inflation</b> Your money keeps about ' + m(g) + ' more buying power.' : '<b class="bad">✕ Inflation wins</b> You lose about ' + m(-g) + ' in buying power, even after interest.'; if (v) v.className = 'infl-verdict ' + (g == null ? '' : g >= 0 ? 'up' : 'down') }
-  $('#calcRealNote').textContent = r && isPeso(r) ? `Buying power at ${INFL()}% PH inflation${S.currency === 'USD' ? ', for a PHP deposit shown in USD at the fixed reference rate' : ''}. ${Y > 1 ? 'Tax includes its compounding effect. ' : ''}Rates and inflation are scenarios, not forecasts.` : 'PH inflation is not a measure of dollar buying power. Crypto returns are not adjusted for tax or inflation.';
+  $('#calcRealNote').innerHTML = r && isPeso(r) ? 'Buying power at ' + INFL() + '% PH inflation. A scenario, not a forecast' + FN('method') : 'PH inflation is not a measure of dollar buying power. Crypto is not adjusted for tax or inflation' + FN('method');
   let hint = '';
   if (r) {
     if (r.kind === 'promo') { const base = M.baseProduct(r, ROWS); hint += `${r.promoEnds ? 'Promo ends ' + fmtDate(r.promoEnds) : r.promoDays ? 'Promo lasts ' + r.promoDays + ' days' : 'No published end date: boost modeled for year 1 only'}, then ${base ? pct(base.rate) : 'base rate not published'}. `; }
@@ -746,7 +740,7 @@ function calc() {
     if (!result && minMet) hint += 'A required rate is unpublished; a complete estimate is unavailable. ';
   }
   $('#calcHint').innerHTML = esc(hint) + (r && r.source ? ` <a href="${esc(r.source)}" target="_blank" rel="noopener">Official source ↗</a>` : '');
-  $('#calcNote').textContent = 'Interest compounds annually in this estimate. Caps and tiers are applied each year; actual crediting schedules differ. A promo ends at its published date or duration; undated boosts are limited to year 1.';
+  $('#calcNote').innerHTML = 'How we calculate' + FN('method');
 }
 
 /* ── header, rules ────────────────────────── */
