@@ -22,6 +22,7 @@ const LOGOS = { gcash: 'gcash', maribank: 'maribank', gotyme: 'gotyme', maya: 'm
 const DEFI = { projects: { 'kamino-lend': ['Kamino', 'https://app.kamino.finance/'], 'jupiter-lend': ['Jupiter', 'https://jup.ag/lend'] }, symbols: ['USDT', 'USDC', 'USDG'], minTvl: 2e6 };
 
 let DATA = null, ROWS = [];
+let TREND_GROUP = false; // Trend column only for groups with 2+ real snapshots
 const S = {
   view: 'basic', tax: true, real: false, currency: 'PHP', amount: 100000,
   f: { cat: 'all', kind: 'all', cap: 'all', lock: 'all' }, q: '',
@@ -46,7 +47,8 @@ function units(r, pesos) { return M.units(r, pesos, FX()); }
 const amountPesos = () => M.toPesos(S.amount, S.currency, FX());
 const showMoney = pesos => {
   const n = M.fromPesos(pesos, S.currency, FX());
-  return n == null ? 'Not available' : (n < 0 ? '−' : '') + (S.currency === 'USD' ? '$' : '₱') + Math.abs(n).toLocaleString('en-PH', { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  const usd = S.currency === 'USD', d = usd ? 2 : 0;
+  return n == null ? 'Not available' : (n < 0 ? '−' : '') + (usd ? '$' : '₱') + Math.abs(n).toLocaleString('en-PH', { maximumFractionDigits: d, minimumFractionDigits: d });
 };
 const scrollMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth';
 // "Have you beaten inflation?" (Advanced view, peso savers in the Philippines)
@@ -148,6 +150,8 @@ function partner(r) {
   return null;
 }
 // Partner/referral links live in the footer footnotes; rows and picks only link down to them.
+// Approved referral wording only. Bitget has no approved wording, so it shows none.
+const REBATE = { OKX: '20% trading-fee rebate (referral)', MEXC: '20% trading-fee rebate (referral)', Gate: '20% trading-fee rebate (referral)', Bybit: '15% trading-fee discount (referral)', Binance: '5% trading-fee rebate (referral)' };
 const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-');
 // Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
 const fnLink = (p) => p.code
@@ -158,7 +162,7 @@ function renderFootnotes() {
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
   const item = (p) => `<li id="${fnId(p)}"><span class="fn-name">${esc(p.label || p.name)}</span>${p.code
       ? `<span class="fn-code"><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="fn-how">${esc(p.codeHow || '')} <a href="${esc(p.url)}" target="_blank" rel="noopener">Official site ↗</a></span>`
-      : `<a class="fn-url" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a> <small class="fn-dom">${esc(new URL(p.url).hostname.replace(/^www\./, ''))}</small>`}</li>`;
+      : `<a class="fn-url" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a> <small class="fn-dom">${esc(new URL(p.url).hostname.replace(/^www\./, ''))}</small>${REBATE[p.name] ? `<span class="fn-how">${REBATE[p.name]}</span>` : ''}`}</li>`;
   const banks = list.filter((p) => p.kind === 'bank'), ex = list.filter((p) => p.kind !== 'bank');
   // Collapsed by default (George, 9 Nov); the heading and disclosure line always stay visible.
   el.innerHTML = `<div class="fn-head"><h3 class="fn-title">Partner &amp; referral links</h3>
@@ -166,7 +170,7 @@ function renderFootnotes() {
     <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
     <div class="fn-cols" id="fnBody" hidden>
       <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
-      <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. An eligible sign-up may qualify for the partner's stated fee rebate. Check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
+      <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. Where a fee rebate or discount applies, it is named next to the exchange; check the offer's terms and availability. Trading involves risk; this is education, not advice. Adults (18+) only.</p></div>
     </div>`;
 }
 function spark(h) {
@@ -219,7 +223,7 @@ function rowHTML(r) {
   const estimate = unavailable ? null : yearRate(r, amountPesos());
   const minMet = !r.minDeposit || (units(r, amountPesos()) || 0) >= r.minDeposit;
   const earn = estimate == null || !minMet ? null : amountPesos() * (S.tax && taxable(r) ? estimate * (1 - TAX() / 100) : estimate) / 100;
-  const ry = !unavailable && isPeso(r) ? realYield(r) : null;
+  const ry = !unavailable && isPeso(r) && S.view === 'advanced' ? realYield(r) : null;
   const earning = !minMet ? 'Below the minimum deposit' : earn == null ? 'Annual estimate unavailable' : `${r.upTo ? 'Up to ' : ''}${showMoney(earn)} / year${S.tax && taxable(r) ? ' after tax' : ''}`;
   const rateCell = unavailable
     ? `<div class="rate na">No current rate published${ended(r) ? '<small>Promo ended ' + fmtDate(r.promoEnds) + '</small>' : ''}</div>`
@@ -241,7 +245,7 @@ function rowHTML(r) {
     ['Insurance', r.pdic ? 'PDIC member bank: up to ₱1,000,000 per depositor, per bank, counting all your accounts at that bank together' : r.category === 'government' ? 'Not PDIC; backed by the agency' : 'None. Not a bank deposit'],
     ['Checked', `${fmtDate(r.checkedOn)}${stale(r) ? ' (older than our schedule)' : ''}`],
   ].filter(Boolean).map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('');
-  return `<div class="row${(r.history || []).length >= 2 ? ' has-trend' : ''}${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
+  return `<div class="row${TREND_GROUP ? ' has-trend' : ''}${S.open.has(r.id) ? ' open' : ''}${ended(r) ? ' is-ended' : ''}" data-id="${id}">
   <button class="row-main" aria-expanded="${S.open.has(r.id)}" aria-controls="m-${id}">
     <div class="prov"><div class="logo">${logo(r)}</div><div class="prov-txt"><span class="prov-name">${esc(r.provider)}</span><span class="prov-prod">${esc(r.product)}</span><span class="row-earn">${earning}</span>${ry != null ? `<span class="row-earn ${ry < 0 ? 'bad' : 'good'}">${ry >= 0 ? '+' : ''}${pct2(ry)} vs ${INFL()}% PH inflation</span>` : ''}</div></div>
     ${rateCell}
@@ -250,7 +254,7 @@ function rowHTML(r) {
     <div class="c-cap cell-s">${capText(r)}</div>
     <div class="adv-only c-adv cell-s">${esc(locked(r) ? r.lockup : 'Anytime')}<small>${ins.replace(/<[^>]+>/g, '')}</small></div>
     <div class="adv-only c-adv cell-s">${fmtDate(r.checkedOn)}<small>${stale(r) ? '<span style="color:var(--red)">re-check due</span>' : 'on schedule'}</small></div>
-    ${(r.history || []).length >= 2 ? `<div class="adv-only c-adv c-trend">${spark(r.history)}</div>` : ''}
+    ${TREND_GROUP ? `<div class="adv-only c-adv c-trend">${spark(r.history)}</div>` : ''}
     <div class="c-badges">${kindBadge(r)} ${capped(r) ? '<span class="badge cap">Capped</span>' : ''} ${ins} ${st} ${inflBadge(r)}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
@@ -310,7 +314,9 @@ function renderRates() {
     if (!g.length) continue;
     { const np = new Set(g.map((r) => r.provider)).size; html += `<div class="rgroup-title">${CAT_LABEL[cat]} <span>${np} provider${np > 1 ? 's' : ''} · ${g.length} rate${g.length > 1 ? 's' : ''}</span></div>`; }
     if (CAT_NOTE[cat]) html += `<p class="rgroup-note">${CAT_NOTE[cat]}</p>`;
-    html += headFor(cat, g.some(r => (r.history || []).length >= 2)) + groupByProvider(g).map(provHTML).join('');
+    TREND_GROUP = g.some(r => (r.history || []).length >= 2);
+    html += headFor(cat, TREND_GROUP) + groupByProvider(g).map(provHTML).join('');
+    TREND_GROUP = false;
   }
   $('#rates').innerHTML = html || '<p class="no-picks">No rates match these filters.</p>';
   const hidden = ROWS.filter((r) => r.rate == null || r.teaser || r.vipOnly || (r.category === 'cex' && !r.stablecoin)).length;
@@ -459,7 +465,13 @@ function renderStats() {
   };
   $('#statsRow').innerHTML = card(plain, 'Best today · plain peso savings', true) + card(promo, 'Best peso promo · conditions apply', false) + card(usd, 'Best USD · standard stablecoin rate', false);
   const ph = DATA.checked && DATA.checked.ph, cx = DATA.checked && DATA.checked.crypto;
-  $('#verifyChecked').textContent = `Peso rates checked ${fmtDate(ph)} · Crypto checked ${fmtDate(cx)} · Sources on every row`;
+  // Next scheduled checks: peso rates on the 28th, crypto on the 1st and 15th (Manila calendar date).
+  const t = new Date(TODAY), nextPh = new Date(t), nextCx = new Date(t);
+  if (t.getUTCDate() >= 28) nextPh.setUTCMonth(t.getUTCMonth() + 1, 28); else nextPh.setUTCDate(28);
+  if (t.getUTCDate() < 15) nextCx.setUTCDate(15); else nextCx.setUTCMonth(t.getUTCMonth() + 1, 1);
+  const dm = (d) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const late = (iso, days) => iso && daysBetween(new Date(iso), TODAY) > days;
+  $('#verifyChecked').innerHTML = `<span class="vc">Peso rates checked <b>${fmtDate(ph)}</b></span><span class="vsep"> · </span><span class="vc">crypto <b>${fmtDate(cx)}</b></span><span class="vsep"> · </span><span class="vc">next checks: pesos ${dm(nextPh)}, crypto ${dm(nextCx)}</span>${late(ph, 35) || late(cx, 16) ? '<span class="vsep"> · </span><span class="vc verify-late">a re-check is overdue</span>' : ''}`;
 }
 function renderRules() {
   const R = DATA.rules || {};
@@ -575,7 +587,8 @@ function wire() {
   $$('[data-currency]').forEach(b => b.addEventListener('click', () => {
     if (S.currency === b.dataset.currency || !DATA) return;
     const pesos = amountPesos(); S.currency = b.dataset.currency;
-    S.amount = M.fromPesos(pesos, S.currency, FX()); updateAmount();
+    const d = S.currency === 'USD' ? 100 : 1; // show cents for dollars, whole pesos
+    S.amount = Math.round(M.fromPesos(pesos, S.currency, FX()) * d) / d; updateAmount();
   }));
 }
 async function loadDefi() {

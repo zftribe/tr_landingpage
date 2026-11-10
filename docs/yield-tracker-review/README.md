@@ -33,3 +33,9 @@ Before images show the committed baseline, served from Git in memory without a s
 Hosted preview: https://tr-landingpage-h09ls37mg-tr-lms-vercel.vercel.app/yield-tracker/index.html
 
 Hosted captures: [desktop](vercel-desktop.png), [phone rates](vercel-phone-rates.png).
+
+## Polish pass (10 Nov 2026): original look restored
+
+George asked to keep the tracker's original look. The Cormorant Garamond restyle is reverted to the original stylesheet (Plus Jakarta Sans display, DM Sans body, gold #F9A825, rounded dark cards, centred hero with "Where should your money earn?"). All functional fixes from this PR stay. The new parts (best-today cards, shared ₱/$ amount, calculator ledger, phone nav and bottom bar) are drawn in the original style. The freshness line is a small gold stamp instead of the green seal.
+
+Fixes in the same pass: the Advanced Trend column is decided per rate group, so header and row columns stay aligned; peso amounts show whole pesos and dollar amounts show cents (switching ₱→$ no longer shows 1583.706824); the per-row "vs inflation" line is Advanced-only, as in the original; partner footnotes use only the approved referral wording (OKX, MEXC, Gate: 20% trading-fee rebate; Bybit: 15% trading-fee discount; none for Bitget), and the generic note no longer implies a Bitget rebate; the phone controls bar wraps instead of widening the page.
