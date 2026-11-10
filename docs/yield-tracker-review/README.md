@@ -32,4 +32,4 @@ Before images show the committed baseline, served from Git in memory without a s
 
 Hosted preview: https://tr-landingpage-h09ls37mg-tr-lms-vercel.vercel.app/yield-tracker/index.html
 
-Hosted captures: [desktop](vercel-desktop.png), [phone hero](vercel-phone-hero.png), [phone rates](vercel-phone-rates.png).
+Hosted captures: [desktop](vercel-desktop.png), [phone rates](vercel-phone-rates.png).
