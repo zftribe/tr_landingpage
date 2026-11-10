@@ -161,7 +161,7 @@ const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, 
 // Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
 const fnLink = (p) => p.code
   ? `<span class="ref-code"><span class="ref-lbl">Referral code</span><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="ref-how">${esc(p.codeHow || 'Enter this referral code when you sign up.')}</span>`
-  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a><span class="ref-how">We may earn a commission' + FN('partner') + '</span>`;
+  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a><span class="ref-how">We may earn a commission${FN('partner')}</span>`;
 function renderFootnotes() {
   const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
