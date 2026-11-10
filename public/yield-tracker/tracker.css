@@ -722,3 +722,33 @@ body[data-view=basic] #nextSteps { order: 4; }
   #inflation-check .sim-fields .sf:nth-child(3), #inflation-check .sim-fields .switch { grid-column: 1 / -1; }
 }
 @media (max-width: 720px) { #inflation-check .sim-explain, #inflation-check .sim-box { padding: 16px; } }
+
+/* ── Round 8 (George picked C): progress strip, welcome back, result card ── */
+.jr-strip { position: sticky; z-index: 48; background: rgba(12,12,14,.96); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(249,168,37,.35); }
+.jr-in { max-width: 1320px; margin: 0 auto; padding: 9px max(16px, env(safe-area-inset-left, 0px)); display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; font-size: .86rem; }
+.jr-in > b { font: 800 .74rem/1 var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--gold); }
+.jr-in > span#jrLabel { color: var(--white); font-weight: 600; }
+.jr-dots { display: flex; gap: 6px; } .jr-dots i { width: 24px; height: 6px; border-radius: 9px; background: rgba(255,255,255,.12); transition: background .3s; } .jr-dots i.on { background: var(--gold); }
+.jr-btns { margin-left: auto; display: flex; gap: 8px; }
+.jr-btn { font: 600 .8rem/1 var(--font-body); padding: 8px 12px; border-radius: 100px; border: 1px solid var(--border-2); background: transparent; color: var(--white); cursor: pointer; min-height: 34px; }
+.jr-btn.gold { border-color: var(--gold); color: var(--gold); }
+.jr-btn:hover { border-color: var(--gold); }
+body[data-view=advanced] .jr-strip { display: none; }
+.jr-welcome { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin: 0 auto 26px; max-width: 900px; padding: 16px 20px; border-radius: var(--radius); border: 1px solid rgba(34,197,94,.45); background: linear-gradient(180deg, rgba(34,197,94,.08), transparent), var(--bg-card); }
+.jr-welcome b { display: block; color: var(--white); font-family: var(--font-display); }
+.jr-welcome span { color: var(--text-dim); font-size: .88rem; }
+.jr-welcome-act { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+body[data-view=advanced] .jr-welcome { display: none; }
+.jr-card:empty { display: none; }
+.jr-card-in { max-width: 560px; margin: 0 auto 22px; padding: 24px; border-radius: 20px; border: 1px solid rgba(249,168,37,.55); background: radial-gradient(120% 80% at 0 0, rgba(249,168,37,.14), transparent 60%), var(--bg-card); animation: stepIn .5s ease both; }
+.jr-card-top { display: flex; justify-content: space-between; font: 800 .74rem/1 var(--font-display); letter-spacing: .14em; text-transform: uppercase; color: var(--gold); }
+.jr-card-in h3 { font: 800 1.5rem/1.2 var(--font-display); color: var(--white); margin: 14px 0 4px; }
+.jr-card-in h3 em { font-style: normal; color: var(--green); }
+.jr-card-in small { display: block; color: var(--text-dim); font-size: .74rem; }
+.jr-rows { display: grid; gap: 8px; margin: 14px 0; }
+.jr-rows div { display: flex; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 7px; font-size: .9rem; }
+.jr-rows strong { color: var(--white); font-variant-numeric: tabular-nums; } .jr-rows .bad { color: var(--red); } .jr-rows .good { color: var(--green); }
+.jr-card-act { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 14px; }
+.jr-toast { color: var(--green); font-size: .82rem; font-weight: 600; }
+@media (max-width: 720px) { .jr-in { font-size: .8rem; gap: 6px 10px; } .jr-dots i { width: 16px; } .jr-card-in h3 { font-size: 1.25rem; } }
+.jr-linkbox { width: 100%; margin-top: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border-2); background: var(--bg); color: var(--white); font-size: .8rem; }

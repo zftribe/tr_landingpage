@@ -322,6 +322,86 @@ const journey = () => {
   else if (S.currency === 'PHP') seq.push('#inflation-check') // pesos: have you beaten inflation?
   seq.push('#nextSteps'); return seq
 }
+const STEP_LABEL = { '#finder': 'Finder', '#calculator': 'What would it earn?', '#fx-check': 'Dollar round trip', '#inflation-check': 'Have you beaten inflation?', '#nextSteps': 'Your result' }
+const JR_KEY = 'tr-yield-journey'
+function saveJourney() {
+  try { if (!S.step || S.step < 2) return; localStorage.setItem(JR_KEY, JSON.stringify({ at: Date.now(), step: S.step, tree: S.tree, currency: S.currency, amount: S.amount, pick: ($('#calcPick') || {}).value, years: Number(($('#calcYears') || {}).value) || 1 })) } catch (e) {}
+}
+const loadJourney = () => { try { const j = JSON.parse(localStorage.getItem(JR_KEY) || 'null'); return j && Date.now() - j.at < 30 * 864e5 ? j : null } catch (e) { return null } }
+function applyJourney(j) {
+  if (j.currency && j.currency !== S.currency) { S.currency = j.currency }
+  if (j.amount) S.amount = j.amount
+  S.tree = j.tree || {}; renderTree(); updateAmount()
+  if (j.pick && $('#calcPick')) $('#calcPick').value = j.pick
+  if (j.years && $('#calcYears')) $('#calcYears').value = j.years
+  calc(); const seq = journey(), n = Math.min(j.step || 2, seq.length); setStep(n, seq[n - 1])
+}
+function restartJourney() {
+  try { localStorage.removeItem(JR_KEY) } catch (e) {}
+  S.tree = {}; S.topPick = null; renderTree(); $('#jrWelcome').hidden = true; setStep(1, '#finder')
+}
+function renderStrip() {
+  const st = $('#jrStrip'); if (!st) return
+  const seq = journey(), n = Math.min(S.step || 1, seq.length)
+  st.hidden = !(S.step >= 2)
+  $('#jrStep').textContent = 'Step ' + n + ' of ' + seq.length
+  $('#jrLabel').textContent = STEP_LABEL[seq[n - 1]] || ''
+  $('#jrDots').innerHTML = seq.map((_, i) => '<i class="' + (i < n ? 'on' : '') + '"></i>').join('')
+  const ctl = $('#controls'), nav = document.querySelector('.nav'), stickyCtl = ctl && getComputedStyle(ctl).position === 'sticky'
+  st.style.top = ((nav ? nav.offsetHeight : 0) + (stickyCtl ? ctl.offsetHeight : 0)) + 'px'
+}
+/* C: the result card */
+function journeyResult() {
+  const r = ROWS.find((x) => x.id === ($('#calcPick') || {}).value); if (!r) return null
+  const A = amountPesos(), Y = Number($('#calcYears').value) || 1, minMet = !r.minDeposit || (units(r, A) || 0) >= r.minDeposit
+  const p = minMet ? M.project(r, A, Y, ROWS, TODAY_ISO, DATA.rules, S.tax) : null; if (!p) return null
+  const rt = isUsdBank(r) && S.currency === 'PHP' ? roundTrip(r, A, Y * 12) : null
+  return { r, A, Y, p, rt, rate: net(r.rate, r) }
+}
+function renderCard() {
+  const box = $('#jrCard'); if (!box) return
+  const x = journeyResult(); if (!x) { box.innerHTML = ''; return }
+  const { r, A, Y, p } = x, yrs = Y === 1 ? '12 months' : Y + ' years'
+  const rows = ['<div><span>Interest after tax</span><strong>' + showMoney(p.net) + '</strong></div>']
+  if (p.realGain != null) rows.push('<div><span>Inflation (' + INFL() + '%) takes</span><strong class="bad">−' + showMoney(p.inflationLoss) + '</strong></div>', '<div><span>Real buying power</span><strong class="' + (p.realGain < 0 ? 'bad' : 'good') + '">' + (p.realGain < 0 ? '−' : '+') + showMoney(Math.abs(p.realGain)) + '</strong></div>')
+  box.innerHTML = '<div class="jr-card-in"><div class="jr-card-top"><span>My savings check</span><span>Trading Republic</span></div>' +
+    '<h3>' + showMoney(A) + ' could earn <em>' + showMoney(p.net) + '</em> in ' + yrs + '</h3>' +
+    '<small>' + esc(r.provider) + ' · ' + esc(r.product) + ' · ' + pct2(x.rate) + (S.tax && taxable(r) ? ' after 20% tax' : '') + ' · if the rate stays the same</small>' +
+    '<div class="jr-rows">' + rows.join('') + '</div>' +
+    '<small>Rates checked ' + fmtDate(r.checkedOn) + ' · welcome.tradingrepublic.io/yield-tracker · not financial advice</small>' +
+    '<div class="jr-card-act"><button type="button" class="btn gold" data-jr="save">Save image</button><button type="button" class="btn" data-jr="share">Share</button><button type="button" class="btn" data-jr="link">Copy link</button><span class="jr-toast" id="jrToast" role="status"></span></div></div>'
+}
+function journeyLink() {
+  const q = new URLSearchParams({ amt: String(S.amount), ccy: S.currency, ...S.tree, pick: ($('#calcPick') || {}).value || '', y: ($('#calcYears') || {}).value || '1' })
+  return location.origin + location.pathname + '?' + q.toString()
+}
+function shareText() { const x = journeyResult(); if (!x) return ''; return 'My savings check on the TR Yield Tracker: ' + showMoney(x.A) + ' could earn about ' + showMoney(x.p.net) + ' in ' + (x.Y === 1 ? '12 months' : x.Y + ' years') + ' at ' + x.r.provider + ' (after tax, if the rate stays the same).' + (x.p.realGain != null ? ' After ' + INFL() + '% inflation: ' + (x.p.realGain < 0 ? '−' : '+') + showMoney(Math.abs(x.p.realGain)) + ' in buying power.' : '') + ' Not financial advice.' }
+function toast(t) { const el = $('#jrToast'); if (el) { el.textContent = t; clearTimeout(el._t); el._t = setTimeout(() => (el.textContent = ''), 2600) } }
+function saveCardImage() {
+  const x = journeyResult(); if (!x) return
+  const c = document.createElement('canvas'), W = 1080, H = 1080; c.width = W; c.height = H; const g = c.getContext('2d')
+  const grd = g.createRadialGradient(0, 0, 0, 0, 0, 1100); grd.addColorStop(0, '#2a2110'); grd.addColorStop(1, '#0b0b0f'); g.fillStyle = grd; g.fillRect(0, 0, W, H)
+  g.strokeStyle = '#F9A825'; g.lineWidth = 4; g.strokeRect(40, 40, W - 80, H - 80)
+  const T = (t, x0, y, font, col, al) => { g.font = font; g.fillStyle = col; g.textAlign = al || 'left'; g.fillText(t, x0, y) }
+  T('MY SAVINGS CHECK', 100, 150, '800 34px "Plus Jakarta Sans", sans-serif', '#F9A825'); T('TRADING REPUBLIC', W - 100, 150, '800 30px "Plus Jakarta Sans", sans-serif', '#F9A825', 'right')
+  T(showMoney(x.A) + ' could earn', 100, 300, '800 66px "Plus Jakarta Sans", sans-serif', '#f5f5f7')
+  T(showMoney(x.p.net), 100, 400, '800 96px "Plus Jakarta Sans", sans-serif', '#22c55e'); T('in ' + (x.Y === 1 ? '12 months' : x.Y + ' years'), 100, 470, '700 46px "Plus Jakarta Sans", sans-serif', '#f5f5f7')
+  T(x.r.provider + ' · ' + pct2(x.rate) + (S.tax && taxable(x.r) ? ' after 20% tax' : ''), 100, 550, '500 34px "DM Sans", sans-serif', '#cbcbd7')
+  let y = 660; const line = (k, v, col) => { T(k, 100, y, '500 36px "DM Sans", sans-serif', '#cbcbd7'); T(v, W - 100, y, '700 40px "DM Sans", sans-serif', col, 'right'); g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(100, y + 22, W - 200, 2); y += 84 }
+  line('Interest after tax', showMoney(x.p.net), '#f5f5f7')
+  if (x.p.realGain != null) { line('Inflation (' + INFL() + '%) takes', '−' + showMoney(x.p.inflationLoss), '#ef4444'); line('Real buying power', (x.p.realGain < 0 ? '−' : '+') + showMoney(Math.abs(x.p.realGain)), x.p.realGain < 0 ? '#ef4444' : '#22c55e') }
+  T('If the rate stays the same. Rates checked ' + fmtDate(x.r.checkedOn) + '. Not financial advice.', 100, H - 130, '500 26px "DM Sans", sans-serif', '#85859a')
+  T('welcome.tradingrepublic.io/yield-tracker', 100, H - 86, '700 28px "DM Sans", sans-serif', '#F9A825')
+  c.toBlob((b) => { if (!b) return; const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'tr-savings-check.png'; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove() }, 1000); toast('Image saved') }, 'image/png')
+}
+async function copyLink() {
+  const u = journeyLink()
+  try { await Promise.race([navigator.clipboard.writeText(u), new Promise((_, no) => setTimeout(() => no(new Error('slow')), 1500))]); toast('Link copied'); return } catch (e) {}
+  // no clipboard access: show the link, selected, so it can be copied by hand
+  let box = document.getElementById('jrLinkBox'); if (!box) { box = document.createElement('input'); box.id = 'jrLinkBox'; box.className = 'jr-linkbox'; box.readOnly = true; box.setAttribute('aria-label', 'Link to this result'); const act = document.querySelector('.jr-card-act'); if (act) act.after(box) }
+  box.value = u; box.focus(); box.select(); toast('Copy the link below')
+}
+async function shareCard() { const data = { title: 'My savings check', text: shareText(), url: journeyLink() }; if (navigator.share) { try { await navigator.share(data); return } catch (e) { if (e && e.name === 'AbortError') return } } copyLink() }
 const STEP_SECTIONS = ['#finder', '#calculator', '#fx-check', '#inflation-check', '#nextSteps']
 const NEXT_LABEL = { '#fx-check': 'Next: does a dollar account pay after the exchange? →', '#inflation-check': 'Next: have you beaten inflation? →', '#nextSteps': 'Next: see everything →' }
 function setStep(n, go) {
@@ -330,6 +410,7 @@ function setStep(n, go) {
     el.classList.toggle('jhide', i < 0 || i >= n)
     el.querySelectorAll('[data-step-of]').forEach((t) => (t.textContent = i < 0 ? '' : 'Step ' + (i + 1) + ' of ' + seq.length + ' · ')) })
   const nb = $('#nextFromCalc'); if (nb) nb.textContent = NEXT_LABEL[seq[2]]
+  renderStrip(); saveJourney(); if (n >= seq.length) renderCard()
   if (go) { const el = $(go); if (el) { el.classList.remove('step-in'); void el.offsetWidth; el.classList.add('step-in'); setTimeout(() => el.scrollIntoView({ behavior: scrollMotion(), block: 'start' }), 60) } }
 }
 const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
@@ -579,6 +660,8 @@ function fillCalc() {
   sel.value = opts.some(r => r.id === previous) ? previous : (M.bestPlain(ROWS, TODAY_ISO) || opts[0] || {}).id || '';
 }
 function calc() {
+  if (S.step && S.step >= journey().length) setTimeout(renderCard, 0);
+  if (S.step >= 2) setTimeout(saveJourney, 0);
   const r = ROWS.find((x) => x.id === $('#calcPick').value);
   const A = amountPesos(), Y = Number($('#calcYears').value) || 1;
   const minMet = r && (!r.minDeposit || (units(r, A) || 0) >= r.minDeposit);
@@ -843,6 +926,10 @@ function ensureDefi() {
 async function init() {
   wireCmp();
   document.addEventListener('click', (e) => {
+    if (e.target.closest('#jrRestart') || e.target.closest('#jrFresh')) { restartJourney(); return }
+    if (e.target.closest('#jrContinue')) { const j = loadJourney(); $('#jrWelcome').hidden = true; if (j) applyJourney(j); return }
+    if (e.target.closest('#jrBack')) { const seq = journey(), n = Math.min(S.step || 1, seq.length); const cur = seq.slice(0, n).reduce((best, sel) => { const el = $(sel); return el && el.getBoundingClientRect().top < innerHeight * 0.4 ? sel : best }, seq[0]); const i = Math.max(0, seq.indexOf(cur) - 1); $(seq[i]).scrollIntoView({ behavior: scrollMotion(), block: 'start' }); return }
+    const jb = e.target.closest('[data-jr]'); if (jb) { const k = jb.dataset.jr; if (k === 'save') saveCardImage(); else if (k === 'share') shareCard(); else copyLink(); return }
     const nx = e.target.closest('[data-step-next]')
     if (nx) {
       const k = nx.dataset.stepNext, seq = journey()
@@ -868,6 +955,13 @@ async function init() {
   renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi(); fillFx(); renderFx(); setStep(1); $('#sharedAmount').value = fmtAmount(S.amount);
   const u = M.bestPlain(ROWS, TODAY_ISO);
   if (u) { $('#calcPick').value = u.id; calc(); }
+  { const Q0 = new URLSearchParams(location.search)
+    if (Q0.get('where') && Q0.get('amt') && !Q0.get('demo')) { applyJourney({ step: 9, tree: { where: Q0.get('where'), access: Q0.get('access') || 'any', promo: Q0.get('promo') || 'ok', strings: Q0.get('strings') || 'ok' }, currency: Q0.get('ccy') === 'USD' ? 'USD' : 'PHP', amount: Number(Q0.get('amt')) || 100000, pick: Q0.get('pick'), years: Number(Q0.get('y')) || 1 }) }
+    else { const j = loadJourney(); if (j && j.step >= 2 && S.view === 'basic') { const seq = (() => { const t = S.tree, c = S.currency; S.tree = j.tree || {}; S.currency = j.currency || 'PHP'; const q = journey(); S.tree = t; S.currency = c; return q })(); const n = Math.min(j.step, seq.length), pickRow = ROWS.find((x) => x.id === j.pick)
+      $('#jrWelcomeTitle').textContent = 'Welcome back! You stopped at Step ' + n + ': ' + (STEP_LABEL[seq[n - 1]] || '')
+      $('#jrWelcomeSub').textContent = (j.currency === 'USD' ? '$' : '₱') + Number(j.amount || 0).toLocaleString('en-PH') + (pickRow ? ' · ' + pickRow.provider + ' ' + pickRow.product : '')
+      $('#jrWelcome').hidden = false } } }
+  addEventListener('resize', renderStrip)
   // Preview only: ?demo=1 fills the finder (ccy=usd switches to dollars; where/access override), ?cmp=id,id opens Compare.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { if (Q.get('ccy') === 'usd') { S.currency = 'USD'; S.amount = 1000; updateAmount() } S.tree = { where: Q.get('where') || (Q.get('ccy') === 'usd' ? 'crypto' : 'bank'), access: Q.get('access') || 'flex', promo: 'ok', strings: 'no' }; renderTree(); }
