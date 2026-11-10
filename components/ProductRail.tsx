@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { peso, type Product } from '@/lib/lineup'
 import type { CurriculumCourse } from '@/lib/lms'
 import { CurriculumDialog } from './CurriculumDialog'
@@ -29,13 +29,15 @@ const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
   // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
   web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
+  // "Range bins" mark, A1 Classic (George picked 9 Nov): liquidity bins inside a price range.
+  lp: { alt: 'Liquidity Provider Masterclass', src: '/logos/programs/lp-masterclass.svg' },
   // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
   citizen: { alt: 'Citizen membership', src: '/logos/programs/citizen.svg' },
 } satisfies Record<string, Logo>
 
 const logosOf = (p: Product): Logo[] => [
   ...(p.hasTI ? [L.ti] : []),
-  ...(p.hasWeb3 ? [L.web3] : []),
+  ...(p.hasWeb3 ? [L.web3] : p.hasLP && !p.hasTI ? [L.lp] : []),
   ...(p.months ? [L.citizen] : []),
 ]
 
@@ -89,6 +91,20 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
     el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: reduce ? 'auto' : 'smooth' })
   }
 
+  // Phone page dots: which card the rail is resting on.
+  const [at, setAt] = useState(0)
+  useEffect(() => {
+    const el = rail.current
+    if (!el) return
+    const sync = () => {
+      const first = el.querySelector<HTMLElement>('.pc-card')
+      const step = first ? first.offsetWidth + 14 : el.clientWidth
+      setAt(Math.round(el.scrollLeft / step))
+    }
+    el.addEventListener('scroll', sync, { passive: true })
+    return () => el.removeEventListener('scroll', sync)
+  }, [])
+
   const compared = picked.map((id) => products.find((p) => p.id === id)!).filter(Boolean)
   const total = before.length + products.length + after.length
 
@@ -122,7 +138,8 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
     <div className="pc">
       <div className="pc-bar">
         <p className="pc-hint">
-          {total} programs · swipe or use the arrows · tap Compare on up to three
+          Start free with the Blueprint. Go deeper when you&apos;re ready.{' '}
+          <span className="pc-hint-sub">Tap Compare on up to three.</span>
         </p>
         <div className="pc-arrows">
           <button type="button" className="carousel-btn" onClick={() => page(-1)} aria-label="Previous programs">&#8592;</button>
@@ -162,7 +179,12 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
 
               <ul className="pc-includes">
                 {/* A single course already names itself in the title, so its card says what you get instead. */}
-                {!p.months && p.hasTI !== p.hasWeb3 ? (
+                {p.hasLP && !p.hasWeb3 && !p.hasTI ? (
+                  <>
+                    <li>Liquidity Provider Masterclass course</li>
+                    <li>Market Makers role in Discord (yours for life)</li>
+                  </>
+                ) : !p.months && p.hasTI !== p.hasWeb3 ? (
                   <li>Full recorded course, yours to keep</li>
                 ) : (
                   <>
@@ -171,6 +193,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                   </>
                 )}
                 {p.months && <li>{p.months} months as a Citizen: live sessions, support groups, every channel</li>}
+                {p.hasWeb3 && <li className="pc-incl-note">Includes the Liquidity Provider Masterclass</li>}
               </ul>
 
               {/* George, 8 Nov: Curriculum and Watch intro sit as pills above Buy now / Compare. */}
@@ -185,7 +208,9 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
                 </div>
               )}
               <div className="pc-actions">
-                <a href={p.checkout} className="btn btn-gold">Buy now</a>
+                {p.placeholder
+                  ? <span className="btn btn-gold pc-soon" aria-disabled="true">Coming soon</span>
+                  : <a href={p.checkout} className="btn btn-gold">Buy now</a>}
                 <button type="button" className="btn btn-outline pc-compare" aria-pressed={on} onClick={() => toggle(p.id)}>
                   {on ? '✓ Comparing' : 'Compare'}
                 </button>
@@ -194,6 +219,9 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
           )
         })}
         {after.map(extra)}
+      </div>
+      <div className="pc-dots" aria-hidden="true">
+        {Array.from({ length: total }, (_, i) => <i key={i} className={i === Math.min(at, total - 1) ? 'on' : undefined} />)}
       </div>
 
       <p className="pc-notice" role="status">{notice}</p>
@@ -226,6 +254,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
             <tbody>
               <tr><th scope="row">Technical Intensive</th>{compared.map((p) => <td key={p.id}>{p.hasTI ? '✓' : '—'}</td>)}</tr>
               <tr><th scope="row">WEB3 Masterclass</th>{compared.map((p) => <td key={p.id}>{p.hasWeb3 ? '✓' : '—'}</td>)}</tr>
+              <tr><th scope="row">Liquidity Provider Masterclass</th>{compared.map((p) => <td key={p.id}>{p.hasLP ? '✓' : '—'}</td>)}</tr>
               <tr><th scope="row">Membership</th>{compared.map((p) => <td key={p.id}>{p.months ? `${p.months} months` : '—'}</td>)}</tr>
               <tr><th scope="row">Price</th>{compared.map((p) => <td key={p.id} className="pc-strong">{peso(p.price)}</td>)}</tr>
               <tr><th scope="row">You save</th>{compared.map((p) => <td key={p.id}>{p.discount > 0 ? peso(p.discount) : '—'}</td>)}</tr>
