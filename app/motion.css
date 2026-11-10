@@ -1,0 +1,34 @@
+/* ═══════════ MOTION · DIRECTION A: subtle polish ═══════════
+   Today's look with more care: the hero rises in item by item, sections and cards
+   stagger up as they arrive, and cards lift with a gold edge on hover (mouse only).
+   Everything is gated on html.m-on, which is only set when the visitor has not asked
+   for reduced motion. Only opacity and transform move, so nothing shifts the layout. */
+:root { --m-ease: cubic-bezier(.16, 1, .3, 1); }
+
+.m-on #home .hero-content > *, .m-on #home .hero-video {
+  opacity: 0; transform: translateY(22px);
+  transition: opacity .7s var(--m-ease), transform .7s var(--m-ease);
+}
+.m-on #home .hero-content > :nth-child(2) { transition-delay: 80ms; }
+.m-on #home .hero-content > :nth-child(3) { transition-delay: 160ms; }
+.m-on #home .hero-content > :nth-child(4) { transition-delay: 240ms; }
+.m-on #home .hero-video { transition-delay: 200ms; transform: translateY(22px) scale(.985); }
+.m-on.m-hero #home .hero-content > *, .m-on.m-hero #home .hero-video { opacity: 1; transform: none; }
+
+.m-on [data-m] {
+  opacity: 0; transform: translateY(24px);
+  transition: opacity .7s var(--m-ease), transform .7s var(--m-ease);
+  transition-delay: calc(var(--m-i, 0) * 75ms);
+}
+.m-on [data-m].m-in { opacity: 1; transform: none; }
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .fx-pillars > article, .hwB > li, .pc-card, .wxA-card, .tk, .tier-row, .yt-card, .link-pill {
+    transition: transform .35s var(--m-ease), border-color .35s var(--m-ease), box-shadow .35s var(--m-ease);
+  }
+  .fx-pillars > article:hover, .hwB > li:hover, .pc-card:hover, .wxA-card:hover, .tk:not(.torn):hover, .tier-row:hover, .yt-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(249, 168, 37, .45);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, .35), 0 0 0 1px rgba(249, 168, 37, .16);
+  }
+}
