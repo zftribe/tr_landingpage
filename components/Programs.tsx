@@ -64,6 +64,8 @@ export async function Programs() {
         </div>
 
         <ProductRail products={products} curriculum={curriculum} before={BEFORE} after={AFTER} />
+        {/* Target of the hero's "3-min assessment" link, so it scrolls here even before scripts run; Assessment then opens itself. */}
+        <div id="assessment" className="fx-anchor" aria-hidden="true" />
         <Assessment products={products} />
       </div>
     </section>
