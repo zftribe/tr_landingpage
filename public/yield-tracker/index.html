@@ -85,6 +85,27 @@
       <h2>Every rate, with its <span class="gold">fine print</span></h2>
       <p class="subtitle" id="ratesSub">Tap a row for the catches and the official source.</p>
     </div>
+    <div class="amt-card basic-only" id="amtCard">
+      <div class="amt-q">
+        <label for="amtBig">How much will you put in?</label>
+        <div class="amt-big"><span id="amtSym" aria-hidden="true">₱</span><input id="amtBig" type="number" inputmode="decimal" min="0" step="any" value="100000" aria-describedby="amtWhere"></div>
+        <div class="amt-chips" role="group" aria-label="Quick amounts" id="amtChips"></div>
+      </div>
+      <div class="amt-out" aria-live="polite">
+        <small>At the best plain rate today, in 12 months</small>
+        <b id="amtEarn">—</b>
+        <span id="amtWhere"></span>
+        <span class="amt-hint">Every rate below shows what this amount would earn in a year.</span>
+      </div>
+    </div>
+    <nav class="adv-tools adv-only" aria-label="Advanced tools">
+      <span class="adv-tools-label">Tools</span>
+      <a href="#rates">All rates</a><a href="#cmpPanel" data-tool="compare">Compare</a><a href="#calculator">Calculator</a><a href="#fx-check">Dollar round trip</a><a href="#inflation-check">Inflation check</a>
+      <label class="adv-sort">Sort by
+        <select id="sortBy"><option value="rate">Best rate</option><option value="earn">Most earned on your amount</option><option value="min">Lowest minimum</option><option value="checked">Most recently checked</option></select>
+      </label>
+    </nav>
+    <p class="adv-cmp-tip adv-only" id="advCmpTip" hidden>Tap <b>+ Compare</b> on two or three rates below, then press <b>Compare side by side</b>.</p>
 
     <div class="infl adv-only" id="inflPanel"></div>
 
@@ -200,7 +221,16 @@
 </section>
 
 <!-- ═══════════ HOW WE CHECK ═══════════ -->
-<section class="section" id="fx-check">
+<section class="section section-tight basic-only" id="moreTools">
+  <div class="container">
+    <div class="more-tools">
+      <div><b>Want to dig deeper?</b><span>Advanced view adds Compare with a best match, sorting, the peso to dollar round trip, and the inflation check.</span></div>
+      <button type="button" class="btn gold" data-goadv>Switch to Advanced</button>
+    </div>
+  </div>
+</section>
+
+<section class="section adv-only" id="fx-check">
   <div class="container-wide">
     <div class="sec-head">
       <span class="eyebrow">Dollar round trip</span>
@@ -219,7 +249,7 @@
   </div>
 </section>
 
-<section class="section" id="inflation-check">
+<section class="section adv-only" id="inflation-check">
   <div class="container">
     <div class="sec-head">
       <span class="eyebrow">For savers in the Philippines</span>
@@ -255,7 +285,13 @@
 
 <section class="section section-tight" id="method">
   <div class="container">
-    <div class="method">
+    <details class="method-fold">
+      <summary>
+        <span class="mf-title">How we keep this honest</span>
+        <span class="mf-tags"><span>Official sources only</span><span>Philippine tax on interest</span><span>PDIC cover</span><span>Checked monthly</span></span>
+        <span class="mf-more" aria-hidden="true"><span class="mf-closed">Show</span><span class="mf-open">Hide</span> ▾</span>
+      </summary>
+      <div class="method">
       <div>
         <h3>How we keep this honest</h3>
         <ul>
@@ -267,6 +303,7 @@
       </div>
       <div id="rulesBox"></div>
     </div>
+    </details>
   </div>
 </section>
 </main>

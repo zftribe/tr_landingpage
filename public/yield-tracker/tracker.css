@@ -562,3 +562,79 @@ body[data-view=advanced] .row.has-trend .row-main, body[data-view=advanced] .rat
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* ── Round 5 (George, 10 Nov): Basic vs Advanced, amount card, folded method, motion. Current look kept. ── */
+body[data-view=basic] .adv-only, body[data-view=advanced] .basic-only { display: none !important; }
+/* Basic: how much will you put in? */
+.amt-card { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px 28px; align-items: center; margin: 0 auto 22px; padding: 20px 22px; border-radius: var(--radius); border: 1px solid rgba(249,168,37,.45); background: linear-gradient(180deg, rgba(249,168,37,.07), transparent 70%), var(--bg-card); }
+.amt-q { display: grid; gap: 10px; min-width: 0; }
+.amt-q label { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--white); }
+.amt-big { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border-2); border-radius: 14px; padding: 6px 14px; transition: border-color .2s; }
+.amt-big:focus-within { border-color: var(--gold); }
+.amt-big span { font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; color: var(--gold); }
+.amt-big input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; color: var(--white); font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; font-variant-numeric: tabular-nums; padding: 4px 0; }
+.amt-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.amt-chips button { font: 600 .82rem/1 var(--font-body); padding: 8px 12px; border-radius: 100px; border: 1px solid var(--border-2); background: transparent; color: var(--text-dim); cursor: pointer; min-height: 36px; transition: border-color .15s, color .15s, transform .15s; }
+.amt-chips button:hover { color: var(--white); border-color: var(--gold); }
+.amt-chips button:active { transform: scale(.96); }
+.amt-chips button[aria-pressed="true"] { color: #141006; background: var(--gold); border-color: var(--gold); }
+.amt-out { display: grid; gap: 4px; text-align: right; min-width: 0; }
+.amt-out small { color: var(--text-dim); font-size: .78rem; }
+.amt-out b { font-family: var(--font-display); font-weight: 800; font-size: 2.4rem; line-height: 1.05; color: var(--green); font-variant-numeric: tabular-nums; }
+.amt-out span { color: var(--text); font-size: .86rem; }
+.amt-out .amt-hint { color: var(--text-dim); font-size: .76rem; }
+body[data-view=basic] .row-earn { color: var(--white); font-weight: 600; }
+body[data-view=basic] .row-earn::before { content: "≈ "; color: var(--gold); }
+/* Basic: invitation to the Advanced tools */
+.more-tools { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px 20px; padding: 16px 20px; border: 1px dashed var(--border-2); border-radius: var(--radius); background: var(--bg-card); }
+.more-tools b { display: block; color: var(--white); font-family: var(--font-display); }
+.more-tools span { color: var(--text-dim); font-size: .88rem; }
+/* Advanced: tools bar + sort */
+.adv-tools { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 auto 18px; padding: 10px 12px; border: 1px solid var(--border-2); border-radius: 14px; background: var(--bg-card); animation: r5in .35s ease both; }
+.adv-tools-label { font: 700 .68rem/1 var(--font-display); letter-spacing: 1.6px; text-transform: uppercase; color: var(--gold); margin-right: 4px; }
+.adv-tools a { font-size: .84rem; font-weight: 600; color: var(--text); padding: 7px 12px; border-radius: 100px; border: 1px solid var(--border); text-decoration: none; transition: border-color .15s, color .15s; }
+.adv-tools a:hover { border-color: var(--gold); color: var(--white); }
+.adv-sort { margin-left: auto; display: flex; align-items: center; gap: 8px; font-size: .82rem; color: var(--text-dim); }
+.adv-sort select { background: var(--bg); color: var(--white); border: 1px solid var(--border-2); border-radius: 10px; padding: 7px 10px; font: 600 .84rem var(--font-body); }
+.adv-cmp-tip { margin: -6px auto 16px; padding: 10px 14px; border-radius: 12px; background: var(--gold-glow); border: 1px solid rgba(249,168,37,.4); font-size: .86rem; }
+/* "How we keep this honest" + Philippine tax: one compact row, closed by default */
+.method-fold { border: 1px solid var(--border-2); border-radius: var(--radius); background: var(--bg-card); }
+.method-fold > summary { list-style: none; cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 14px 18px; }
+.method-fold > summary::-webkit-details-marker { display: none; }
+.method-fold > summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; border-radius: var(--radius); }
+.mf-title { font-family: var(--font-display); font-weight: 700; color: var(--white); }
+.mf-tags { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; min-width: 0; }
+.mf-tags span { font-size: .72rem; color: var(--text-dim); border: 1px solid var(--border); border-radius: 100px; padding: 3px 9px; }
+.mf-more { color: var(--gold); font-size: .82rem; font-weight: 600; margin-left: auto; }
+.method-fold .mf-open, .method-fold[open] .mf-closed { display: none; }
+.method-fold[open] .mf-open { display: inline; }
+.method-fold > .method { padding: 4px 18px 18px; animation: r5in .3s ease both; }
+/* motion: rows ease in on a view switch; cards lift on hover */
+@keyframes r5in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+#rates.swap > * { animation: r5in .32s ease both; }
+#rates.swap > *:nth-child(n+2) { animation-delay: .03s; } #rates.swap > *:nth-child(n+4) { animation-delay: .06s; } #rates.swap > *:nth-child(n+6) { animation-delay: .09s; }
+.best-card, .pick { transition: transform .2s ease, border-color .2s ease; }
+.best-card:hover, .pick:hover { transform: translateY(-2px); }
+@media (max-width: 720px) {
+  .amt-card { grid-template-columns: 1fr; padding: 16px; }
+  .amt-out { text-align: left; }
+  .amt-out b { font-size: 2rem; }
+  .amt-big span, .amt-big input { font-size: 1.35rem; }
+  .adv-sort { margin-left: 0; width: 100%; justify-content: space-between; }
+  .adv-tools a { font-size: .8rem; padding: 6px 10px; }
+  .mf-tags { display: none; }
+  /* the compare tray sits above the phone bottom bar */
+  .cmp-tray { bottom: calc(50px + env(safe-area-inset-bottom, 0px)); }
+}
+
+.prov-earn { display: block; font-family: var(--font-body); font-size: .74rem; font-weight: 600; color: var(--text-dim); margin-top: 2px; letter-spacing: 0; }
+body[data-view=basic] .prov-earn { color: var(--white); }
+body[data-view=basic] .prov-earn::before { content: "≈ "; color: var(--gold); }
+
+/* Round 5: Advanced summary rows use the product-row columns, so "best" rates sit under Net rate. */
+body[data-view=advanced] .prov-head { grid-template-columns: minmax(200px, 2fr) .9fr 4.6fr 24px; }
+@media (max-width: 1080px) { body[data-view=advanced] .prov-head { grid-template-columns: minmax(180px, 2fr) 1fr 2.1fr 24px; } }
+@media (max-width: 720px) { body[data-view=advanced] .prov-head { grid-template-columns: 1fr auto 18px; } }
+.prov-txt, .prov { min-width: 0; } .prov-name { overflow-wrap: anywhere; }
+.prov-head .rate .na { display: block; font-family: var(--font-body); font-size: .82rem; font-weight: 600; color: var(--text-dim); line-height: 1.35; }
+@media (max-width: 720px) { .prov-head .rate .na { max-width: 110px; text-align: right; font-size: .74rem; } }

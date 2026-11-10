@@ -291,6 +291,7 @@ function provHTML({ k, rs }) {
   const best = (f) => ok.filter(f).sort((a, b) => net(b.rate, b) - net(a.rate, a))[0];
   const top = best(() => true), std = best((r) => r.kind === 'standard'), promo = best((r) => r.kind === 'promo');
   const open = S.openProv.has(k), kid = 'p-' + k.replace(/[^a-z0-9]+/gi, '-');
+  const earns = ok.map(earnOf).filter((v) => v != null), bestEarn = earns.length ? Math.max(...earns) : null;
   const bits = [
     std ? `Steady up to <b>${pct2(net(std.rate, std))}</b>` : '',
     promo ? `Promo up to <b>${pct2(net(promo.rate, promo))}</b>${promo.promoEnds ? ' · ends ' + fmtDate(promo.promoEnds) : ''}` : '',
@@ -300,13 +301,21 @@ function provHTML({ k, rs }) {
   return `<div class="prov-card${open ? ' open' : ''}" data-prov="${esc(k)}">
   <button class="prov-head" aria-expanded="${open}" aria-controls="${kid}">
     <div class="prov"><div class="logo">${logo(r0)}</div><div class="prov-txt"><span class="prov-name">${esc(r0.provider)}</span><span class="prov-prod">${rs.length} products · tap to compare</span></div></div>
-    <div class="rate">${top ? '<small>best' + (top.upTo || top.tiers ? ' up to' : '') + '</small>' + pct2(net(top.rate, top)) : '<span class="na">No current rate published</span>'}</div>
+    <div class="rate">${top ? '<small>best' + (top.upTo || top.tiers ? ' up to' : '') + '</small>' + pct2(net(top.rate, top)) + (bestEarn != null ? '<span class="prov-earn">' + (ok.some((r) => r.upTo) ? 'up to ' : '') + showMoney(bestEarn) + ' / year</span>' : '') : '<span class="na">No current rate published</span>'}</div>
     <div class="prov-sum">${bits} ${ins}</div>
     <svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
   </button>
   <div class="prov-body" id="${kid}">${rs.map(rowHTML).join('')}</div>
 </div>`;
 }
+/* Round 5: what the shared amount earns in a year, after tax where it applies (same maths as each row). */
+function earnOf(r) {
+  if (r.rate == null || ended(r)) return null
+  const p = amountPesos(), y = yearRate(r, p)
+  if (y == null || (r.minDeposit && (units(r, p) || 0) < r.minDeposit)) return null
+  return p * (S.tax && taxable(r) ? y * (1 - TAX() / 100) : y) / 100
+}
+const SORTS = { rate: null, earn: (r) => earnOf(r) ?? -1, min: (r) => (r.rate == null ? -1e12 : -((r.minDeposit || 0) * (isPeso(r) ? 1 : (FX() || 60)))), checked: (r) => (r.checkedOn ? Date.parse(r.checkedOn) : 0) }
 function renderRates() {
   const list = visibleRows();
   const sortKey = (r) => (r.rate == null ? -1 : ended(r) ? -0.5 : net(r.rate, r));
@@ -315,7 +324,8 @@ function renderRates() {
     : '';
   let html = '';
   for (const cat of ORDER) {
-    const g = list.filter((r) => r.category === cat).sort((a, b) => sortKey(b) - sortKey(a));
+    const sk = S.view === 'advanced' && SORTS[S.sort] ? SORTS[S.sort] : sortKey
+    const g = list.filter((r) => r.category === cat).sort((a, b) => sk(b) - sk(a) || sortKey(b) - sortKey(a));
     if (!g.length) continue;
     { const np = new Set(g.map((r) => r.provider)).size; html += `<div class="rgroup-title">${CAT_LABEL[cat]} <span>${np} provider${np > 1 ? 's' : ''} · ${g.length} rate${g.length > 1 ? 's' : ''}</span></div>`; }
     if (CAT_NOTE[cat]) html += `<p class="rgroup-note">${CAT_NOTE[cat]}</p>`;
@@ -627,7 +637,7 @@ function renderRules() {
 
 /* ── wiring ───────────────────────────────── */
 function setView(v) {
-  S.view = v; document.body.dataset.view = v; if (v === 'basic' && S.f.lock !== 'all') S.f.lock = 'all';
+  S.view = v; document.body.dataset.view = v; const rt = document.getElementById('rates'); if (rt) { rt.classList.remove('swap'); void rt.offsetWidth; rt.classList.add('swap') } if (v === 'basic' && S.f.lock !== 'all') S.f.lock = 'all';
   $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
   try { localStorage.setItem('trYieldView', v); } catch (e) {}
   if (v === 'basic') { if (S.f.cat === 'dex') S.f.cat = 'all'; S.real = false; $('#realToggle').checked = false; syncChips(); }
@@ -669,11 +679,33 @@ function syncFilterUi() {
   $('#fActive').innerHTML = act.length ? act.map((k) => `<button class="f-pill" data-clear="${k}" aria-label="Clear ${FLABEL[k]} filter">${FLABEL[k]}: ${optLabel(k, S.f[k])} <span aria-hidden="true">×</span></button>`).join('') + (act.length > 1 ? '<button class="f-pill f-clear" data-clear="*">Clear all</button>' : '') : '';
 }
 function renderAll() { if (!DATA) return; renderStats(); renderRates(); syncCmp(); if (TREE.every((t) => S.tree[t.key] != null)) renderPicks(); calc(); }
+const AMT_CHIPS = { PHP: [10000, 50000, 100000, 500000], USD: [100, 500, 1000, 5000] }
+function countTo(el, to, fmt) {
+  if (!el) return
+  const from = Number(el.dataset.v || 0), reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
+  el.dataset.v = to
+  if (reduce || !isFinite(from) || from === to) { el.textContent = fmt(to); return }
+  const t0 = performance.now(), dur = 450
+  const step = (now) => { const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(from + (to - from) * e); if (k < 1 && el.dataset.v == to) requestAnimationFrame(step) }
+  requestAnimationFrame(step)
+}
+function renderAmountCard() {
+  if (!DATA || !$('#amtCard')) return
+  const usd = S.currency === 'USD'
+  $('#amtSym').textContent = usd ? '$' : '₱'
+  const big = $('#amtBig'); if (document.activeElement !== big) big.value = Number(S.amount.toFixed(usd ? 2 : 0))
+  $('#amtChips').innerHTML = AMT_CHIPS[S.currency].map((v) => '<button type="button" data-amt="' + v + '" aria-pressed="' + (Math.abs(S.amount - v) < 0.005) + '">' + (usd ? '$' : '₱') + v.toLocaleString('en-PH') + '</button>').join('')
+  const u = ROWS.filter((r) => rankable(r) && r.category !== 'dex')
+  const best = usd ? u.filter((r) => (r.stablecoin || isUsdBank(r)) && r.kind === 'standard' && !r.strings && !r.upTo && !locked(r) && !r.pastReturn).sort((a, b) => (earnOf(b) ?? -1) - (earnOf(a) ?? -1))[0] : M.bestPlain(ROWS, TODAY_ISO)
+  const e = best ? earnOf(best) : null
+  countTo($('#amtEarn'), e == null ? 0 : e, (v) => (e == null ? '—' : showMoney(v)))
+  $('#amtWhere').innerHTML = best ? (e == null ? 'Below the minimum deposit for ' + esc(best.provider) : esc(best.provider) + ' · ' + esc(best.product) + ', ' + pct2(net(best.rate, best)) + (S.tax && taxable(best) ? ' after tax' : isPeso(best) ? '' : ' APR · not insured')) : 'No current rate published'
+}
 function updateAmount() {
   $('#sharedAmount').value = Number(S.amount.toFixed(6));
   $('#sharedAmount').setAttribute('aria-label', 'Amount in ' + (S.currency === 'USD' ? 'US dollars' : 'pesos'));
   $$('[data-currency]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.currency === S.currency)));
-  renderAll(); if (DATA) sim();
+  renderAll(); renderAmountCard(); if (DATA) sim();
 }
 function wire() {
   $$('.seg button').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
@@ -773,6 +805,13 @@ function ensureDefi() {
 }
 async function init() {
   wireCmp();
+  document.addEventListener('click', (e) => {
+    const c = e.target.closest('[data-amt]'); if (c) { S.amount = Number(c.dataset.amt); updateAmount(); return }
+    const g = e.target.closest('[data-goadv]'); if (g && !e.target.closest('#ratesFoot')) { e.preventDefault(); setView('advanced'); $('#yields').scrollIntoView({ behavior: scrollMotion(), block: 'start' }); return }
+    const t = e.target.closest('[data-tool="compare"]'); if (t && !CMP.open) { e.preventDefault(); const tip = $('#advCmpTip'); tip.hidden = false; $('#rates').scrollIntoView({ behavior: scrollMotion(), block: 'start' }) }
+  })
+  const big = $('#amtBig'); if (big) big.addEventListener('input', () => { const v = Number(big.value); if (isFinite(v) && v >= 0) { S.amount = v; $('#sharedAmount').value = v; renderAll(); renderAmountCard(); if (DATA) sim() } })
+  const sb = $('#sortBy'); if (sb) sb.addEventListener('change', () => { S.sort = sb.value; renderRates() });
   ['fxAmt', 'fxMonths', 'fxPick'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', renderFx); });
   setupFilters();
   wire();
@@ -780,7 +819,7 @@ async function init() {
   try { DATA = await (await fetch('yields.json', { cache: 'no-cache' })).json(); }
   catch (e) { $('#rates').innerHTML = '<p class="no-picks">Could not load the rates. Please refresh.</p>'; return; }
   ROWS = DATA.rows;
-  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); syncFilterUi(); fillFx(); renderFx();
+  renderRules(); renderInfl(); renderFootnotes(); fillSim(); fillCalc(); renderTree(); renderAll(); renderAmountCard(); syncFilterUi(); fillFx(); renderFx();
   const u = M.bestPlain(ROWS, TODAY_ISO);
   if (u) { $('#calcPick').value = u.id; calc(); }
   // Preview only: ?demo=1 fills the finder (ccy=usd switches to dollars; where/access override), ?cmp=id,id opens Compare.
