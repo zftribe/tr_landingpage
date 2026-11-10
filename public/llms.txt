@@ -2,7 +2,7 @@
 
 > Trading Republic (TR) is a trading community and education program by ZFT, founded by George Asibal (Zeefreaks). Members learn to trade and invest in stocks, forex, commodities, indices and crypto through courses, weekly webinars and a Discord community. Tagline: "The New Generation of Wealth Builders."
 
-Prices and course details change; the homepage (https://welcome.tradingrepublic.io/) is the source of truth.
+Prices and course details change; the homepage (https://www.tradingrepublic.io/) is the source of truth.
 
 ## What Trading Republic offers
 
@@ -26,7 +26,7 @@ Empower individuals to become confident traders and investors in stocks and cryp
 
 ## Official links
 
-- Homepage: https://welcome.tradingrepublic.io/
+- Homepage: https://www.tradingrepublic.io/
 - Discord: https://discord.gg/SXEEhgmeTn
 - YouTube: https://www.youtube.com/@tradingrepubliczft
 - Facebook: https://www.facebook.com/thetradingrepublic
