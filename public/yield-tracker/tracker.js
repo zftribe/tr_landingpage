@@ -348,14 +348,15 @@ function applyJourney(j) {
 }
 function restartJourney() {
   try { localStorage.removeItem(JR_KEY) } catch (e) {}
+  if (document.body.dataset.flow || S.view !== 'basic') { delete document.body.dataset.flow; setView('basic') }
   S.tree = {}; S.topPick = null; S.choice = null; renderTree(); $('#jrWelcome').hidden = true; setStep(1, '#finder')
 }
 function renderStrip() {
   const st = $('#jrStrip'); if (!st) return
-  const seq = journey(), n = Math.min(S.step || 1, seq.length)
+  const seq = journey(), n = document.body.dataset.flow ? seq.length : Math.min(S.step || 1, seq.length)
   st.hidden = !(S.step >= 2)
   $('#jrStep').textContent = 'Step ' + n + ' of ' + seq.length
-  $('#jrLabel').textContent = STEP_LABEL[seq[n - 1]] || ''
+  $('#jrLabel').textContent = document.body.dataset.flow ? 'Every rate, with its fine print' : (STEP_LABEL[seq[n - 1]] || '')
   $('#jrDots').innerHTML = seq.map((_, i) => '<i class="' + (i < n ? 'on' : '') + '"></i>').join('')
   const ctl = $('#controls'), nav = document.querySelector('.nav'), stickyCtl = ctl && getComputedStyle(ctl).position === 'sticky'
   st.style.top = ((nav ? nav.offsetHeight : 0) + (stickyCtl ? ctl.offsetHeight : 0)) + 'px'
@@ -591,12 +592,13 @@ function wireCmp() {
     if (b) { e.preventDefault(); e.stopPropagation(); const id = b.dataset.cmp, i = CMP.ids.indexOf(id);
       if (i >= 0) CMP.ids.splice(i, 1); else if (CMP.ids.length < CMP_MAX) CMP.ids.push(id); else { $('#cmpNames').textContent = 'You can compare up to 3. Remove one first.'; return; }
       if (CMP.ids.length < 2) CMP.open = false; syncCmp(); return; }
-    if (e.target.closest('#cmpOpen')) { CMP.open = true; const r0 = ROWS.find((r) => r.id === CMP.ids[0]); if (r0 && !isPeso(r0)) { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = 1000; } syncCmpForm(); syncCmp(); $('#cmpPanel').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
+    if (e.target.closest('#cmpOpen')) { if (S.view === 'basic') { document.body.dataset.flow = journey().includes('#fx-check') ? 'fx' : 'journey'; setView('advanced') } CMP.open = true; const r0 = ROWS.find((r) => r.id === CMP.ids[0]); if (r0 && !isPeso(r0)) { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = fmtAmount(1000); } syncCmpForm(); syncCmp(); setTimeout(() => { const pn = $('#cmpPanel'), off = [...document.querySelectorAll('.nav, #controls, #jrStrip')].reduce((t, el) => t + (el && !el.hidden && getComputedStyle(el).display !== 'none' && getComputedStyle(el).position !== 'static' ? el.offsetHeight : 0), 0); scrollTo({ top: pn.getBoundingClientRect().top + scrollY - off - 12, behavior: scrollMotion() }) }, 80); return; }
     if (e.target.closest('#cmpClear')) { CMP.ids = []; CMP.open = false; syncCmp(); return; }
     if (e.target.closest('#cmpClose')) { CMP.open = false; syncCmp(); return; }
-    const c = e.target.closest('[data-ccy]'); if (c) { CMP.ccy = c.dataset.ccy; CMP.amount = CMP.ccy === 'usd' ? 1000 : 100000; $('#cmpAmt').value = CMP.amount; syncCmpForm(); renderCmp(); }
+    const c = e.target.closest('[data-ccy]'); if (c) { CMP.ccy = c.dataset.ccy; CMP.amount = CMP.ccy === 'usd' ? 1000 : 100000; $('#cmpAmt').value = fmtAmount(CMP.amount); syncCmpForm(); renderCmp(); }
   }, true);
-  ['cmpAmt', 'cmpPromo', 'cmpTasks', 'cmpIns', 'cmpFlex'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', () => { CMP.amount = Number($('#cmpAmt').value) || 0; CMP.promo = $('#cmpPromo').checked; CMP.tasks = $('#cmpTasks').checked; CMP.insured = $('#cmpIns').checked; CMP.flex = $('#cmpFlex').checked; renderCmp(); }); });
+  { const ca = $('#cmpAmt'); if (ca) { ca.addEventListener('change', () => (ca.value = fmtAmount(parseAmount(ca.value)))); ca.addEventListener('focus', () => ca.select()) } }
+  ['cmpAmt', 'cmpPromo', 'cmpTasks', 'cmpIns', 'cmpFlex'].forEach((id) => { const el = $('#' + id); if (el) el.addEventListener('input', () => { CMP.amount = parseAmount($('#cmpAmt').value); CMP.promo = $('#cmpPromo').checked; CMP.tasks = $('#cmpTasks').checked; CMP.insured = $('#cmpIns').checked; CMP.flex = $('#cmpFlex').checked; renderCmp(); }); });
 }
 function syncCmpForm() { document.querySelectorAll('[data-ccy]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.ccy === CMP.ccy))); $('#cmpSym').textContent = CMP.ccy === 'usd' ? '$' : '₱'; }
 function renderTree() {
@@ -765,7 +767,7 @@ function renderRules() {
 
 /* ── wiring ───────────────────────────────── */
 function setView(v) {
-  S.view = v; document.body.dataset.view = v; const rt = document.getElementById('rates'); if (rt) { rt.classList.remove('swap'); void rt.offsetWidth; rt.classList.add('swap') } if (v === 'basic' && S.f.lock !== 'all') S.f.lock = 'all';
+  S.view = v; document.body.dataset.view = v; setTimeout(renderStrip, 0); const rt = document.getElementById('rates'); if (rt) { rt.classList.remove('swap'); void rt.offsetWidth; rt.classList.add('swap') } if (v === 'basic' && S.f.lock !== 'all') S.f.lock = 'all';
   $$('.seg button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
   try { localStorage.setItem('trYieldView', v); } catch (e) {}
   if (v === 'basic') { if (S.f.cat === 'dex') S.f.cat = 'all'; S.real = false; $('#realToggle').checked = false; syncChips(); }
@@ -997,7 +999,7 @@ async function init() {
   // Preview only: ?demo=1 fills the finder (ccy=usd switches to dollars; where/access override), ?cmp=id,id opens Compare.
   const Q = new URLSearchParams(location.search);
   if (Q.get('demo')) { if (Q.get('ccy') === 'usd') { S.currency = 'USD'; S.amount = 1000; updateAmount() } S.tree = { where: Q.get('where') || (Q.get('ccy') === 'usd' ? 'crypto' : 'bank'), access: Q.get('access') || 'flex', promo: 'ok', strings: 'no' }; renderTree(); }
-  if (Q.get('cmp')) { CMP.ids = Q.get('cmp').split(',').filter((id) => ROWS.some((r) => r.id === id)).slice(0, 3); if (Q.get('cmpccy') === 'usd') { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = 1000; } CMP.open = CMP.ids.length > 1; syncCmpForm(); syncCmp(); }
+  if (Q.get('cmp')) { CMP.ids = Q.get('cmp').split(',').filter((id) => ROWS.some((r) => r.id === id)).slice(0, 3); if (Q.get('cmpccy') === 'usd') { CMP.ccy = 'usd'; CMP.amount = 1000; $('#cmpAmt').value = fmtAmount(1000); } CMP.open = CMP.ids.length > 1; syncCmpForm(); syncCmp(); }
   if (Q.get('open')) { Q.get('open').split(',').forEach((id) => { const r = ROWS.find((x) => x.id === id); if (r) { S.open.add(id); S.openProv.add(r.category + '|' + r.provider); } }); renderRates(); } // preview screenshots only
   if (Q.get('view') === 'advanced') setView('advanced');
   if (Q.get('fdemo')) { S.f.kind = 'standard'; S.f.cap = 'nocap'; syncChips(); renderRates(); const t = $('.f-toggle'); if (t && Q.get('fdemo') === 'open') t.click(); }
