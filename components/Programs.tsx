@@ -63,7 +63,8 @@ export async function Programs() {
           </h2>
         </div>
 
-        <ProductRail products={products} curriculum={curriculum} before={BEFORE} after={AFTER} />
+        {/* Cards run cheapest to dearest (George, 11 Nov); equal prices keep their lineup order. */}
+        <ProductRail products={[...products].sort((a, b) => a.price - b.price)} curriculum={curriculum} before={BEFORE} after={AFTER} />
         {/* Target of the hero's "3-min assessment" link, so it scrolls here even before scripts run; Assessment then opens itself. */}
         <div id="assessment" className="fx-anchor" aria-hidden="true" />
         <Assessment products={products} />
