@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 76 76" width="256" height="256" role="img" aria-label="Liquidity Provider Masterclass">
+  <title>Liquidity Provider Masterclass: range bins (A1 Classic, picked by George 9 Nov 2026)</title>
+  <rect x="2" y="2" width="72" height="72" rx="16" fill="#141416" stroke="#F9A825" stroke-width="1.5"/>
+  <path d="M16 18 h-4 v40 h4 M60 18 h4 v40 h-4" fill="none" stroke="#F9A825" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="18" y="46" width="5" height="10" rx="1.5" fill="#22c55e"/>
+  <rect x="25" y="38" width="5" height="18" rx="1.5" fill="#22c55e"/>
+  <rect x="32" y="26" width="5" height="30" rx="1.5" fill="#F9A825"/>
+  <rect x="39" y="22" width="5" height="34" rx="1.5" fill="#F9A825"/>
+  <rect x="46" y="34" width="5" height="22" rx="1.5" fill="#ef4444"/>
+  <rect x="53" y="44" width="5" height="12" rx="1.5" fill="#ef4444"/>
+</svg>

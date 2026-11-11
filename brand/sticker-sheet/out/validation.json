@@ -1,0 +1,3826 @@
+{
+  "checkedAt": "2026-11-11",
+  "mediaCount": 38,
+  "sourceSheetSHA256": "ada5872f51ffc078572eb0a93249a3520974111be5a867c91e857961999eadf3",
+  "sourceArtUnchanged": true,
+  "sourceArtHashes": [
+    {
+      "Algorithm": "SHA256",
+      "Hash": "EEAA6945F6B41079C96CCEC01A20351F11475FEAA7B3D13D64597EA2407F819A",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\booster.svg"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "385757BBF360D1E43EAC3A8E48D83EF1F6D1C21FF609125573A5E5619E6903B6",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\citizen.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "9E53036AAC0F5CD4FA8BBC0C05469889648471474C51034D22A5B5FBF3DDC6F2",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\community-leader.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "375F461B140128FB6FD557400AFB850058447C4BED9B00DF2C492A87BD83CAD4",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\digital-walkers-A-256.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "85A73F0A2D38F963DC16035CFD417F395B1C4CEEE738D79BFA26535B961A8402",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\digital-walkers-B-256.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "766CAE580018640E4278A165E80339E09AF553996B3533FA255300DDB56E5F34",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\digital-walkers-C-256.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "3C7D9BEFFF72747ABCCC271C607CA35BA26BC30BD6B3E1FB32FF782E8D6BDAC7",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\digital-walkers.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "49252B6BDF377BFAE60FDE79D57732E57455FEBC57881DE546381B61FDF824A6",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\eternal.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "D67D16F56EDBDAB9713B8821EA62F83DC8DE6343CF304AD4D6CE9D32337F9AC9",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\explorer.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "D0067D5D9564693F3E358BEB096F20A177CA7EED202CB0EBA20AC15A8E2E3912",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\guild-leader.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "C687CCCC92428C680695F8CFD2D15FD750D57EF3B2CC2697096FA4BD81E5C477",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\lp-masterclass.svg"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "C1996ED71B0D383EDB904B047903EC126BFB7A555055A48AAB89335F419E43D9",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\masterclass.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "050E3386F7828E603B95B0A639862FC94EB9604B808DC98CFAC4AAFB8CD5900E",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\pathfinder.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "24C588DE58B8D73609AE0C97710F016242BDC433180A0627BEAE3C804E478DDC",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\patron.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "B55360B9AD2BB7C046A451E50B6BA0CF80A35249FB3E9A1F1F770283198C05D8",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\technical-intensive.png"
+    },
+    {
+      "Algorithm": "SHA256",
+      "Hash": "CFA5574DD812F25713F5C57A398B74F9DCA972EAD082EF2AC5931E8680A4144D",
+      "Path": "D:\\Media\\Claude\\badge-sheet\\img\\wealth-builder.png"
+    }
+  ],
+  "fonts": {
+    "web": {
+      "ready": "loaded",
+      "rows": [
+        {
+          "tag": "DIV",
+          "class": "kick",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "500",
+          "style": "normal",
+          "spec": "normal 500 18px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "H1",
+          "class": "",
+          "family": "\"Playfair Display\", serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 76px \"Playfair Display\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "lede",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 30px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "SPAN",
+          "class": "new",
+          "family": "Caveat, cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 30px Caveat",
+          "check": true
+        },
+        {
+          "tag": "H2",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 26px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 21px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 25px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 20px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "DIV",
+          "class": "end",
+          "family": "Caveat, cursive",
+          "weight": "600",
+          "style": "normal",
+          "spec": "normal 600 34px Caveat",
+          "check": true
+        }
+      ],
+      "platform": {
+        "h1": {
+          "fonts": [
+            {
+              "familyName": "Playfair Display",
+              "postScriptName": "PlayfairDisplay-Bold",
+              "isCustomFont": true,
+              "glyphCount": 29
+            }
+          ]
+        },
+        ".kick": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Medium",
+              "isCustomFont": true,
+              "glyphCount": 34
+            }
+          ]
+        },
+        ".boost h2": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Bold",
+              "isCustomFont": true,
+              "glyphCount": 14
+            }
+          ]
+        },
+        ".card h3": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Bold",
+              "isCustomFont": true,
+              "glyphCount": 8
+            }
+          ]
+        },
+        ".lede": {
+          "fonts": [
+            {
+              "familyName": "Patrick Hand",
+              "postScriptName": "PatrickHand-Regular",
+              "isCustomFont": true,
+              "glyphCount": 73
+            }
+          ]
+        },
+        ".card p": {
+          "fonts": [
+            {
+              "familyName": "Patrick Hand",
+              "postScriptName": "PatrickHand-Regular",
+              "isCustomFont": true,
+              "glyphCount": 37
+            }
+          ]
+        },
+        ".new": {
+          "fonts": [
+            {
+              "familyName": "Caveat SemiBold",
+              "postScriptName": "Caveat-SemiBold",
+              "isCustomFont": true,
+              "glyphCount": 3
+            }
+          ]
+        },
+        ".end": {
+          "fonts": [
+            {
+              "familyName": "Caveat SemiBold",
+              "postScriptName": "Caveat-SemiBold",
+              "isCustomFont": true,
+              "glyphCount": 38
+            }
+          ]
+        }
+      }
+    },
+    "phone": {
+      "ready": "loaded",
+      "rows": [
+        {
+          "tag": "DIV",
+          "class": "kick",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "500",
+          "style": "normal",
+          "spec": "normal 500 13px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "H1",
+          "class": "",
+          "family": "\"Playfair Display\", serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 38px \"Playfair Display\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "lede",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 19px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "SPAN",
+          "class": "new",
+          "family": "Caveat, cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 24px Caveat",
+          "check": true
+        },
+        {
+          "tag": "H2",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 26px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 18px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "B",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "H3",
+          "class": "",
+          "family": "\"Space Grotesk\", sans-serif",
+          "weight": "700",
+          "style": "normal",
+          "spec": "normal 700 20px \"Space Grotesk\"",
+          "check": true
+        },
+        {
+          "tag": "P",
+          "class": "",
+          "family": "\"Patrick Hand\", cursive",
+          "weight": "400",
+          "style": "normal",
+          "spec": "normal 400 17px \"Patrick Hand\"",
+          "check": true
+        },
+        {
+          "tag": "DIV",
+          "class": "end",
+          "family": "Caveat, cursive",
+          "weight": "600",
+          "style": "normal",
+          "spec": "normal 600 26px Caveat",
+          "check": true
+        }
+      ],
+      "platform": {
+        "h1": {
+          "fonts": [
+            {
+              "familyName": "Playfair Display",
+              "postScriptName": "PlayfairDisplay-Bold",
+              "isCustomFont": true,
+              "glyphCount": 28
+            }
+          ]
+        },
+        ".kick": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Medium",
+              "isCustomFont": true,
+              "glyphCount": 34
+            }
+          ]
+        },
+        ".boost h2": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Bold",
+              "isCustomFont": true,
+              "glyphCount": 14
+            }
+          ]
+        },
+        ".card h3": {
+          "fonts": [
+            {
+              "familyName": "Space Grotesk Light",
+              "postScriptName": "Space-Grotesk-Light-Bold",
+              "isCustomFont": true,
+              "glyphCount": 8
+            }
+          ]
+        },
+        ".lede": {
+          "fonts": [
+            {
+              "familyName": "Patrick Hand",
+              "postScriptName": "PatrickHand-Regular",
+              "isCustomFont": true,
+              "glyphCount": 72
+            }
+          ]
+        },
+        ".card p": {
+          "fonts": [
+            {
+              "familyName": "Patrick Hand",
+              "postScriptName": "PatrickHand-Regular",
+              "isCustomFont": true,
+              "glyphCount": 36
+            }
+          ]
+        },
+        ".new": {
+          "fonts": [
+            {
+              "familyName": "Caveat SemiBold",
+              "postScriptName": "Caveat-SemiBold",
+              "isCustomFont": true,
+              "glyphCount": 3
+            }
+          ]
+        },
+        ".end": {
+          "fonts": [
+            {
+              "familyName": "Caveat SemiBold",
+              "postScriptName": "Caveat-SemiBold",
+              "isCustomFont": true,
+              "glyphCount": 38
+            }
+          ]
+        }
+      }
+    }
+  },
+  "records": [
+    {
+      "file": "booster-64.gif",
+      "bytes": 135978,
+      "sha256": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "booster.gif",
+      "bytes": 807482,
+      "sha256": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "booster.webp",
+      "bytes": 1420114,
+      "sha256": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "citizen-64.gif",
+      "bytes": 139455,
+      "sha256": "3d62780f044ff9bd098ed8d42d0568c4411937da66242e6b9fe8d66956a97536",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "citizen.gif",
+      "bytes": 858527,
+      "sha256": "19291119428fb7f8aa4adbd16ee4a859bb4f0e34e8a73042ada6909ce6fa5131",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "citizen.webp",
+      "bytes": 1011282,
+      "sha256": "203cee6a55d8fb1e5bc10e5ae60f0de420e0208f90a6ee0c23f377c779a89e64",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "community-leader-64.gif",
+      "bytes": 119212,
+      "sha256": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "community-leader.gif",
+      "bytes": 813316,
+      "sha256": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "community-leader.webp",
+      "bytes": 1363128,
+      "sha256": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+      "width": 256,
+      "height": 256,
+      "frames": 119,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "contact.png",
+      "bytes": 192843,
+      "sha256": "2a238e908739d85e74f073d23f0964beec7ac189d15d14fc0dbd293d57bfc751",
+      "width": 1120,
+      "height": 1010,
+      "frames": 1,
+      "duration": 0
+    },
+    {
+      "file": "eternals-64.gif",
+      "bytes": 194907,
+      "sha256": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "eternals.gif",
+      "bytes": 1399883,
+      "sha256": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "eternals.webp",
+      "bytes": 2573014,
+      "sha256": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+      "width": 256,
+      "height": 256,
+      "frames": 119,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "explorer-64.gif",
+      "bytes": 91649,
+      "sha256": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "explorer.gif",
+      "bytes": 556405,
+      "sha256": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "explorer.webp",
+      "bytes": 604218,
+      "sha256": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+      "width": 256,
+      "height": 256,
+      "frames": 119,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "guild-leader-64.gif",
+      "bytes": 142982,
+      "sha256": "ebed7862741d9387699ddddd5315e2ebc5edf21449de0bf9996e9df052abdab3",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "guild-leader.gif",
+      "bytes": 1014670,
+      "sha256": "e68172f184aa452fd512bfb609f6ce260002430aac96953a6019eee37cfdeb4c",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "guild-leader.webp",
+      "bytes": 1360068,
+      "sha256": "b63eb6e3e35b294bcc9cc1c2e7b968678419238994e05bb380ba063ea82e336c",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "liquidity-provider-64.gif",
+      "bytes": 125465,
+      "sha256": "7e20e294c06a463cf4bac8f015c33438473cfbee59ec218d9e16594099042d23",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "liquidity-provider.gif",
+      "bytes": 454654,
+      "sha256": "c6f16922a0747039a8b7368caccaa80dccb9a8bfa4a2416dafbf458d68374c1e",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "liquidity-provider.webp",
+      "bytes": 598822,
+      "sha256": "4d4c42ef0a1bea82d74d4323bbcfcc3b56ffbcc2cd8b8d1b17ba847eb71f45a0",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "pathfinders-64.gif",
+      "bytes": 153942,
+      "sha256": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "pathfinders.gif",
+      "bytes": 953636,
+      "sha256": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "pathfinders.webp",
+      "bytes": 1484206,
+      "sha256": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+      "width": 256,
+      "height": 256,
+      "frames": 142,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "poster-phone.gif",
+      "bytes": 13956903,
+      "sha256": "cabf7faff306b93e487d346bfcff9cf1d85e68800f271af2e7e4f1654a100090",
+      "width": 780,
+      "height": 4536,
+      "frames": 240,
+      "duration": 8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ],
+      "fontChecksPassed": true
+    },
+    {
+      "file": "poster-phone.mp4",
+      "bytes": 2852890,
+      "sha256": "bc7e2e40f1859d9d79bc89a2fe0000b7ed8692f928d2869d436e80d3ba0d9090",
+      "width": 780,
+      "height": 4536,
+      "frames": 240,
+      "duration": 8,
+      "profile": "High",
+      "pixelFormat": "yuv420p",
+      "fps": "30/1",
+      "faststart": true,
+      "fontChecksPassed": true
+    },
+    {
+      "file": "poster-web.gif",
+      "bytes": 12836746,
+      "sha256": "3ec3d8c3e1eeab38a42ac205950c3d3f7e994bafb93b587cfe46c49b02503cf9",
+      "width": 1600,
+      "height": 1938,
+      "frames": 240,
+      "duration": 8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ],
+      "fontChecksPassed": true
+    },
+    {
+      "file": "poster-web.mp4",
+      "bytes": 1729861,
+      "sha256": "afda25aee4ddc031fd70b9197567b77299cba7e9d764e6d02e3f37b3534ba64d",
+      "width": 1600,
+      "height": 1938,
+      "frames": 240,
+      "duration": 8,
+      "profile": "High",
+      "pixelFormat": "yuv420p",
+      "fps": "30/1",
+      "faststart": true,
+      "fontChecksPassed": true
+    },
+    {
+      "file": "technical-intensive-64.gif",
+      "bytes": 150576,
+      "sha256": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "technical-intensive.gif",
+      "bytes": 842246,
+      "sha256": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "technical-intensive.webp",
+      "bytes": 843530,
+      "sha256": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+      "width": 256,
+      "height": 256,
+      "frames": 142,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "wealth-builder-64.gif",
+      "bytes": 172596,
+      "sha256": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "wealth-builder.gif",
+      "bytes": 933931,
+      "sha256": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "wealth-builder.webp",
+      "bytes": 1351590,
+      "sha256": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625",
+      "width": 256,
+      "height": 256,
+      "frames": 119,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "web3-masterclass-64.gif",
+      "bytes": 133789,
+      "sha256": "c65834058c15b46130ddb356e489e22b0f20e55d5122e889a294f2b0e2122b07",
+      "width": 64,
+      "height": 64,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "web3-masterclass.gif",
+      "bytes": 724607,
+      "sha256": "7a96ccc7d80bd624bf9d96ff4af3e609abb2633cd08cb0c67cdf0a6b6d3b69f7",
+      "width": 256,
+      "height": 256,
+      "frames": 144,
+      "duration": 4.8,
+      "loop": 0,
+      "delays": [
+        0.03,
+        0.04
+      ]
+    },
+    {
+      "file": "web3-masterclass.webp",
+      "bytes": 1070740,
+      "sha256": "9fbe6d7a5d849a0eedcb3229add1f42050a4d4eb6251c6a5bf44a4ee8b9697bf",
+      "width": 256,
+      "height": 256,
+      "frames": 119,
+      "duration": 4.8,
+      "loop": 0
+    },
+    {
+      "file": "poster-web-check.png",
+      "bytes": 936772,
+      "sha256": "36ac94fa4b45d357130e81be269db3e3b5836dda6080858961d539130b1048b1",
+      "width": 3200,
+      "height": 1938,
+      "frames": 1,
+      "duration": 0,
+      "fontChecksPassed": true
+    },
+    {
+      "file": "poster-phone-check.png",
+      "bytes": 1421753,
+      "sha256": "12aacb4a63e2ea6a33ba89498a6d0a42f2fc7639b9ff4d0153cb2d252dd3d212",
+      "width": 1560,
+      "height": 4536,
+      "frames": 1,
+      "duration": 0,
+      "fontChecksPassed": true
+    },
+    {
+      "file": "anim3-check.png",
+      "bytes": 644697,
+      "sha256": "5290e13ef61fe8b1e9d4f8cec50b4c64871dc16242d419dc236f163af08c6316",
+      "width": 1152,
+      "height": 1776,
+      "frames": 1,
+      "duration": 0
+    }
+  ],
+  "posterFontRerender": {
+    "job": "cc-badge-poster-fonts",
+    "checkedAt": "2026-11-11T03:04:46.228Z",
+    "frameStepMs": 33.333333333333336,
+    "sourceArtAndFontsUnchanged": true,
+    "sourceSheetChangedExternallyAfterCapture": true,
+    "capturedSourceSheetSHA256": "de533a5dd5c0fb5e661009d450292da789bf3f0b64eac4a5a829b2ec9e3c0eb0",
+    "currentSourceSheetSHA256": "1566d3f1efb68f635e89b90037e663f27f276bbc973ac9706cf75075fb6611b5",
+    "sourceDriftNote": "sheet.html modified externally at 11:03:45 local, after both captures; includes new WEB3 reference digital-walkers-B-256.png. Render retains the source loaded at capture time for this fonts-only job.",
+    "protectedMedia": {
+      "unchanged": true,
+      "count": 34,
+      "before": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "citizen-64.gif": "87b4b658e4d49e5dcd7fb314f32976210c720d1f7fadb0caa35f6c046cda2734",
+        "citizen.gif": "7439405dddf25f601aefb3bbd4803b2677f5b674aa1e9263fd75ddb8961cac88",
+        "citizen.webp": "03599e46ad27c39f6609438e2121a2edaf8a4ea57001daf28e2e0f2b105110ff",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "contact.png": "c794f73539c418bd18495e946872a034b508170d93043930de00c5e301b2dd75",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "guild-leader-64.gif": "f91dc1a61fb631e88ef3e9aa495918b3fcfa3644715f11210c34c3d64588a380",
+        "guild-leader.gif": "4f4484c7957bd5cfb1c5af06e98c0e1b169fdbb6c214e2c500acd7891ebe8206",
+        "guild-leader.webp": "c0b098b491699f5354bd4fc16fd4a19021dac85bba00874e25ea1c052cb4d3ae",
+        "liquidity-provider-64.gif": "f23bb5c99d8328d36f8d12b98aeee53611eb83d60c009f5b2fdd603557c254c8",
+        "liquidity-provider.gif": "13fc06bbb1681825676ae1dac7ba0a433566a5eac2a47f83d8b0ffc239633603",
+        "liquidity-provider.webp": "88c7e59d86def9374043d1953c9e0c96d24e7663bdd3c59a2cbc79b059f6dc91",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625",
+        "web3-masterclass-64.gif": "831da9ec0e72791d86c694695bedba4ed20cb255a86ad577af3790e3c8076a49",
+        "web3-masterclass.gif": "50cb14ac3c95165e0fd0a26f6b691f7179d58a522e0601d4ce212fdaaca9ecb9",
+        "web3-masterclass.webp": "581ebba55734ce04ec92b379b9e9000301e7ef30d6a92fa6217109b8ede43653"
+      },
+      "after": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "citizen-64.gif": "87b4b658e4d49e5dcd7fb314f32976210c720d1f7fadb0caa35f6c046cda2734",
+        "citizen.gif": "7439405dddf25f601aefb3bbd4803b2677f5b674aa1e9263fd75ddb8961cac88",
+        "citizen.webp": "03599e46ad27c39f6609438e2121a2edaf8a4ea57001daf28e2e0f2b105110ff",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "contact.png": "c794f73539c418bd18495e946872a034b508170d93043930de00c5e301b2dd75",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "guild-leader-64.gif": "f91dc1a61fb631e88ef3e9aa495918b3fcfa3644715f11210c34c3d64588a380",
+        "guild-leader.gif": "4f4484c7957bd5cfb1c5af06e98c0e1b169fdbb6c214e2c500acd7891ebe8206",
+        "guild-leader.webp": "c0b098b491699f5354bd4fc16fd4a19021dac85bba00874e25ea1c052cb4d3ae",
+        "liquidity-provider-64.gif": "f23bb5c99d8328d36f8d12b98aeee53611eb83d60c009f5b2fdd603557c254c8",
+        "liquidity-provider.gif": "13fc06bbb1681825676ae1dac7ba0a433566a5eac2a47f83d8b0ffc239633603",
+        "liquidity-provider.webp": "88c7e59d86def9374043d1953c9e0c96d24e7663bdd3c59a2cbc79b059f6dc91",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625",
+        "web3-masterclass-64.gif": "831da9ec0e72791d86c694695bedba4ed20cb255a86ad577af3790e3c8076a49",
+        "web3-masterclass.gif": "50cb14ac3c95165e0fd0a26f6b691f7179d58a522e0601d4ce212fdaaca9ecb9",
+        "web3-masterclass.webp": "581ebba55734ce04ec92b379b9e9000301e7ef30d6a92fa6217109b8ede43653"
+      }
+    },
+    "fontNote": "Offline local WOFF2; Caveat 700 uses supplied 600 face with browser synthesis; CDP confirms custom fonts throughout checked selectors.",
+    "stills": [
+      {
+        "file": "poster-web-check.png",
+        "width": 3200,
+        "height": 1938,
+        "bytes": 938955,
+        "sha256": "690c9438480a1b2eda7c48d8cac66ed81f617febef16a84acd7ea818b5344362",
+        "layout": "frame 0 left; frame 120 (4 s) right"
+      },
+      {
+        "file": "poster-phone-check.png",
+        "width": 1560,
+        "height": 4536,
+        "bytes": 1418956,
+        "sha256": "884d551556dd5bc44ba0ff35148a0c424d683b6975b1b6ab1f4bae0d34eecad2",
+        "layout": "frame 0 left; frame 120 (4 s) right"
+      }
+    ],
+    "visualInspection": "Both MP4 first/mid-frame composites and final GIF midpoints checked.",
+    "supersededBy": "cc-badge-web3b (current poster files and font evidence in web3BRerender)"
+  },
+  "web3BRerender": {
+    "job": "cc-badge-web3b",
+    "checkedAt": "2026-11-11T03:10:31.944Z",
+    "image": "img/digital-walkers-B-256.png",
+    "sourceHashes": {
+      "sheet.html": "ada5872f51ffc078572eb0a93249a3520974111be5a867c91e857961999eadf3",
+      "img/booster.svg": "eeaa6945f6b41079c96ccec01a20351f11475feaa7b3d13d64597ea2407f819a",
+      "img/citizen-anim.svg": "119c7271483c718809b15c2a6fc65f39a451f6fd726939e16cebf2c9c89f986a",
+      "img/citizen.png": "385757bbf360d1e43eac3a8e48d83ef1f6d1c21ff609125573a5e5619e6903b6",
+      "img/community-leader.png": "9e53036aac0f5cd4fa8bbc0c05469889648471474c51034d22a5b5fbf3ddc6f2",
+      "img/digital-walkers-A-256.png": "375f461b140128fb6fd557400afb850058447c4bed9b00df2c492a87bd83cad4",
+      "img/digital-walkers-B-256.png": "85a73f0a2d38f963dc16035cfd417f395b1c4ceee738d79bfa26535b961a8402",
+      "img/digital-walkers-C-256.png": "766cae580018640e4278a165e80339e09af553996b3533fa255300ddb56e5f34",
+      "img/digital-walkers.png": "3c7d9befff72747abccc271c607ca35ba26bc30bd6b3e1fb32ff782e8d6bdac7",
+      "img/eternal.png": "49252b6bdf377bfae60fde79d57732e57455febc57881de546381b61fdf824a6",
+      "img/explorer.png": "d67d16f56edbdab9713b8821ea62f83dc8de6343cf304ad4d6ce9d32337f9ac9",
+      "img/guild-leader-anim.svg": "386b0b81c719f05cf300551dd64425dcdb2d77636e0107104e5b9f17c50a5081",
+      "img/guild-leader.png": "d0067d5d9564693f3e358beb096f20a177ca7eed202cb0eba20ac15a8e2e3912",
+      "img/lp-anim.svg": "a9e7219cc6356f5bb3bda08a4b188a130035c82b606ad0d3c0747158974595e2",
+      "img/lp-masterclass.svg": "c687cccc92428c680695f8cfd2d15fd750d57ef3b2cc2697096fa4bd81e5c477",
+      "img/masterclass.png": "c1996ed71b0d383edb904b047903ec126bfb7a555055a48aab89335f419e43d9",
+      "img/pathfinder.png": "050e3386f7828e603b95b0a639862fc94eb9604b808dc98cfac4aafb8cd5900e",
+      "img/patron.png": "24c588de58b8d73609ae0c97710f016242bdc433180a0627beae3c804e478ddc",
+      "img/technical-intensive.png": "b55360b9ad2bb7c046a451e50b6ba0cf80a35249fb3e9a1f1f770283198c05d8",
+      "img/wealth-builder.png": "cfa5574dd812f25713f5c57a398b74f9dca972ead082ef2ac5931e8680a4144d",
+      "fonts/Caveat-600-latin-ext.woff2": "ec90c36c3dfe05fca71ab42c5e8d6fcaf21b1363d4b008de3fa0b0d39d7ed34f",
+      "fonts/Caveat-600-latin.woff2": "d51e2283010e661d9f3dafdc9ff4b82b2ebcb2f7aa43ca48a105f5f68d46cc32",
+      "fonts/g.css": "7680a4189c6d4a77fc5965c3e6c458d297ed22f4722494dea9e592251720b7d3",
+      "fonts/local.css": "a82bfcb82f3ff14814494dd62fd5299349f55834489f062ef1f00581d87bf581",
+      "fonts/PatrickHand-400-latin-ext.woff2": "c16846bad9501534b8402172c18f87e927146c4e63af2942f1fa8ad8ba7e6e70",
+      "fonts/PatrickHand-400-latin.woff2": "ac5bc9033b2572bf84d39f7150c1634e37ed16e8dbee632d6d0bceac0bbf0199",
+      "fonts/PlayfairDisplay-700-latin-ext.woff2": "edb9f5d879b30c617698bcc288692c339d5a0a2464a5476f00025195e5cad166",
+      "fonts/PlayfairDisplay-700-latin.woff2": "28453852ea165c47b5a941be00e418402e1407002ed87507f062a1e316328fe6",
+      "fonts/SpaceGrotesk-500-latin-ext.woff2": "952dddb45d2f96f71cbf3b7f510b24379afc3c89ea02fcf89d377b45d62c0166",
+      "fonts/SpaceGrotesk-500-latin.woff2": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d",
+      "fonts/SpaceGrotesk-700-latin-ext.woff2": "952dddb45d2f96f71cbf3b7f510b24379afc3c89ea02fcf89d377b45d62c0166",
+      "fonts/SpaceGrotesk-700-latin.woff2": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d"
+    },
+    "sourceUnchanged": true,
+    "postersRerendered": true,
+    "reason": "Font job captured the old WEB3 art before sheet.html changed.",
+    "capture": {
+      "fps": 30,
+      "badgeFrames": 144,
+      "posterFrames": 240,
+      "documentFontsReady": true,
+      "imageLoadsConfirmed": true,
+      "httpBlocked": true
+    },
+    "pixelChecks": {
+      "contact": {
+        "changedPixelsInsideWEB3Tile": 46281,
+        "changedPixelsOutsideWEB3Tile": 0,
+        "rectangle": {
+          "x": 296,
+          "y": 347,
+          "width": 256,
+          "height": 256
+        }
+      },
+      "seamless": {
+        "startEquals4800ms": true
+      }
+    },
+    "protectedBadges": {
+      "unchanged": true,
+      "count": 30,
+      "before": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "citizen-64.gif": "87b4b658e4d49e5dcd7fb314f32976210c720d1f7fadb0caa35f6c046cda2734",
+        "citizen.gif": "7439405dddf25f601aefb3bbd4803b2677f5b674aa1e9263fd75ddb8961cac88",
+        "citizen.webp": "03599e46ad27c39f6609438e2121a2edaf8a4ea57001daf28e2e0f2b105110ff",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "guild-leader-64.gif": "f91dc1a61fb631e88ef3e9aa495918b3fcfa3644715f11210c34c3d64588a380",
+        "guild-leader.gif": "4f4484c7957bd5cfb1c5af06e98c0e1b169fdbb6c214e2c500acd7891ebe8206",
+        "guild-leader.webp": "c0b098b491699f5354bd4fc16fd4a19021dac85bba00874e25ea1c052cb4d3ae",
+        "liquidity-provider-64.gif": "f23bb5c99d8328d36f8d12b98aeee53611eb83d60c009f5b2fdd603557c254c8",
+        "liquidity-provider.gif": "13fc06bbb1681825676ae1dac7ba0a433566a5eac2a47f83d8b0ffc239633603",
+        "liquidity-provider.webp": "88c7e59d86def9374043d1953c9e0c96d24e7663bdd3c59a2cbc79b059f6dc91",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625"
+      },
+      "after": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "citizen-64.gif": "87b4b658e4d49e5dcd7fb314f32976210c720d1f7fadb0caa35f6c046cda2734",
+        "citizen.gif": "7439405dddf25f601aefb3bbd4803b2677f5b674aa1e9263fd75ddb8961cac88",
+        "citizen.webp": "03599e46ad27c39f6609438e2121a2edaf8a4ea57001daf28e2e0f2b105110ff",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "guild-leader-64.gif": "f91dc1a61fb631e88ef3e9aa495918b3fcfa3644715f11210c34c3d64588a380",
+        "guild-leader.gif": "4f4484c7957bd5cfb1c5af06e98c0e1b169fdbb6c214e2c500acd7891ebe8206",
+        "guild-leader.webp": "c0b098b491699f5354bd4fc16fd4a19021dac85bba00874e25ea1c052cb4d3ae",
+        "liquidity-provider-64.gif": "f23bb5c99d8328d36f8d12b98aeee53611eb83d60c009f5b2fdd603557c254c8",
+        "liquidity-provider.gif": "13fc06bbb1681825676ae1dac7ba0a433566a5eac2a47f83d8b0ffc239633603",
+        "liquidity-provider.webp": "88c7e59d86def9374043d1953c9e0c96d24e7663bdd3c59a2cbc79b059f6dc91",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625"
+      }
+    },
+    "fonts": {
+      "web": {
+        "ready": "loaded",
+        "rows": [
+          {
+            "tag": "DIV",
+            "class": "kick",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "500",
+            "style": "normal",
+            "spec": "normal 500 18px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "H1",
+            "class": "",
+            "family": "\"Playfair Display\", serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 76px \"Playfair Display\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "lede",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 30px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "SPAN",
+            "class": "new",
+            "family": "Caveat, cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 30px Caveat",
+            "check": true
+          },
+          {
+            "tag": "H2",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 26px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 21px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "DIV",
+            "class": "end",
+            "family": "Caveat, cursive",
+            "weight": "600",
+            "style": "normal",
+            "spec": "normal 600 34px Caveat",
+            "check": true
+          }
+        ],
+        "platform": {
+          "h1": {
+            "fonts": [
+              {
+                "familyName": "Playfair Display",
+                "postScriptName": "PlayfairDisplay-Bold",
+                "isCustomFont": true,
+                "glyphCount": 29
+              }
+            ]
+          },
+          ".kick": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Medium",
+                "isCustomFont": true,
+                "glyphCount": 34
+              }
+            ]
+          },
+          ".boost h2": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 14
+              }
+            ]
+          },
+          ".card h3": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 8
+              }
+            ]
+          },
+          ".lede": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 73
+              }
+            ]
+          },
+          ".card p": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 37
+              }
+            ]
+          },
+          ".new": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 3
+              }
+            ]
+          },
+          ".end": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 38
+              }
+            ]
+          }
+        }
+      },
+      "phone": {
+        "ready": "loaded",
+        "rows": [
+          {
+            "tag": "DIV",
+            "class": "kick",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "500",
+            "style": "normal",
+            "spec": "normal 500 13px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "H1",
+            "class": "",
+            "family": "\"Playfair Display\", serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 38px \"Playfair Display\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "lede",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 19px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "SPAN",
+            "class": "new",
+            "family": "Caveat, cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 24px Caveat",
+            "check": true
+          },
+          {
+            "tag": "H2",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 26px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 18px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "DIV",
+            "class": "end",
+            "family": "Caveat, cursive",
+            "weight": "600",
+            "style": "normal",
+            "spec": "normal 600 26px Caveat",
+            "check": true
+          }
+        ],
+        "platform": {
+          "h1": {
+            "fonts": [
+              {
+                "familyName": "Playfair Display",
+                "postScriptName": "PlayfairDisplay-Bold",
+                "isCustomFont": true,
+                "glyphCount": 28
+              }
+            ]
+          },
+          ".kick": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Medium",
+                "isCustomFont": true,
+                "glyphCount": 34
+              }
+            ]
+          },
+          ".boost h2": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 14
+              }
+            ]
+          },
+          ".card h3": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 8
+              }
+            ]
+          },
+          ".lede": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 72
+              }
+            ]
+          },
+          ".card p": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 36
+              }
+            ]
+          },
+          ".new": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 3
+              }
+            ]
+          },
+          ".end": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 38
+              }
+            ]
+          }
+        }
+      }
+    },
+    "images": {
+      "badge": [
+        {
+          "src": "img/explorer.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/citizen-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        },
+        {
+          "src": "img/wealth-builder.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/technical-intensive.png",
+          "complete": true,
+          "width": 111,
+          "height": 128
+        },
+        {
+          "src": "img/digital-walkers-B-256.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/lp-anim.svg",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/community-leader.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/eternal.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/masterclass.png",
+          "complete": true,
+          "width": 128,
+          "height": 128
+        },
+        {
+          "src": "img/guild-leader-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        }
+      ],
+      "web": [
+        {
+          "src": "img/explorer.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/citizen-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        },
+        {
+          "src": "img/wealth-builder.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/technical-intensive.png",
+          "complete": true,
+          "width": 111,
+          "height": 128
+        },
+        {
+          "src": "img/digital-walkers-B-256.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/lp-anim.svg",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/community-leader.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/eternal.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/masterclass.png",
+          "complete": true,
+          "width": 128,
+          "height": 128
+        },
+        {
+          "src": "img/guild-leader-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        }
+      ],
+      "phone": [
+        {
+          "src": "img/explorer.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/citizen-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        },
+        {
+          "src": "img/wealth-builder.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/technical-intensive.png",
+          "complete": true,
+          "width": 111,
+          "height": 128
+        },
+        {
+          "src": "img/digital-walkers-B-256.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/lp-anim.svg",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/community-leader.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/eternal.png",
+          "complete": true,
+          "width": 256,
+          "height": 256
+        },
+        {
+          "src": "img/masterclass.png",
+          "complete": true,
+          "width": 128,
+          "height": 128
+        },
+        {
+          "src": "img/guild-leader-anim.svg",
+          "complete": true,
+          "width": 120,
+          "height": 120
+        }
+      ]
+    },
+    "changedMedia": [
+      {
+        "file": "web3-masterclass.gif",
+        "before": "50cb14ac3c95165e0fd0a26f6b691f7179d58a522e0601d4ce212fdaaca9ecb9",
+        "after": "7a96ccc7d80bd624bf9d96ff4af3e609abb2633cd08cb0c67cdf0a6b6d3b69f7"
+      },
+      {
+        "file": "web3-masterclass-64.gif",
+        "before": "831da9ec0e72791d86c694695bedba4ed20cb255a86ad577af3790e3c8076a49",
+        "after": "c65834058c15b46130ddb356e489e22b0f20e55d5122e889a294f2b0e2122b07"
+      },
+      {
+        "file": "web3-masterclass.webp",
+        "before": "581ebba55734ce04ec92b379b9e9000301e7ef30d6a92fa6217109b8ede43653",
+        "after": "9fbe6d7a5d849a0eedcb3229add1f42050a4d4eb6251c6a5bf44a4ee8b9697bf"
+      },
+      {
+        "file": "poster-web.mp4",
+        "before": "e6ffadbbdc53e23434bc8fa6dddfaf87498be2dc6f6097ca315351ffc4af7418",
+        "after": "76e39be936319e8bc7cb601fe9d8861e28fe8c3731caca2657f9122c947f6404"
+      },
+      {
+        "file": "poster-web.gif",
+        "before": "32cd98612820ed9317cc8c3a4369dff14b03af1503f4b71a3542ebda19f84391",
+        "after": "0df781b65047d0f1312ecdca905316c94b11a9523dff6fd0dd4e7fc831704cd6"
+      },
+      {
+        "file": "poster-phone.mp4",
+        "before": "29b3fdf1d2f1484d1b7fb123fcdaa7d87a40df156a5b9f8561992db9810dd600",
+        "after": "c1bf411b7b04d7a13311892bf9b6c2c9f9e26d4e951dd21ffd97c061ebbc4bf1"
+      },
+      {
+        "file": "poster-phone.gif",
+        "before": "4620cf3dc7f97946ac7d303458d3815751d32b6b0c492211d4f3181eb5e7a484",
+        "after": "e66cc92204dfecd10e04ae9c2cd51f26ac67ce5f98b15bd893e73eaf4dfc70b6"
+      },
+      {
+        "file": "contact.png",
+        "before": "c794f73539c418bd18495e946872a034b508170d93043930de00c5e301b2dd75",
+        "after": "933a91f61ba4cfcd442b0e42a496e804436afb69bca09586d9dc69110ca7bb12"
+      },
+      {
+        "file": "poster-web-check.png",
+        "before": "690c9438480a1b2eda7c48d8cac66ed81f617febef16a84acd7ea818b5344362",
+        "after": "0a4fcbb22b440c9ac8172ca297930ba54cce5b91f92666a8d12b22c30f54a641"
+      },
+      {
+        "file": "poster-phone-check.png",
+        "before": "884d551556dd5bc44ba0ff35148a0c424d683b6975b1b6ab1f4bae0d34eecad2",
+        "after": "bf186b788cadb1133c6430f51b2dd102855c2216b231728aea712a11592679cb"
+      }
+    ],
+    "visualInspection": "WEB3 B first frame, contact tile and decoded final web/phone GIF midpoint composites inspected.",
+    "losslessWebP": {
+      "verified": true,
+      "frameCodec": "VP8L",
+      "frames": 119
+    }
+  },
+  "anim3Rerender": {
+    "job": "cc-badge-anim3",
+    "checkedAt": "2026-11-11T03:26:35.427Z",
+    "sourceHashes": {
+      "sheet.html": "ada5872f51ffc078572eb0a93249a3520974111be5a867c91e857961999eadf3",
+      "img/booster.svg": "eeaa6945f6b41079c96ccec01a20351f11475feaa7b3d13d64597ea2407f819a",
+      "img/citizen-anim.svg": "119c7271483c718809b15c2a6fc65f39a451f6fd726939e16cebf2c9c89f986a",
+      "img/citizen.png": "385757bbf360d1e43eac3a8e48d83ef1f6d1c21ff609125573a5e5619e6903b6",
+      "img/community-leader.png": "9e53036aac0f5cd4fa8bbc0c05469889648471474c51034d22a5b5fbf3ddc6f2",
+      "img/digital-walkers-A-256.png": "375f461b140128fb6fd557400afb850058447c4bed9b00df2c492a87bd83cad4",
+      "img/digital-walkers-B-256.png": "85a73f0a2d38f963dc16035cfd417f395b1c4ceee738d79bfa26535b961a8402",
+      "img/digital-walkers-C-256.png": "766cae580018640e4278a165e80339e09af553996b3533fa255300ddb56e5f34",
+      "img/digital-walkers.png": "3c7d9befff72747abccc271c607ca35ba26bc30bd6b3e1fb32ff782e8d6bdac7",
+      "img/eternal.png": "49252b6bdf377bfae60fde79d57732e57455febc57881de546381b61fdf824a6",
+      "img/explorer.png": "d67d16f56edbdab9713b8821ea62f83dc8de6343cf304ad4d6ce9d32337f9ac9",
+      "img/guild-leader-anim.svg": "386b0b81c719f05cf300551dd64425dcdb2d77636e0107104e5b9f17c50a5081",
+      "img/guild-leader.png": "d0067d5d9564693f3e358beb096f20a177ca7eed202cb0eba20ac15a8e2e3912",
+      "img/lp-anim.svg": "a9e7219cc6356f5bb3bda08a4b188a130035c82b606ad0d3c0747158974595e2",
+      "img/lp-masterclass.svg": "c687cccc92428c680695f8cfd2d15fd750d57ef3b2cc2697096fa4bd81e5c477",
+      "img/masterclass.png": "c1996ed71b0d383edb904b047903ec126bfb7a555055a48aab89335f419e43d9",
+      "img/pathfinder.png": "050e3386f7828e603b95b0a639862fc94eb9604b808dc98cfac4aafb8cd5900e",
+      "img/patron.png": "24c588de58b8d73609ae0c97710f016242bdc433180a0627beae3c804e478ddc",
+      "img/technical-intensive.png": "b55360b9ad2bb7c046a451e50b6ba0cf80a35249fb3e9a1f1f770283198c05d8",
+      "img/wealth-builder.png": "cfa5574dd812f25713f5c57a398b74f9dca972ead082ef2ac5931e8680a4144d",
+      "fonts/Caveat-600-latin-ext.woff2": "ec90c36c3dfe05fca71ab42c5e8d6fcaf21b1363d4b008de3fa0b0d39d7ed34f",
+      "fonts/Caveat-600-latin.woff2": "d51e2283010e661d9f3dafdc9ff4b82b2ebcb2f7aa43ca48a105f5f68d46cc32",
+      "fonts/g.css": "7680a4189c6d4a77fc5965c3e6c458d297ed22f4722494dea9e592251720b7d3",
+      "fonts/local.css": "a82bfcb82f3ff14814494dd62fd5299349f55834489f062ef1f00581d87bf581",
+      "fonts/PatrickHand-400-latin-ext.woff2": "c16846bad9501534b8402172c18f87e927146c4e63af2942f1fa8ad8ba7e6e70",
+      "fonts/PatrickHand-400-latin.woff2": "ac5bc9033b2572bf84d39f7150c1634e37ed16e8dbee632d6d0bceac0bbf0199",
+      "fonts/PlayfairDisplay-700-latin-ext.woff2": "edb9f5d879b30c617698bcc288692c339d5a0a2464a5476f00025195e5cad166",
+      "fonts/PlayfairDisplay-700-latin.woff2": "28453852ea165c47b5a941be00e418402e1407002ed87507f062a1e316328fe6",
+      "fonts/SpaceGrotesk-500-latin-ext.woff2": "952dddb45d2f96f71cbf3b7f510b24379afc3c89ea02fcf89d377b45d62c0166",
+      "fonts/SpaceGrotesk-500-latin.woff2": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d",
+      "fonts/SpaceGrotesk-700-latin-ext.woff2": "952dddb45d2f96f71cbf3b7f510b24379afc3c89ea02fcf89d377b45d62c0166",
+      "fonts/SpaceGrotesk-700-latin.woff2": "0640890476fc1198ab4de571fb658de443c4d85b66466ec09534a8737ab1ce9d"
+    },
+    "sourceUnchanged": true,
+    "capture": {
+      "browser": "local headless Chrome, direct CDP pipe",
+      "fps": 30,
+      "badgeFrames": 144,
+      "posterFrames": 240,
+      "documentFontsReady": true,
+      "allFourFamiliesChecked": true,
+      "computedAndCustomPlatformFontsConfirmed": true,
+      "httpBlocked": true,
+      "method": "CDP Animation playbackRate=0 plus pause/seek for parent CSS; Emulation virtual time budget for original external SVG CSS, with compositor wake-up budget of 0.001 ms included in each target frame time. Two complete pre-roll cycles allow SVG image timelines to settle; final source frames 288..431 and wrap 432. No SVG rewriting or inlining.",
+      "posterWarmup": "Original SVGs warmed at 30 fps with parent animations sought to settled visible state, then parent entrance reset to t=0. 240 frames at 30 fps."
+    },
+    "pixelChecks": {
+      "seamless": {
+        "frame0EqualsFrame144": true,
+        "changedPixels": 0,
+        "sourceCaptureFrames": [
+          288,
+          432
+        ]
+      },
+      "contact": {
+        "changedPixelsOutsideThreeTiles": 0,
+        "changedPixelsInsideTiles": {
+          "liquidity-provider": 3786,
+          "citizen": 26188,
+          "guild-leader": 23274
+        },
+        "rectangles": [
+          {
+            "name": "liquidity-provider",
+            "x": 564,
+            "y": 347,
+            "width": 256,
+            "height": 256
+          },
+          {
+            "name": "citizen",
+            "x": 564,
+            "y": 28,
+            "width": 256,
+            "height": 256
+          },
+          {
+            "name": "guild-leader",
+            "x": 564,
+            "y": 666,
+            "width": 256,
+            "height": 256
+          }
+        ]
+      },
+      "candles": [
+        {
+          "name": "citizen-left",
+          "x": 354,
+          "miny": 45,
+          "amp": 18.666666666666668,
+          "delay": 0,
+          "changes": [
+            {
+              "frame": 35,
+              "color": "red",
+              "top": 78
+            },
+            {
+              "frame": 71,
+              "color": "green",
+              "top": 112
+            },
+            {
+              "frame": 107,
+              "color": "red",
+              "top": 78
+            },
+            {
+              "frame": 143,
+              "color": "green",
+              "top": 118
+            }
+          ],
+          "fit": {
+            "phase": 68,
+            "offset": 99.16666666666663,
+            "error": 0.09956787897698074,
+            "rmse": 0.31554378297944763
+          },
+          "turningPoints": [
+            {
+              "frame": 34,
+              "subframe": 33.959999999999994,
+              "type": "top"
+            },
+            {
+              "frame": 70,
+              "subframe": 69.96,
+              "type": "bottom"
+            },
+            {
+              "frame": 106,
+              "subframe": 105.96000000000001,
+              "type": "top"
+            },
+            {
+              "frame": 142,
+              "subframe": 141.96,
+              "type": "bottom"
+            }
+          ],
+          "maxFrameDifference": 1
+        },
+        {
+          "name": "citizen-right",
+          "x": 414,
+          "miny": 35,
+          "amp": 18.666666666666668,
+          "delay": 1200,
+          "changes": [
+            {
+              "frame": 35,
+              "color": "green",
+              "top": 70
+            },
+            {
+              "frame": 71,
+              "color": "red",
+              "top": 35
+            },
+            {
+              "frame": 107,
+              "color": "green",
+              "top": 70
+            },
+            {
+              "frame": 143,
+              "color": "red",
+              "top": 36
+            }
+          ],
+          "fit": {
+            "phase": 71.25,
+            "offset": 54.93749999999998,
+            "error": 3.338107398965671,
+            "rmse": 1.8270488222720462
+          },
+          "turningPoints": [
+            {
+              "frame": 34,
+              "subframe": 33.8625,
+              "type": "bottom"
+            },
+            {
+              "frame": 70,
+              "subframe": 69.8625,
+              "type": "top"
+            },
+            {
+              "frame": 106,
+              "subframe": 105.8625,
+              "type": "bottom"
+            },
+            {
+              "frame": 142,
+              "subframe": 141.86249999999998,
+              "type": "top"
+            }
+          ],
+          "maxFrameDifference": 1
+        },
+        {
+          "name": "guild-left",
+          "x": 597,
+          "miny": 100,
+          "amp": 11.2,
+          "delay": 0,
+          "changes": [
+            {
+              "frame": 35,
+              "color": "red",
+              "top": 119
+            },
+            {
+              "frame": 71,
+              "color": "green",
+              "top": 138
+            },
+            {
+              "frame": 107,
+              "color": "red",
+              "top": 119
+            },
+            {
+              "frame": 143,
+              "color": "green",
+              "top": 144
+            }
+          ],
+          "fit": {
+            "phase": 59.5,
+            "offset": 133.09027777777777,
+            "error": 7.977987193094271,
+            "rmse": 2.824533092936649
+          },
+          "turningPoints": [
+            {
+              "frame": 34,
+              "subframe": 34.215,
+              "type": "top"
+            },
+            {
+              "frame": 70,
+              "subframe": 70.215,
+              "type": "bottom"
+            },
+            {
+              "frame": 106,
+              "subframe": 106.215,
+              "type": "top"
+            },
+            {
+              "frame": 142,
+              "subframe": 142.215,
+              "type": "bottom"
+            }
+          ],
+          "maxFrameDifference": 1
+        },
+        {
+          "name": "guild-middle",
+          "x": 640,
+          "miny": 85,
+          "amp": 11.2,
+          "delay": 800,
+          "changes": [
+            {
+              "frame": 11,
+              "color": "red",
+              "top": 95
+            },
+            {
+              "frame": 47,
+              "color": "green",
+              "top": 113
+            },
+            {
+              "frame": 83,
+              "color": "red",
+              "top": 90
+            },
+            {
+              "frame": 119,
+              "color": "green",
+              "top": 116
+            }
+          ],
+          "fit": {
+            "phase": 70.25,
+            "offset": 106.67361111111111,
+            "error": 0.11440083899909981,
+            "rmse": 0.3382319307799011
+          },
+          "turningPoints": [
+            {
+              "frame": 10,
+              "subframe": 9.8925,
+              "type": "top"
+            },
+            {
+              "frame": 46,
+              "subframe": 45.8925,
+              "type": "bottom"
+            },
+            {
+              "frame": 82,
+              "subframe": 81.8925,
+              "type": "top"
+            },
+            {
+              "frame": 118,
+              "subframe": 117.8925,
+              "type": "bottom"
+            }
+          ],
+          "maxFrameDifference": 1
+        },
+        {
+          "name": "guild-right",
+          "x": 683,
+          "miny": 70,
+          "amp": 11.2,
+          "delay": 1600,
+          "changes": [
+            {
+              "frame": 23,
+              "color": "green",
+              "top": 98
+            },
+            {
+              "frame": 59,
+              "color": "red",
+              "top": 72
+            },
+            {
+              "frame": 95,
+              "color": "green",
+              "top": 94
+            },
+            {
+              "frame": 131,
+              "color": "red",
+              "top": 77
+            }
+          ],
+          "fit": {
+            "phase": 54,
+            "offset": 88.52083333333336,
+            "error": 5.787052726791608,
+            "rmse": 2.4056293826754795
+          },
+          "turningPoints": [
+            {
+              "frame": 22,
+              "subframe": 22.38,
+              "type": "bottom"
+            },
+            {
+              "frame": 58,
+              "subframe": 58.379999999999995,
+              "type": "top"
+            },
+            {
+              "frame": 94,
+              "subframe": 94.38,
+              "type": "bottom"
+            },
+            {
+              "frame": 130,
+              "subframe": 130.38,
+              "type": "top"
+            }
+          ],
+          "maxFrameDifference": 1
+        }
+      ],
+      "strip": {
+        "frames": [
+          9,
+          10,
+          11,
+          21,
+          22,
+          23,
+          33,
+          34,
+          35,
+          45,
+          46,
+          47,
+          57,
+          58,
+          59,
+          69,
+          70,
+          71,
+          81,
+          82,
+          83,
+          93,
+          94,
+          95,
+          105,
+          106,
+          107,
+          117,
+          118,
+          119,
+          129,
+          130,
+          131,
+          141,
+          142,
+          143
+        ],
+        "layout": "12 rows: each motion turning point minus one frame, turning frame, plus one frame; all three badges visible"
+      }
+    },
+    "protectedBadges": {
+      "unchanged": true,
+      "count": 24,
+      "matchesPostWeb3B": true,
+      "before": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625",
+        "web3-masterclass-64.gif": "c65834058c15b46130ddb356e489e22b0f20e55d5122e889a294f2b0e2122b07",
+        "web3-masterclass.gif": "7a96ccc7d80bd624bf9d96ff4af3e609abb2633cd08cb0c67cdf0a6b6d3b69f7",
+        "web3-masterclass.webp": "9fbe6d7a5d849a0eedcb3229add1f42050a4d4eb6251c6a5bf44a4ee8b9697bf"
+      },
+      "after": {
+        "booster-64.gif": "5906a23abd6c83d0d671031e6d3117e96178409517731f0ac74ab659c7000bab",
+        "booster.gif": "11a7e356cfc37d15fbf38a0958cee65184d104c68b220b86224145cec9993e2b",
+        "booster.webp": "857d212c2262b8af29f91825f5ded41922b330876d03294d7fa11a659a9a4692",
+        "community-leader-64.gif": "404e6c2833832bc83fc51728cb9a5f38ba6f85783dd8f0f8af95b047e7c4b256",
+        "community-leader.gif": "e0cf1847cab8a6bb013fcf21e153d973057f86e2bd69b5756a435c903c1cced7",
+        "community-leader.webp": "e3dcff944cbcaa3e455916a9e27c541c5ab35800dc9f91dc3f67855c4a1fe43e",
+        "eternals-64.gif": "0c588d295a37e3558f163044ad294643eedc2484d7dfcd2efaafee9ea2649ecf",
+        "eternals.gif": "b904a5de9c50cd6662dab7d76fcdcd815ae815a6b682d1fff7affc27e01043e9",
+        "eternals.webp": "30117f199eceb6dcf2f9a349cfa410f1982658837c448d491396a64a3d6bd1bd",
+        "explorer-64.gif": "35789e7ef00e280cdf789a9a43c448fd6c0dc79cf43bc28c5000f2a89f9e70fe",
+        "explorer.gif": "b9520159d2123c513dd1db649c73365144de3ffaa8b982cee5f0bb4368caaf15",
+        "explorer.webp": "8eea0f72350e55834c3dacada8eee2d187c9364599d5b68ca8d4797079b1c609",
+        "pathfinders-64.gif": "d9143ac5cde731ea6bbaf5edbdefa9167f34e3f7bf42c861b6c2cb3507564c4b",
+        "pathfinders.gif": "ad5b8bab06f1f2c7212a4cca2d8224e58d9c002408f210094faafaf770bd9d69",
+        "pathfinders.webp": "949f8510eea8d0268562b2a402b133e5cc423935f62d8025dcc404300bf6019b",
+        "technical-intensive-64.gif": "30fc53fc4b79a0a42bed6232d13301cdaf8ae3b5d4d252f24ea84e3c90d1017c",
+        "technical-intensive.gif": "274377fb071d2cbf7e5b0ea2454a7c42be4dcc4118d4ea043eea17bf10b2b17d",
+        "technical-intensive.webp": "6c5ca5f3ae86da96043df7a4680075d289ffc6268ac6b7bcffe56dfd0f65bb79",
+        "wealth-builder-64.gif": "852510929225ec31ab61104ea11d5432217622d095526774d1bd78c3675fb1f9",
+        "wealth-builder.gif": "a5eb2dae645eca767e99d742ab9b67c912df1eab7d5b1fc18c75685b7ae9bd7b",
+        "wealth-builder.webp": "f75bc9ae49ee3144cbf9dcea7afb47d9aa0fa389aa77a9504a39e22e2f436625",
+        "web3-masterclass-64.gif": "c65834058c15b46130ddb356e489e22b0f20e55d5122e889a294f2b0e2122b07",
+        "web3-masterclass.gif": "7a96ccc7d80bd624bf9d96ff4af3e609abb2633cd08cb0c67cdf0a6b6d3b69f7",
+        "web3-masterclass.webp": "9fbe6d7a5d849a0eedcb3229add1f42050a4d4eb6251c6a5bf44a4ee8b9697bf"
+      }
+    },
+    "losslessWebP": {
+      "liquidity-provider": {
+        "verified": true,
+        "frameCodec": "VP8L",
+        "frames": 144
+      },
+      "citizen": {
+        "verified": true,
+        "frameCodec": "VP8L",
+        "frames": 144
+      },
+      "guild-leader": {
+        "verified": true,
+        "frameCodec": "VP8L",
+        "frames": 144
+      }
+    },
+    "fonts": {
+      "web": {
+        "ready": "loaded",
+        "rows": [
+          {
+            "tag": "DIV",
+            "class": "kick",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "500",
+            "style": "normal",
+            "spec": "normal 500 18px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "H1",
+            "class": "",
+            "family": "\"Playfair Display\", serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 76px \"Playfair Display\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "lede",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 30px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "SPAN",
+            "class": "new",
+            "family": "Caveat, cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 30px Caveat",
+            "check": true
+          },
+          {
+            "tag": "H2",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 26px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 21px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 25px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 20px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "DIV",
+            "class": "end",
+            "family": "Caveat, cursive",
+            "weight": "600",
+            "style": "normal",
+            "spec": "normal 600 34px Caveat",
+            "check": true
+          }
+        ],
+        "platform": {
+          "h1": {
+            "fonts": [
+              {
+                "familyName": "Playfair Display",
+                "postScriptName": "PlayfairDisplay-Bold",
+                "isCustomFont": true,
+                "glyphCount": 29
+              }
+            ]
+          },
+          ".kick": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Medium",
+                "isCustomFont": true,
+                "glyphCount": 34
+              }
+            ]
+          },
+          ".boost h2": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 14
+              }
+            ]
+          },
+          ".card h3": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 8
+              }
+            ]
+          },
+          ".lede": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 73
+              }
+            ]
+          },
+          ".card p": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 37
+              }
+            ]
+          },
+          ".new": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 3
+              }
+            ]
+          },
+          ".end": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 38
+              }
+            ]
+          }
+        }
+      },
+      "phone": {
+        "ready": "loaded",
+        "rows": [
+          {
+            "tag": "DIV",
+            "class": "kick",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "500",
+            "style": "normal",
+            "spec": "normal 500 13px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "H1",
+            "class": "",
+            "family": "\"Playfair Display\", serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 38px \"Playfair Display\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "lede",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 19px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "SPAN",
+            "class": "new",
+            "family": "Caveat, cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 24px Caveat",
+            "check": true
+          },
+          {
+            "tag": "H2",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 26px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 18px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "B",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "H3",
+            "class": "",
+            "family": "\"Space Grotesk\", sans-serif",
+            "weight": "700",
+            "style": "normal",
+            "spec": "normal 700 20px \"Space Grotesk\"",
+            "check": true
+          },
+          {
+            "tag": "P",
+            "class": "",
+            "family": "\"Patrick Hand\", cursive",
+            "weight": "400",
+            "style": "normal",
+            "spec": "normal 400 17px \"Patrick Hand\"",
+            "check": true
+          },
+          {
+            "tag": "DIV",
+            "class": "end",
+            "family": "Caveat, cursive",
+            "weight": "600",
+            "style": "normal",
+            "spec": "normal 600 26px Caveat",
+            "check": true
+          }
+        ],
+        "platform": {
+          "h1": {
+            "fonts": [
+              {
+                "familyName": "Playfair Display",
+                "postScriptName": "PlayfairDisplay-Bold",
+                "isCustomFont": true,
+                "glyphCount": 28
+              }
+            ]
+          },
+          ".kick": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Medium",
+                "isCustomFont": true,
+                "glyphCount": 34
+              }
+            ]
+          },
+          ".boost h2": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 14
+              }
+            ]
+          },
+          ".card h3": {
+            "fonts": [
+              {
+                "familyName": "Space Grotesk Light",
+                "postScriptName": "Space-Grotesk-Light-Bold",
+                "isCustomFont": true,
+                "glyphCount": 8
+              }
+            ]
+          },
+          ".lede": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 72
+              }
+            ]
+          },
+          ".card p": {
+            "fonts": [
+              {
+                "familyName": "Patrick Hand",
+                "postScriptName": "PatrickHand-Regular",
+                "isCustomFont": true,
+                "glyphCount": 36
+              }
+            ]
+          },
+          ".new": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 3
+              }
+            ]
+          },
+          ".end": {
+            "fonts": [
+              {
+                "familyName": "Caveat SemiBold",
+                "postScriptName": "Caveat-SemiBold",
+                "isCustomFont": true,
+                "glyphCount": 38
+              }
+            ]
+          }
+        }
+      }
+    },
+    "changedMedia": [
+      {
+        "file": "liquidity-provider.gif",
+        "before": "13fc06bbb1681825676ae1dac7ba0a433566a5eac2a47f83d8b0ffc239633603",
+        "after": "c6f16922a0747039a8b7368caccaa80dccb9a8bfa4a2416dafbf458d68374c1e"
+      },
+      {
+        "file": "liquidity-provider-64.gif",
+        "before": "f23bb5c99d8328d36f8d12b98aeee53611eb83d60c009f5b2fdd603557c254c8",
+        "after": "7e20e294c06a463cf4bac8f015c33438473cfbee59ec218d9e16594099042d23"
+      },
+      {
+        "file": "liquidity-provider.webp",
+        "before": "88c7e59d86def9374043d1953c9e0c96d24e7663bdd3c59a2cbc79b059f6dc91",
+        "after": "4d4c42ef0a1bea82d74d4323bbcfcc3b56ffbcc2cd8b8d1b17ba847eb71f45a0"
+      },
+      {
+        "file": "citizen.gif",
+        "before": "7439405dddf25f601aefb3bbd4803b2677f5b674aa1e9263fd75ddb8961cac88",
+        "after": "19291119428fb7f8aa4adbd16ee4a859bb4f0e34e8a73042ada6909ce6fa5131"
+      },
+      {
+        "file": "citizen-64.gif",
+        "before": "87b4b658e4d49e5dcd7fb314f32976210c720d1f7fadb0caa35f6c046cda2734",
+        "after": "3d62780f044ff9bd098ed8d42d0568c4411937da66242e6b9fe8d66956a97536"
+      },
+      {
+        "file": "citizen.webp",
+        "before": "03599e46ad27c39f6609438e2121a2edaf8a4ea57001daf28e2e0f2b105110ff",
+        "after": "203cee6a55d8fb1e5bc10e5ae60f0de420e0208f90a6ee0c23f377c779a89e64"
+      },
+      {
+        "file": "guild-leader.gif",
+        "before": "4f4484c7957bd5cfb1c5af06e98c0e1b169fdbb6c214e2c500acd7891ebe8206",
+        "after": "e68172f184aa452fd512bfb609f6ce260002430aac96953a6019eee37cfdeb4c"
+      },
+      {
+        "file": "guild-leader-64.gif",
+        "before": "f91dc1a61fb631e88ef3e9aa495918b3fcfa3644715f11210c34c3d64588a380",
+        "after": "ebed7862741d9387699ddddd5315e2ebc5edf21449de0bf9996e9df052abdab3"
+      },
+      {
+        "file": "guild-leader.webp",
+        "before": "c0b098b491699f5354bd4fc16fd4a19021dac85bba00874e25ea1c052cb4d3ae",
+        "after": "b63eb6e3e35b294bcc9cc1c2e7b968678419238994e05bb380ba063ea82e336c"
+      },
+      {
+        "file": "poster-web.mp4",
+        "before": "76e39be936319e8bc7cb601fe9d8861e28fe8c3731caca2657f9122c947f6404",
+        "after": "afda25aee4ddc031fd70b9197567b77299cba7e9d764e6d02e3f37b3534ba64d"
+      },
+      {
+        "file": "poster-web.gif",
+        "before": "0df781b65047d0f1312ecdca905316c94b11a9523dff6fd0dd4e7fc831704cd6",
+        "after": "3ec3d8c3e1eeab38a42ac205950c3d3f7e994bafb93b587cfe46c49b02503cf9"
+      },
+      {
+        "file": "poster-phone.mp4",
+        "before": "c1bf411b7b04d7a13311892bf9b6c2c9f9e26d4e951dd21ffd97c061ebbc4bf1",
+        "after": "bc7e2e40f1859d9d79bc89a2fe0000b7ed8692f928d2869d436e80d3ba0d9090"
+      },
+      {
+        "file": "poster-phone.gif",
+        "before": "e66cc92204dfecd10e04ae9c2cd51f26ac67ce5f98b15bd893e73eaf4dfc70b6",
+        "after": "cabf7faff306b93e487d346bfcff9cf1d85e68800f271af2e7e4f1654a100090"
+      },
+      {
+        "file": "contact.png",
+        "before": "933a91f61ba4cfcd442b0e42a496e804436afb69bca09586d9dc69110ca7bb12",
+        "after": "2a238e908739d85e74f073d23f0964beec7ac189d15d14fc0dbd293d57bfc751"
+      },
+      {
+        "file": "poster-web-check.png",
+        "before": "0a4fcbb22b440c9ac8172ca297930ba54cce5b91f92666a8d12b22c30f54a641",
+        "after": "36ac94fa4b45d357130e81be269db3e3b5836dda6080858961d539130b1048b1"
+      },
+      {
+        "file": "poster-phone-check.png",
+        "before": "bf186b788cadb1133c6430f51b2dd102855c2216b231728aea712a11592679cb",
+        "after": "12aacb4a63e2ea6a33ba89498a6d0a42f2fc7639b9ff4d0153cb2d252dd3d212"
+      },
+      {
+        "file": "anim3-check.png",
+        "before": null,
+        "after": "5290e13ef61fe8b1e9d4f8cec50b4c64871dc16242d419dc236f163af08c6316"
+      }
+    ],
+    "visualInspection": "anim3-check.png, contact.png, first/mid poster check PNGs and decoded final GIF midpoints inspected.",
+    "scope": "Local render only. No network, installs, browser connector, Computer Use, git or publishing. _render and _chrome-profile retained."
+  }
+}

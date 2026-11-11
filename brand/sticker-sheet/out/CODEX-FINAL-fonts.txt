@@ -1,0 +1,5 @@
+Re-rendered all four posters with verified local fonts. Both GIFs are under 15 MB; all 34 protected badge/contact files are hash-identical.
+
+Saved the [Claude handoff block](D:/Media/Claude/badge-sheet/out/CODEX-FINAL-fonts.txt), [web checks](D:/Media/Claude/badge-sheet/out/poster-web-check.png), and [phone checks](D:/Media/Claude/badge-sheet/out/poster-phone-check.png).
+
+The handoff documents an external `sheet.html` edit made after capture; these renders retain the captured fonts-only version.
