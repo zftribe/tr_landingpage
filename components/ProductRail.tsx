@@ -27,8 +27,8 @@ export type Logo = { alt: string; src?: string; text?: string; coin?: string }
 const MAX_COMPARE = 3
 const L = {
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
-  // George picked the classic W3 coin (C1, 8 Nov); drawn in CSS so it uses the site's own font.
-  web3: { alt: 'WEB3 Masterclass', coin: 'W3' },
+  // "Node hex" mark, option B (George picked 11 Nov): a network hexagon around one rising candle.
+  web3: { alt: 'WEB3 Masterclass', src: '/logos/programs/web3-masterclass.svg' },
   // "Range bins" mark, A1 Classic (George picked 9 Nov): liquidity bins inside a price range.
   lp: { alt: 'Liquidity Provider Masterclass', src: '/logos/programs/lp-masterclass.svg' },
   // TR rank set "Market candles" (George picked O1, 8 Nov). Source files: Dropbox ZFT Agent Pack/Logos/TR Ranks.
