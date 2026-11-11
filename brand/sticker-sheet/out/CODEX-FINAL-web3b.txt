@@ -1,0 +1,5 @@
+Completed WEB3 B exports and re-rendered all four posters because they contained the old art.
+
+All 30 other badge files are hash-identical. Contact changes are confined to the WEB3 tile. Font, timing, size and loop checks passed.
+
+[Saved SEND THIS TO CLAUDE block](D:/Media/Claude/badge-sheet/out/CODEX-FINAL-web3b.txt).
