@@ -169,12 +169,11 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
 
               <div className="program-price pc-price">
                 <span className="now">{peso(p.price)}</span>
-                {p.discount > 0 && (
-                  <>
-                    <span className="was">{peso(p.subtotal)}</span>
-                    <span className="save">Save {peso(p.discount)}</span>
-                  </>
-                )}
+                {(p.saving ?? 0) > 0 ? (
+                  <span className="save">Save {peso(p.saving!)} vs buying {p.savingVs} separately</span>
+                ) : p.lpFree ? (
+                  <span className="save">Includes LP Masterclass free ({peso(p.lpFree)} value)</span>
+                ) : null}
               </div>
 
               <ul className="pc-includes">
@@ -257,7 +256,7 @@ export function ProductRail({ products, curriculum, before = [], after = [] }: {
               <tr><th scope="row">Liquidity Provider Masterclass</th>{compared.map((p) => <td key={p.id}>{p.hasLP ? '✓' : '—'}</td>)}</tr>
               <tr><th scope="row">Membership</th>{compared.map((p) => <td key={p.id}>{p.months ? `${p.months} months` : '—'}</td>)}</tr>
               <tr><th scope="row">Price</th>{compared.map((p) => <td key={p.id} className="pc-strong">{peso(p.price)}</td>)}</tr>
-              <tr><th scope="row">You save</th>{compared.map((p) => <td key={p.id}>{p.discount > 0 ? peso(p.discount) : '—'}</td>)}</tr>
+              <tr><th scope="row">You save</th>{compared.map((p) => <td key={p.id}>{(p.saving ?? 0) > 0 ? peso(p.saving!) : '—'}</td>)}</tr>
               <tr><th scope="row"><span className="pc-sr">Buy</span></th>{compared.map((p) => <td key={p.id}><a href={p.checkout} className="btn btn-gold pc-small">Buy →</a></td>)}</tr>
             </tbody>
           </table>
