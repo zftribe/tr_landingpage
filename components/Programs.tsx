@@ -28,12 +28,11 @@ const AFTER: ExtraCard[] = [
     key: 'eternals',
     tag: 'Lifetime Citizen',
     name: 'The Eternals',
-    price: '₱88,000',
+    price: '₱60,000',
     priceNote: 'one-time',
     lines: [
       'Citizen for life, no future price increases',
       'The Vault: 300+ webinar videos since 2020',
-      '₱59,999 if you own Wealth Builder · ₱69,999 with TI or WEB3',
     ],
     logos: [{ alt: 'The Eternals', src: '/logos/programs/eternal.svg' }],
     cta: { label: 'Ask us on Discord', href: DISCORD_INVITE, external: true },

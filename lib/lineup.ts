@@ -41,6 +41,12 @@ export type Product = {
   price: number
   subtotal: number
   discount: number
+  /** Real saving vs the cheapest way to buy the same things from this lineup (0 = none). */
+  saving?: number
+  /** What that cheapest way is, e.g. "TI + 12 mo and WEB3 + 12 mo". */
+  savingVs?: string
+  /** Value of the LP Masterclass that comes free with WEB3 (only on the WEB3 course card). */
+  lpFree?: number
 }
 
 /**
@@ -93,7 +99,55 @@ export function lineup(packages: LmsPackage[]): Product[] {
     const at = list.findIndex((p) => p.hasWeb3 && !p.hasTI && !p.months)
     list.splice(at >= 0 ? at + 1 : list.length, 0, lp)
   }
-  return list
+  return withHonestSavings(list)
+}
+
+/** Short label for one product: "TI", "WEB3 + 12 mo", "12 mo". */
+export const shortLabel = (p: Product) => {
+  const parts = [p.hasTI && 'TI', p.hasWeb3 && 'WEB3', p.hasLP && !p.hasWeb3 && !p.hasTI && 'LP'].filter(Boolean) as string[]
+  const mo = p.months ? `${p.months} mo` : ''
+  return parts.length ? parts.join(' + ') + (mo ? ` + ${mo}` : '') : mo
+}
+
+/**
+ * The LMS "subtotal" adds up every part at its list price, which overstates the
+ * saving (George, pricing-fix pick A, 12 Nov). Instead: the cheapest set of OTHER
+ * products in this lineup that gives exactly the same courses and membership
+ * time. A plain membership product may be bought more than once.
+ */
+export function honestSaving(p: Product, all: Product[]): { saving: number; vs: string } {
+  const others = all.filter((o) => o.id !== p.id && !o.placeholder)
+  const plain = others.filter((o) => !o.hasTI && !o.hasWeb3 && !o.hasLP && o.months)
+  const rest = others.filter((o) => !plain.includes(o)).slice(0, 12)
+  let best: { cost: number; parts: Product[] } | null = null
+  for (let mask = 1; mask < 1 << rest.length; mask++) {
+    const picked = rest.filter((_, i) => mask & (1 << i))
+    for (const extra of [null, ...plain]) {
+      for (let k = extra ? 1 : 0; k <= (extra ? 3 : 0); k++) {
+        const parts = [...picked, ...Array(k).fill(extra)] as Product[]
+        const ti = parts.some((o) => o.hasTI), w3 = parts.some((o) => o.hasWeb3), lp = parts.some((o) => o.hasLP)
+        const months = parts.reduce((n, o) => n + (o.months ?? 0), 0)
+        // Exactly the same courses and membership time; a bigger bundle is not "the same things".
+        if (ti !== p.hasTI || w3 !== p.hasWeb3 || lp !== p.hasLP || months !== (p.months ?? 0)) continue
+        const cost = parts.reduce((n, o) => n + o.price, 0)
+        if (!best || cost < best.cost) best = { cost, parts }
+      }
+    }
+  }
+  if (!best || best.cost <= p.price) return { saving: 0, vs: '' }
+  const counts = new Map<string, number>()
+  for (const o of best.parts) counts.set(shortLabel(o), (counts.get(shortLabel(o)) ?? 0) + 1)
+  const vs = [...counts].map(([l, n]) => (n > 1 ? `${n} × ${l}` : l)).join(' and ')
+  return { saving: best.cost - p.price, vs }
+}
+
+function withHonestSavings(list: Product[]): Product[] {
+  const lp = list.find((o) => o.hasLP && !o.hasWeb3 && !o.hasTI && !o.months)
+  return list.map((p) => {
+    const { saving, vs } = honestSaving(p, list)
+    const lpFree = lp && p.hasWeb3 && !p.hasTI && !p.months ? lp.price : undefined
+    return { ...p, saving, savingVs: vs, lpFree }
+  })
 }
 
 export const peso = (n: number) => `₱${Math.round(n).toLocaleString('en-PH')}`
