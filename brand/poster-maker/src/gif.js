@@ -75,5 +75,15 @@
     if (block.length) o.push(block.length, ...block);
     o.push(0);
   }
-  window.TRGif = { GifWriter };
+  // GIF delays use whole centiseconds. Round cumulative boundaries so the
+  // selected frame count and loop duration survive fractional frame delays.
+  function frameTiming(duration, fps) {
+    const count = Math.round(duration * fps);
+    return Array.from({ length: count }, (_, i) => {
+      const start = Math.round(i * duration * 100 / count);
+      const end = Math.round((i + 1) * duration * 100 / count);
+      return { time: i * duration / count, delay: end - start };
+    });
+  }
+  window.TRGif = { GifWriter, frameTiming };
 })();
