@@ -11,7 +11,7 @@ node scripts/yields/build.js --check   # checks only; exits 1 on errors
 ## Live and preview (George, 9 Nov 2026)
 | | Where | Branch |
 |---|---|---|
-| **Live** | welcome.tradingrepublic.io/yield-tracker/ | `main` |
+| **Live** | www.tradingrepublic.io/yield-tracker/ | `main` |
 | **Preview** | tr-welcome-preview.1037293.workers.dev/yield-tracker/ (ribbon "PREVIEW, not live") | `claude/yield-tracker-polish` (draft PR #16) |
 | **Compare** | tr-welcome-preview.1037293.workers.dev/yield-options.html (live vs preview, web + phone) | — |
 

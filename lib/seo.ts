@@ -5,8 +5,11 @@ import path from 'node:path'
  * Search and AI-search facts for the homepage. Every sentence here comes from
  * text already on the page (content/legacy-*.html) or from George Asibal's own
  * site, so nothing is claimed that the page does not already say.
+ *
+ * SITE_URL is the canonical origin for metadata, sitemap, robots and JSON-LD.
+ * Override it with NEXT_PUBLIC_SITE_URL; a trailing slash is removed.
  */
-export const SITE_URL = 'https://welcome.tradingrepublic.io'
+export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tradingrepublic.io').replace(/\/+$/, '')
 export const SITE_NAME = 'Trading Republic by ZFT'
 export const TITLE = 'Trading Republic by ZFT · Trading Community, Courses & Webinars'
 export const DESCRIPTION =
