@@ -43,7 +43,7 @@ const AFTER: ExtraCard[] = [
     name: 'ZFT Masterclass: Pathfinders',
     price: 'Masterclass',
     lines: ['Bear markets hold big opportunities; learn to position early', 'Find your approach as a trader, investor, or both'],
-    logos: [{ alt: 'ZFT Masterclass', src: '/logos/programs/masterclass.png' }],
+    logos: [{ alt: 'Pathfinder mentorship', src: '/logos/programs/pathfinder-role.png' }],
     cta: { label: 'Full details', href: 'https://zeefreaks.gitbook.io/zft-masterclass-pathfinders/', external: true },
   },
 ]
