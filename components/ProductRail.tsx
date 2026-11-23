@@ -26,6 +26,7 @@ export type Logo = { alt: string; src?: string; text?: string; coin?: string }
 
 const MAX_COMPARE = 3
 const L = {
+  wealth: { alt: 'Wealth Builder', src: '/logos/programs/wealth-builder-role.png' },
   ti: { alt: 'Technical Intensive', src: '/logos/programs/technical-intensive.png' },
   // "Node hex" mark, option B (George picked 11 Nov): a network hexagon around one rising candle.
   web3: { alt: 'WEB3 Masterclass', src: '/logos/programs/web3-masterclass.svg' },
@@ -36,7 +37,7 @@ const L = {
 } satisfies Record<string, Logo>
 
 const logosOf = (p: Product): Logo[] => [
-  ...(p.hasTI ? [L.ti] : []),
+  ...(p.hasTI && p.hasWeb3 ? [L.wealth] : p.hasTI ? [L.ti] : []),
   ...(p.hasWeb3 ? [L.web3] : p.hasLP && !p.hasTI ? [L.lp] : []),
   ...(p.months ? [L.citizen] : []),
 ]
