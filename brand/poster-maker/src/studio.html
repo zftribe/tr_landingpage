@@ -1107,7 +1107,7 @@ function cleanDesign(d){
   const g=d.gif&&typeof d.gif==="object"?d.gif:{}, pick=(v,ok)=>ok.includes(String(v))?String(v):"";
   const ph=d.photos&&typeof d.photos==="object"?d.photos:{}, img=(v,max)=>typeof v==="string" && v.length<=max && IMG_RE.test(v) ? v : "";
   const extra={stage: Number.isInteger(d.stage)&&d.stage>=0&&d.stage<=5 ? d.stage : 2, caption:s(d.caption,1900), capKind:d.capKind==="facebook"?"facebook":"discord", capEdited:!!d.capEdited,
-    gif:{dur:pick(g.dur,["4","6","8","10"]), fps:pick(g.fps,["10","12","15"]), w:pick(g.w,["540","720","1080"])},
+    gif:{dur:pick(g.dur,["4","6","8","10"]), fps:pick(g.fps,["10","12","15","30","45","60"]), w:pick(g.w,["540","720","1080"])},
     photos:{bg:img(ph.bg,4000000), spk:(Array.isArray(ph.spk)?ph.spk:[]).slice(0,3).map(x=>img(x,1000000))}};
   return {...extra, custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:["natural","bw"].includes(d.grade)?d.grade:"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
 }
