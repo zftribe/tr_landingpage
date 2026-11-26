@@ -1,7 +1,8 @@
 <?php
 /* Saved designs + team history. Any signed-in Guild Leader: save/open their own designs on any device,
    see the last 30 posters the team made (who, when, posted where), open or duplicate them. JSON in, JSON out.
-   Designs hold settings and text only, never uploaded photos. */
+   Designs hold settings and text; photos a Guild Leader added (backdrop upload, speaker photos) are kept as small
+   data URLs in a private side file per design (data/design-photos/<id>.json), never in the shared designs list. */
 declare(strict_types=1);
 require __DIR__ . '/lib/bootstrap.php';
 require __DIR__ . '/lib/net.php';
@@ -12,6 +13,16 @@ $u = zt_user();
 if (!$u) zt_json_fail(401, 'You were signed out. Reload the page and sign in again.', 'signed_out');
 $me = zt_user_key($u);
 const ZT_MAX_DESIGNS = 400;
+const ZT_IMG_RE = '#^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$#';
+function zt_photo_path(string $id): string { $d = zt_private_dir() . '/data/design-photos'; if (!is_dir($d)) @mkdir($d, 0700, true); return $d . '/' . $id . '.json'; }
+/* photos: backdrop up to 4 MB, each speaker up to 1 MB (as data URLs); anything else is dropped */
+function zt_clean_photos($ph): ?array {
+    if (!is_array($ph)) return null;
+    $img = fn($v, $max) => is_string($v) && strlen($v) <= $max && preg_match(ZT_IMG_RE, $v) ? $v : '';
+    $out = ['bg' => $img($ph['bg'] ?? '', 4000000), 'spk' => []];
+    foreach (array_slice(is_array($ph['spk'] ?? null) && array_is_list($ph['spk']) ? $ph['spk'] : [], 0, 3) as $x) $out['spk'][] = $img($x, 1000000);
+    return ($out['bg'] !== '' || array_filter($out['spk'])) ? $out : null;
+}
 
 /* keep only known fields with the right types and limits (designs are shared with the whole team) */
 function zt_clean_design(array $d): ?array {
@@ -33,8 +44,19 @@ function zt_clean_design(array $d): ?array {
     foreach (['titleScale' => [0.7, 1.3], 'photoZoom' => [1, 3], 'focusX' => [0, 1], 'focusY' => [0, 1]] as $k => [$lo, $hi]) { $v = $num($f[$k] ?? null, $lo, $hi); if ($v !== null) $of[$k] = $v; }
     $sp = is_array($f['speakers'] ?? null) && array_is_list($f['speakers']) ? $f['speakers'] : [];
     $of['speakers'] = [];
-    foreach (array_slice($sp, 0, 3) as $s) { if (!is_array($s)) continue; $row = ['name' => $str($s['name'] ?? '', 40), 'role' => $str($s['role'] ?? '', 40)]; $z = $num($s['zoom'] ?? null, 1, 2); if ($z !== null) $row['zoom'] = $z; $of['speakers'][] = $row; }
+    foreach (array_slice($sp, 0, 3) as $s) { if (!is_array($s)) continue; $row = ['name' => $str($s['name'] ?? '', 40), 'role' => $str($s['role'] ?? '', 40)];
+        foreach (['zoom' => [1, 3], 'fx' => [0, 1], 'fy' => [0, 1]] as $k => [$lo, $hi]) { $v = $num($s[$k] ?? null, $lo, $hi); if ($v !== null) $row[$k] = $v; }
+        if (($s['bw'] ?? null) === true) $row['bw'] = true;
+        $of['speakers'][] = $row; }
     $out['f'] = $of;
+    // the rest of the stages: where it was saved, the caption, the GIF settings
+    $out['stage'] = is_int($d['stage'] ?? null) && $d['stage'] >= 0 && $d['stage'] <= 5 ? $d['stage'] : 2;
+    $out['caption'] = $str($d['caption'] ?? '', 1900);
+    $out['capKind'] = ($d['capKind'] ?? '') === 'facebook' ? 'facebook' : 'discord';
+    $out['capEdited'] = !empty($d['capEdited']);
+    $g = is_array($d['gif'] ?? null) ? $d['gif'] : [];
+    $pick = fn($v, $ok) => in_array((string)$v, $ok, true) ? (string)$v : '';
+    $out['gif'] = ['dur' => $pick($g['dur'] ?? '', ['4', '6', '8', '10']), 'fps' => $pick($g['fps'] ?? '', ['10', '12', '15', '30', '45', '60']), 'w' => $pick($g['w'] ?? '', ['540', '720', '1080'])];
     return $out;
 }
 
@@ -48,7 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     if (isset($_GET['id'])) {
         $id = (string)$_GET['id'];
         if (!isset($all[$id])) zt_json_fail(404, 'That design was deleted.', 'not_found');
-        echo json_encode(['ok' => true, 'design' => $all[$id]['design'] ?? []]); exit;
+        $design = $all[$id]['design'] ?? [];
+        $pf = zt_photo_path(preg_replace('/[^a-f0-9]/', '', $id));
+        if (!empty($all[$id]['photos']) && is_file($pf)) { $ph = json_decode((string)file_get_contents($pf), true); if (is_array($ph)) $design['photos'] = $ph; }
+        echo json_encode(['ok' => true, 'design' => $design]); exit;
     }
     uasort($all, fn($a, $b) => strcmp($b['at'] ?? '', $a['at'] ?? ''));
     $mine = []; $team = [];
@@ -68,6 +93,7 @@ if ($act === 'save') {
     if (!zt_rate('design:' . $me, 120, 3600)) zt_json_fail(429, 'Too many saves in an hour. Try again later.', 'slow');
     $design = $in['design'] ?? null;
     if (!is_array($design) || !preg_match('/^[a-z0-9-]{2,40}$/', (string)($design['tpl'] ?? ''))) zt_json_fail(400, 'That design looks broken.', 'bad_request');
+    $photos = zt_clean_photos($design['photos'] ?? null);
     $design = zt_clean_design($design);
     if (!$design) zt_json_fail(400, 'That design looks broken.', 'bad_request');
     $raw = json_encode($design);
@@ -75,17 +101,23 @@ if ($act === 'save') {
     $id = is_string($in['id'] ?? null) && preg_match('/^[a-f0-9]{16}$/', $in['id']) ? $in['id'] : null;
     $name = trim(mb_substr((string)($in['name'] ?? ''), 0, 60)) ?: 'Untitled';
     $auto = !empty($in['auto']);
-    $out = zt_update('designs', function (array &$all) use ($id, $design, $name, $auto, $u, $me) {
+    $dropped = [];
+    $out = zt_update('designs', function (array &$all) use ($id, $design, $name, $auto, $u, $me, $photos, &$dropped) {
         if ($id === null || !isset($all[$id]) || ($all[$id]['owner'] ?? '') !== $me) $id = bin2hex(random_bytes(8));
         $prev = $all[$id] ?? [];
         $all[$id] = ['owner' => $me, 'by' => (string)($u['name'] ?? $u['email'] ?? ''), 'at' => gmdate('c'), 'name' => $name,
                      'tpl' => (string)$design['tpl'], 'date' => preg_match('/^\d{4}-\d{2}-\d{2}$/', (string)($design['f']['date'] ?? '')) ? $design['f']['date'] : '',
                      // auto = only made or posted (team history); a press of "Save design" makes it a named design in My designs
                      'auto' => $auto && empty($prev['named']), 'named' => !$auto || !empty($prev['named']),
-                     'posted' => $prev['posted'] ?? '', 'design' => $design];
-        if (count($all) > ZT_MAX_DESIGNS) { uasort($all, fn($a, $b) => strcmp($a['at'] ?? '', $b['at'] ?? '')); $all = array_slice($all, count($all) - ZT_MAX_DESIGNS, null, true); }
+                     'posted' => $prev['posted'] ?? '', 'design' => $design, 'photos' => $photos !== null];
+        if (count($all) > ZT_MAX_DESIGNS) { uasort($all, fn($a, $b) => strcmp($a['at'] ?? '', $b['at'] ?? '')); $dropped = array_keys(array_slice($all, 0, count($all) - ZT_MAX_DESIGNS, true)); $all = array_slice($all, count($all) - ZT_MAX_DESIGNS, null, true); }
         return $id;
     });
+    // the photo side file: written whole (temp + rename), removed when the design has no photos or was trimmed
+    $pf = zt_photo_path($out);
+    if ($photos !== null) { $tmp = $pf . '.tmp-' . bin2hex(random_bytes(4)); if (file_put_contents($tmp, json_encode($photos)) === false || !rename($tmp, $pf)) { @unlink($tmp); zt_update('designs', function (array &$all) use ($out) { if (isset($all[$out])) $all[$out]['photos'] = false; }); } else @chmod($pf, 0600); }
+    else @unlink($pf);
+    foreach ($dropped as $old) @unlink(zt_photo_path((string)$old));
     echo json_encode(['ok' => true, 'id' => $out]); exit;
 }
 $id = (string)($in['id'] ?? '');
@@ -97,6 +129,7 @@ if ($act === 'delete') {
         unset($all[$id]); return true;
     });
     if (!$ok) zt_json_fail(403, 'You can only delete your own designs.', 'not_yours');
+    @unlink(zt_photo_path($id));
     echo '{"ok":true}'; exit;
 }
 if ($act === 'posted') {
