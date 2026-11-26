@@ -1,7 +1,4 @@
-/* Small animated-GIF writer: one global palette (median cut, 255 colours + 1 transparent), ordered dithering, LZW.
-   Size: each frame stores only the rectangle that changed since the last one, unchanged pixels inside it are
-   transparent (whichever of the two encodes smaller), and identical frames are merged into a longer delay.
-   The decoded animation is pixel-for-pixel the same as writing every full frame. */
+/* Small animated-GIF writer: one global 256-colour palette (median cut), ordered dithering, LZW. */
 (function () {
   function medianCut(samples, n) {
     // samples: Uint8Array rgbrgb...
@@ -28,11 +25,9 @@
 
   function GifWriter(w, h, opts) {
     this.w = w; this.h = h; this.dither = (opts && opts.dither) ?? 7; this.out = []; this.cache = new Int16Array(32768).fill(-1);
-    this.prev = null; this.pending = null;
   }
-  const TRANSP = 255;
   GifWriter.prototype.setPalette = function (samples) {
-    this.pal = medianCut(samples, 255); // index 255 stays free for transparency
+    this.pal = medianCut(samples, 256);
     const o = this.out, w = this.w, h = this.h;
     o.push(...[71, 73, 70, 56, 57, 97], w & 255, w >> 8, h & 255, h >> 8, 0xf7, 0, 0);
     for (let i = 0; i < 768; i++) o.push(this.pal[i]);
@@ -42,7 +37,7 @@
     const key = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
     let c = this.cache[key]; if (c >= 0) return c;
     const p = this.pal; let best = 0, bd = 1e9;
-    for (let i = 0; i < 255; i++) { const dr = p[i * 3] - r, dg = p[i * 3 + 1] - g, db = p[i * 3 + 2] - b, d = dr * dr * 2 + dg * dg * 4 + db * db * 3; if (d < bd) { bd = d; best = i; } }
+    for (let i = 0; i < 256; i++) { const dr = p[i * 3] - r, dg = p[i * 3 + 1] - g, db = p[i * 3 + 2] - b, d = dr * dr * 2 + dg * dg * 4 + db * db * 3; if (d < bd) { bd = d; best = i; } }
     this.cache[key] = best; return best;
   };
   GifWriter.prototype.addFrame = function (rgba, delayCs) {
@@ -52,27 +47,12 @@
       const r = Math.max(0, Math.min(255, rgba[j] + t)), g = Math.max(0, Math.min(255, rgba[j + 1] + t)), b = Math.max(0, Math.min(255, rgba[j + 2] + t));
       idx[i] = this.nearest(r | 0, g | 0, b | 0);
     }
-    const prev = this.prev; this.prev = idx;
-    if (!prev) { this.flush(); this.pending = { x: 0, y: 0, w, h, data: lzwBytes(idx), transp: false, delay: delayCs }; return; }
-    // the rectangle that changed since the previous frame
-    let x0 = w, y0 = h, x1 = -1, y1 = -1;
-    for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i++) if (idx[i] !== prev[i]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; y1 = y; }
-    if (x1 < 0) { this.pending.delay += delayCs; return; } // identical frame: hold the last one longer
-    const rw = x1 - x0 + 1, rh = y1 - y0 + 1, plain = new Uint8Array(rw * rh), holes = new Uint8Array(rw * rh);
-    for (let y = 0, k = 0; y < rh; y++) for (let x = 0; x < rw; x++, k++) { const i = (y0 + y) * w + x0 + x; plain[k] = idx[i]; holes[k] = idx[i] === prev[i] ? TRANSP : idx[i]; }
-    const a = lzwBytes(plain), b = lzwBytes(holes), useHoles = b.length < a.length;
-    this.flush(); this.pending = { x: x0, y: y0, w: rw, h: rh, data: useHoles ? b : a, transp: useHoles, delay: delayCs };
+    const o = this.out;
+    o.push(0x21, 0xf9, 4, 0, delayCs & 255, delayCs >> 8, 0, 0);
+    o.push(0x2c, 0, 0, 0, 0, w & 255, w >> 8, h & 255, h >> 8, 0);
+    lzw(idx, 8, o);
   };
-  GifWriter.prototype.flush = function () {
-    const f = this.pending; if (!f) return; this.pending = null;
-    const o = this.out, d = Math.min(65535, f.delay);
-    // disposal 1 (leave the frame in place), transparent index 255 when the frame has holes
-    o.push(0x21, 0xf9, 4, f.transp ? 0x05 : 0x04, d & 255, d >> 8, TRANSP, 0);
-    o.push(0x2c, f.x & 255, f.x >> 8, f.y & 255, f.y >> 8, f.w & 255, f.w >> 8, f.h & 255, f.h >> 8, 0);
-    for (let i = 0; i < f.data.length; i++) o.push(f.data[i]);
-  };
-  GifWriter.prototype.finish = function () { this.flush(); this.out.push(0x3b); return new Uint8Array(this.out); };
-  function lzwBytes(idx) { const o = []; lzw(idx, 8, o); return o; }
+  GifWriter.prototype.finish = function () { this.out.push(0x3b); return new Uint8Array(this.out); };
 
   function lzw(idx, minCode, o) {
     o.push(minCode);
@@ -95,5 +75,15 @@
     if (block.length) o.push(block.length, ...block);
     o.push(0);
   }
-  window.TRGif = { GifWriter };
+  // GIF delays use whole centiseconds. Round cumulative boundaries so the
+  // selected frame count and loop duration survive fractional frame delays.
+  function frameTiming(duration, fps) {
+    const count = Math.round(duration * fps);
+    return Array.from({ length: count }, (_, i) => {
+      const start = Math.round(i * duration * 100 / count);
+      const end = Math.round((i + 1) * duration * 100 / count);
+      return { time: i * duration / count, delay: end - start };
+    });
+  }
+  window.TRGif = { GifWriter, frameTiming };
 })();
