@@ -19,6 +19,8 @@ h1 b{color:var(--gold)}
 .tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .tbtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-weight:700;font-size:13px;background:var(--panel-2)}
 .tbtn[disabled]{opacity:.4;cursor:not-allowed}
+#quickSave{border-color:var(--gold);color:var(--gold)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 /* stage panel */
 .builder{display:grid;gap:0;min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:16px}
 .stagehead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:16px 16px 0}
@@ -198,7 +200,9 @@ a{color:var(--gold)}
     <div class="tools">
       <button class="tbtn" type="button" id="undoBtn" disabled aria-label="Undo" title="Undo (Ctrl+Z)">↶ Undo</button>
       <button class="tbtn" type="button" id="redoBtn" disabled aria-label="Redo" title="Redo (Ctrl+Shift+Z)">↷ Redo</button>
+      <button class="tbtn" type="button" id="quickSave" title="Save everything, from template to caption">Save</button>
       <button class="tbtn" type="button" id="designsBtn">My designs</button>
+      <span class="vh" id="saveLive" role="status" aria-live="polite"></span>
       <button class="tbtn" type="button" id="tourBtn">▶ Tour</button>
     </div>
   </header>
@@ -1026,6 +1030,23 @@ $("mkVid").addEventListener("click", async ()=>{
 const LOCAL_KEY="designs";
 function defaultName(){ const t=byId[state.tpl]; return t.name.replace(/^The /,"") + (state.f.date ? " – "+shortDate(state.f.date) : ""); }
 function designData(){ return {custom:state.custom, titleFont:state.titleFont, titleWeight:state.titleWeight, bodyFont:state.bodyFont, tpl:state.tpl, style:state.style, theme:state.theme, font:state.font, motion:state.motion, grade:state.grade, photoKey:state.bgPhoto?"":state.photoKey, size:state.size, f: JSON.parse(JSON.stringify(state.f,(k,v)=>k==="_img"?undefined:v))}; }
+/* everything after the visuals: photos travel as small data URLs, so a reopened design is complete */
+const IMG_RE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+const imgCache=new WeakMap();
+function imgData(img, max, alpha){
+  if(!img) return ""; const key=max+(alpha?"a":""); const c0=imgCache.get(img); if(c0 && c0[key]) return c0[key];
+  let out="";
+  try{ const w=img.naturalWidth||img.width, h=img.naturalHeight||img.height, k=Math.min(1, max/Math.max(w,h)); const c=document.createElement("canvas"); c.width=Math.max(1,Math.round(w*k)); c.height=Math.max(1,Math.round(h*k)); c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+    if(alpha){ const png=c.toDataURL("image/png"); if(png.length<250000) out=png; } if(!out) out=c.toDataURL("image/jpeg",0.82); }catch(e){ out=""; }
+  imgCache.set(img, Object.assign(c0||{}, {[key]:out})); return out;
+}
+function imgFrom(src){ return new Promise(res=>{ if(!src || !IMG_RE.test(src)) return res(null); const i=new Image(); i.onload=()=>res(i); i.onerror=()=>res(null); i.src=src; }); }
+function fullDesign(withPhotos){
+  const d=designData();
+  Object.assign(d, {stage:state.stage, caption:$("caption").value, capKind, capEdited, gif:{dur:$("gifDur").value, fps:$("gifFps").value, w:$("gifW").value}});
+  if (withPhotos){ const bg=imgData(state.bgPhoto, 1280, false), spk=(state.f.speakers||[]).map(s=>imgData(s._img, 500, true)); if(bg || spk.some(Boolean)) d.photos={bg, spk}; }
+  return d;
+}
 function cleanDesign(d){
   if (!d || typeof d!=="object" || !byId[d.tpl]) return null;
   const s=(v,n)=>typeof v==="string"?v.slice(0,n):"", n=(v,lo,hi)=>typeof v==="number"&&isFinite(v)?Math.min(hi,Math.max(lo,v)):undefined;
@@ -1037,28 +1058,50 @@ function cleanDesign(d){
   f.speakers = Array.isArray(f0.speakers) ? f0.speakers.slice(0,3).filter(x=>x&&typeof x==="object").map(x=>{ const o={name:s(x.name,40), role:s(x.role,40)}; const z=n(x.zoom,1,2); if(z!==undefined) o.zoom=z; return o; }) : [];
   if (f.partner && !PARTNERS.includes(f.partner)) f.partner="";
   const fname=(v)=>typeof v==="string" && /^[A-Za-z0-9 _-]{0,40}$/.test(v) ? v : "";
-  return {custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
+  const g=d.gif&&typeof d.gif==="object"?d.gif:{}, pick=(v,ok)=>ok.includes(String(v))?String(v):"";
+  const ph=d.photos&&typeof d.photos==="object"?d.photos:{}, img=(v,max)=>typeof v==="string" && v.length<=max && IMG_RE.test(v) ? v : "";
+  const extra={stage: Number.isInteger(d.stage)&&d.stage>=0&&d.stage<=5 ? d.stage : 2, caption:s(d.caption,1900), capKind:d.capKind==="facebook"?"facebook":"discord", capEdited:!!d.capEdited,
+    gif:{dur:pick(g.dur,["4","6","8","10"]), fps:pick(g.fps,["10","12","15"]), w:pick(g.w,["540","720","1080"])},
+    photos:{bg:img(ph.bg,4000000), spk:(Array.isArray(ph.spk)?ph.spk:[]).slice(0,3).map(x=>img(x,1000000))}};
+  return {...extra, custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:d.grade==="natural"?"natural":"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
 }
-function openDesign(d0){
-  const d=cleanDesign(d0); if (!d){ $("status").textContent="That design couldn't be opened."; return; } pushHistory();
+async function openDesign(d0){
+  const d=cleanDesign(d0); if (!d){ $("status").textContent="That design couldn't be opened."; return; }
+  const [bg, ...spk] = await Promise.all([imgFrom(d.photos.bg), ...d.photos.spk.map(imgFrom)]);
+  pushHistory();
   if (d.custom) state.custom=d.custom; state.titleFont=d.titleFont; state.titleWeight=d.titleWeight; state.bodyFont=d.bodyFont; ensureFont(d.titleFont, d.titleWeight).then(()=>ensureFont(d.bodyFont, 700)).then(()=>{ draw(); drawThumbs(); });
   Object.assign(state, {tpl:d.tpl, style:TP.STYLES[d.style]?d.style:"signature", theme:(TP.THEMES[d.theme]||d.theme==="custom")?d.theme:"show", font:d.font||"signature", motion:TP.MOTIONS[d.motion]?d.motion:"classic", grade:d.grade||"zft", photoKey:d.photoKey||"", bgPhoto:null});
   if (TP.SIZES[d.size]) { state.size=d.size; markSize(); }
   state.f = Object.assign(freshFields(d.tpl), d.f);
-  afterLoad(); capEdited=false; $("caption").value="";
+  if (bg){ state.bgPhoto=bg; state.photoKey=""; }
+  (state.f.speakers||[]).forEach((s,i)=>{ if(spk[i]) s._img=spk[i]; });
+  for (const [id,v] of [["gifDur",d.gif.dur],["gifFps",d.gif.fps],["gifW",d.gif.w]]) if(v) $(id).value=v;
+  afterLoad(); capKind=d.capKind; markCap(); $("caption").value=d.caption; capEdited=d.capEdited && !!d.caption;
+  return d.stage;
 }
+/* return to the stage the design was saved on, with every earlier stage ticked */
+function reopenAt(st){ visited.clear(); for(let i=0;i<=st;i++) visited.add(i); goStage(st); }
+function storeOk(k,v){ try{ localStorage.setItem("trpm:"+k, JSON.stringify(v)); return true; }catch(e){ return false; } }
 async function saveDesign(auto){
-  const name = ($("designName").value || defaultName()).slice(0,60); const data=designData();
-  if (ZT){
-    try{ const j=await api("designs.php",{act:"save", id: state.designId, name, design:data, auto:!!auto}); state.designId=j.id; if(!auto) $("status").textContent=`Saved “${name}”. Find it under My designs, on any device.`; }
-    catch(e){ if(!auto) $("status").textContent="Couldn't save the design. Try again."; }
-  } else {
-    const list=load(LOCAL_KEY)||[]; const id=state.designId||("l"+Date.now()); const i=list.findIndex(x=>x.id===id); const row={id,name,at:new Date().toISOString(),design:data};
-    if(i>=0) list[i]=row; else list.unshift(row); store(LOCAL_KEY, list.slice(0,30)); state.designId=id; if(!auto) $("status").textContent=`Saved “${name}” on this device.`;
+  if (!$("designName").value) $("designName").value = defaultName();
+  const name = $("designName").value.slice(0,60); const tries=[fullDesign(true)]; if (tries[0].photos) tries.push(fullDesign(false));
+  let saved=null;
+  for (const data of tries){
+    if (ZT){ try{ const j=await api("designs.php",{act:"save", id: state.designId, name, design:data, auto:!!auto}); state.designId=j.id; saved=data; break; }catch(e){} }
+    else { const list=load(LOCAL_KEY)||[]; const id=state.designId||("l"+Date.now()); const i=list.findIndex(x=>x.id===id); const row={id,name,at:new Date().toISOString(),design:data};
+      if(i>=0) list[i]=row; else list.unshift(row); if (storeOk(LOCAL_KEY, list.slice(0,30))){ state.designId=id; saved=data; break; } }
   }
+  if (auto) return !!saved;
+  const where = ZT ? "Find it under My designs, on any device." : "Saved on this device.";
+  const msg = !saved ? (ZT ? "Couldn't save the design. Try again." : "This browser's storage is full. Delete old designs under My designs, then save again.") : (tries[0].photos && !saved.photos) ? `Saved “${name}”, but the photos were too big to keep. Add them again after opening.` : `Saved “${name}” with every stage, photos and caption. ${where}`;
+  $("status").textContent=msg; $("saveLive").textContent=msg;
+  const b=$("quickSave"); b.textContent = !saved ? "Couldn't save" : saved.photos||!tries[0].photos ? "Saved ✓" : "Saved (no photos)"; b.title=msg;
+  clearTimeout(b._t); b._t=setTimeout(()=>{ b.textContent="Save"; b.title="Save everything, from template to caption"; }, 2600);
+  return !!saved;
 }
 function autoSave(){ saveDesign(true); }
 $("saveDesign").addEventListener("click",()=>saveDesign(false));
+$("quickSave").addEventListener("click",()=>saveDesign(false));
 let teamCache=null;
 async function fetchDesigns(){ if(!ZT) return {mine:(load(LOCAL_KEY)||[]).map(x=>({id:x.id,name:x.name,at:x.at,tpl:x.design.tpl,date:x.design.f.date,mine:true})), team:[]}; const r=await fetch("designs.php?list=1",{headers:{Accept:"application/json"}}); if(!r.ok) throw 0; const j=await r.json(); teamCache=j.team||[]; return j; }
 async function getDesign(id){ if(!ZT){ const x=(load(LOCAL_KEY)||[]).find(x=>x.id===id); return x&&x.design; } const r=await fetch("designs.php?id="+encodeURIComponent(id)); if(!r.ok) throw 0; return (await r.json()).design; }
@@ -1067,8 +1110,8 @@ function dItem(x, canDelete){
   const row=document.createElement("div"); row.className="ditem";
   const info=document.createElement("div"); info.innerHTML=`<b>${esc(x.name||"Untitled")}</b><small>${esc((byId[x.tpl]||{}).name||x.tpl)}${x.date?" · "+esc(shortDate(x.date)):""} · ${x.by?esc(x.by)+" · ":""}${esc(ago(x.at))}${x.posted?" · posted to "+esc(x.posted):""}</small>`;
   const act=document.createElement("div"); act.className="row";
-  const o=document.createElement("button"); o.type="button"; o.className="tbtn"; o.textContent="Open"; o.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId = x.mine ? x.id : null; $("designName").value = x.mine ? x.name : ""; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
-  const dup=document.createElement("button"); dup.type="button"; dup.className="tbtn"; dup.textContent="Duplicate"; dup.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); openDesign(d); state.designId=null; $("designName").value=(x.name||"")+" (copy)"; goStage(2); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
+  const o=document.createElement("button"); o.type="button"; o.className="tbtn"; o.textContent="Open"; o.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); const st=await openDesign(d); if(st===undefined) return; state.designId = x.mine ? x.id : null; $("designName").value = x.mine ? x.name : ""; reopenAt(st); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
+  const dup=document.createElement("button"); dup.type="button"; dup.className="tbtn"; dup.textContent="Duplicate"; dup.addEventListener("click", async ()=>{ try{ const d=await getDesign(x.id); closeDesigns(); const st=await openDesign(d); if(st===undefined) return; state.designId=null; $("designName").value=(x.name||"")+" (copy)"; reopenAt(st); }catch(e){ $("dmNote").textContent="Couldn't open that design."; } });
   act.append(o,dup);
   if (canDelete){ const del=document.createElement("button"); del.type="button"; del.className="x"; del.textContent="Delete"; del.addEventListener("click", async ()=>{ if(!confirm(`Delete “${x.name}”?`)) return; try{ if(ZT) await api("designs.php",{act:"delete", id:x.id}); else store(LOCAL_KEY,(load(LOCAL_KEY)||[]).filter(y=>y.id!==x.id)); if(state.designId===x.id) state.designId=null; row.remove(); $("dmClose").focus(); $("dmNote").textContent=`Deleted “${x.name}”.`; }catch(e){ $("dmNote").textContent="Couldn't delete it."; } }); act.append(del); }
   row.append(info,act); return row;
@@ -1079,7 +1122,7 @@ async function openDesigns(){
   $("dmNote").textContent="Loading…"; $("dmMine").textContent=""; $("dmTeam").textContent="";
   $("dmTeamLabel").hidden = !ZT; $("dmTeam").hidden = !ZT;
   try{ const j=await fetchDesigns(); $("dmNote").textContent = ZT ? "Saved on the server: open them on any phone or computer. Team history shows the last 30 posters anyone made." : "Saved on this device only. On zeefreaks.io your designs follow you to any device.";
-    (j.mine||[]).forEach(x=>$("dmMine").append(dItem(Object.assign({mine:true},x), true))); if(!(j.mine||[]).length) $("dmMine").innerHTML='<p class="note">Nothing saved yet. Use “Save design” on the last stage.</p>';
+    (j.mine||[]).forEach(x=>$("dmMine").append(dItem(Object.assign({mine:true},x), true))); if(!(j.mine||[]).length) $("dmMine").innerHTML='<p class="note">Nothing saved yet. Press Save at the top, on any stage.</p>';
     (j.team||[]).forEach(x=>$("dmTeam").append(dItem(x, false))); if(ZT && !(j.team||[]).length) $("dmTeam").innerHTML='<p class="note">No team posters yet.</p>'; }
   catch(e){ $("dmNote").textContent="Couldn't load designs. Try again."; }
 }
@@ -1090,7 +1133,7 @@ $("designsModal").addEventListener("click",(e)=>{ if(e.target===$("designsModal"
 async function checkDuplicates(){
   const w=$("dupWarn"); w.hidden=true; if(!ZT || !state.f.date) return;
   try{ if(!teamCache) await fetchDesigns(); const me = ZT.name||""; const d=(teamCache||[]).find(x=>x.tpl===state.tpl && x.date===state.f.date && x.by!==me && x.id!==state.designId);
-    if (d){ w.hidden=false; w.innerHTML=`<b>${esc(d.by)}</b> already made ${esc(byId[state.tpl].name)} for ${esc(shortDate(d.date))} (${esc(ago(d.at))})${d.posted?`, posted to ${esc(d.posted)}`:""}. Check before posting twice. <button class="x" type="button" id="dupOpen">Open theirs</button>`; $("dupOpen").addEventListener("click", async ()=>{ const dd=await getDesign(d.id); openDesign(dd); state.designId=null; goStage(5); }); } }
+    if (d){ w.hidden=false; w.innerHTML=`<b>${esc(d.by)}</b> already made ${esc(byId[state.tpl].name)} for ${esc(shortDate(d.date))} (${esc(ago(d.at))})${d.posted?`, posted to ${esc(d.posted)}`:""}. Check before posting twice. <button class="x" type="button" id="dupOpen">Open theirs</button>`; $("dupOpen").addEventListener("click", async ()=>{ const dd=await getDesign(d.id); if(await openDesign(dd)===undefined) return; state.designId=null; reopenAt(5); }); } }
   catch(e){}
 }
 
@@ -1213,7 +1256,7 @@ const TOUR = [
   { sel: "#steps", title: "3 · Jump between stages", text: "Tap any number to go back and refine just that part. Your other choices stay as they are. Back and Next walk through them in order." },
   { sel: "#presets", up: ".presets-sec", title: "4 · This week in one tap", text: "“Next Hunt”, “Next Council” and the others fill in the host, time and place, with this week's date." },
   { sel: "#checkLine", up: ".meta", title: "5 · Brand check", text: "A green tick means it's ready. If something needs fixing (text too small, cut off, hard to read, no date), it tells you in one line." },
-  { sel: "#undoBtn", up: ".tools", title: "6 · Undo and My designs", text: "Undo or redo your last 20 changes. Save designs on the last stage and reopen them from My designs, even on another device." },
+  { sel: "#undoBtn", up: ".tools", title: "6 · Undo and My designs", text: "Undo or redo your last 20 changes. Save at any stage: it keeps everything, photos and caption included. Reopen from My designs and you land back where you saved." },
   { sel: null, title: "7 · Generate and share", text: "The last stage makes PNGs, all four sizes, a GIF or a video, writes the caption, and drafts a post for Discord or the TR Page. Nothing posts until you press Confirm and post." },
 ];
 let tourIdx = -1, tourEls = null, tourOpener = null;
