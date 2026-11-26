@@ -282,15 +282,16 @@
     if (!GRAIN) { const c = document.createElement("canvas"); c.width = c.height = 192; const g = c.getContext("2d"); const d = g.createImageData(192, 192); const r = rng("grain"); for (let i = 0; i < d.data.length; i += 4) { const v = 110 + r() * 145; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } g.putImageData(d, 0, 0); GRAIN = c; }
     return ctx.createPattern(GRAIN, "repeat");
   }
-  /* grade: "zft" = dark duotone in the theme's accent + film grain; "natural" = original colours, just darkened */
+  /* grade: "zft" = dark duotone in the theme's accent + film grain; "natural" = original colours, just darkened;
+     "bw" = plain black and white, just darkened. opts.bw forces "bw"; opts.sfx/sfy/szoom frame a speaker's photo used as the hero */
   function photoLayer(ctx, img, W, H, P, grade, p, opts) {
-    opts = opts || {};
+    opts = opts || {}; if (opts.bw) grade = "bw";
     const slow = PH.motion === "zoom";
-    const zoom = ((opts.zoom || 1.02) + (slow ? 0 : 0.035 * Math.sin(TAU * p))) * (PH.zoom || 1) * (slow ? 1 + 0.09 * (0.5 - 0.5 * Math.cos(TAU * p)) : 1);
-    const fx = PH.fx ?? 0.5, fy = PH.fy ?? opts.fy ?? 0.45;
+    const zoom = ((opts.zoom || 1.02) + (slow ? 0 : 0.035 * Math.sin(TAU * p))) * (opts.szoom ?? PH.zoom ?? 1) * (slow ? 1 + 0.09 * (0.5 - 0.5 * Math.cos(TAU * p)) : 1);
+    const fx = opts.sfx ?? PH.fx ?? 0.5, fy = opts.sfy ?? PH.fy ?? opts.fy ?? 0.45;
     ctx.save();
     ctx.globalAlpha = opts.alpha ?? 1;
-    if (grade === "natural") { ctx.filter = "brightness(0.78) contrast(1.05)"; coverImg(ctx, img, 0, 0, W, H, fx, fy, zoom); ctx.filter = "none"; ctx.restore(); return; }
+    if (grade === "natural" || grade === "bw") { ctx.filter = (grade === "bw" ? "grayscale(1) " : "") + "brightness(0.78) contrast(1.05)"; coverImg(ctx, img, 0, 0, W, H, fx, fy, zoom); ctx.filter = "none"; ctx.restore(); return; }
     ctx.filter = "grayscale(1) contrast(1.28) brightness(0.62)";
     coverImg(ctx, img, 0, 0, W, H, fx, fy, zoom);
     ctx.filter = "none";
@@ -398,7 +399,7 @@
   }
   function avatar(ctx, cx, cy, R, spk, P, s) {
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.closePath();
-    if (spk.photo) { ctx.fillStyle = P.bg2 || "#222"; ctx.fill(); ctx.clip(); coverImg(ctx, spk.photo, cx - R, cy - R, R * 2, R * 2, 0.5, 0.3, spk.zoom || 1); }
+    if (spk.photo) { ctx.fillStyle = P.bg2 || "#222"; ctx.fill(); ctx.clip(); if (spk.bw) ctx.filter = "grayscale(1)"; coverImg(ctx, spk.photo, cx - R, cy - R, R * 2, R * 2, spk.fx ?? 0.5, spk.fy ?? 0.3, spk.zoom || 1); ctx.filter = "none"; }
     else {
       ctx.fillStyle = A(P.ink, 0.14); ctx.fill(); ctx.clip();
       const ini = (spk.name || "?").replace(/^coach\s+/i, "").split(/[\s&]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
@@ -480,7 +481,7 @@
     }
     if (style === "spotlight") {
       const hero = photo || (spk.length === 1 && spk[0].photo) || null;
-      if (hero) { ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H); photoLayer(ctx, hero, W, H, P, grade, p, { fy: 0.25, zoom: 1.05 }); }
+      if (hero) { ctx.fillStyle = P.bg; ctx.fillRect(0, 0, W, H); photoLayer(ctx, hero, W, H, P, grade, p, photo ? { fy: 0.25, zoom: 1.05 } : { fy: 0.25, zoom: 1.05, bw: !!spk[0].bw, sfx: spk[0].fx, sfy: spk[0].fy, szoom: spk[0].zoom }); }
       else { artFn(ctx, W, H, s, r, P, p); ctx.fillStyle = A(P.bg, 0.45); ctx.fillRect(0, 0, W, H); }
       // light beam
       const bx = W * (0.75 + 0.06 * Math.sin(TAU * p));
