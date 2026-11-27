@@ -325,7 +325,7 @@ a{color:var(--gold)}
         </div>
         <div class="grid3">
           <div class="f"><label for="gifDur">Loop length</label><select id="gifDur"><option value="4">4 s</option><option value="6" selected>6 s</option><option value="8">8 s</option><option value="10">10 s</option></select></div>
-          <div class="f"><label for="gifFps">GIF smoothness</label><select id="gifFps"><option value="10">10 fps</option><option value="12" selected>12 fps</option><option value="15">15 fps</option></select></div>
+          <div class="f"><label for="gifFps">GIF smoothness</label><select id="gifFps"><option value="10">10 fps</option><option value="12" selected>12 fps</option><option value="15">15 fps</option><option value="30">30 fps</option><option value="45">45 fps</option><option value="60">60 fps</option></select></div>
           <div class="f"><label for="gifW">GIF width</label><select id="gifW"><option value="540">540 px (small)</option><option value="720" selected>720 px</option><option value="1080">Full size</option></select></div>
         </div>
         <div class="bar" aria-hidden="true"><i id="gifBar"></i></div>
@@ -1030,16 +1030,16 @@ function lockExports(on){ busy=on; ["mkGif","mkVid","dlPack","dlPng"].forEach(id
 $("mkGif").addEventListener("click", async ()=>{
   if (busy) return; lockExports(true); $("result").hidden=true;
   const st=$("status"), bar=$("gifBar");
-  const dur=Math.min(10, +$("gifDur").value), fps=+$("gifFps").value, delay=Math.round(100/fps), n=Math.round(dur*100/delay);
+  const dur=Math.min(10, +$("gifDur").value), fps=+$("gifFps").value, timing=TRGif.frameTiming(dur,fps), n=timing.length;
   const sn=snapshot(), S=TP.SIZES[sn.size], gw=Math.min(+$("gifW").value, S.w) , gh=Math.round(S.h*gw/S.w);
   const big=document.createElement("canvas"), small=document.createElement("canvas"); small.width=gw; small.height=gh; const sctx=small.getContext("2d",{willReadFrequently:true});
-  const frame=(i)=>{ TP.render(big, sn.tpl, sn.f, sn.c, sn.size, {t: i*delay/100, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
+  const frame=(i)=>{ TP.render(big, sn.tpl, sn.f, sn.c, sn.size, {t: timing[i].time, dur}); sctx.drawImage(big,0,0,gw,gh); return sctx.getImageData(0,0,gw,gh).data; };
   try{
     st.textContent="Reading colours…";
     const samples=[]; const step=Math.max(1, Math.floor(gw*gh/9000));
     for (let k=0;k<10;k++){ const d=frame(Math.floor(k*n/10)); for (let i=0;i<d.length;i+=4*step) samples.push(d[i],d[i+1],d[i+2]); await new Promise(r=>setTimeout(r)); }
     const gw2=new TRGif.GifWriter(gw,gh,{dither:5}); gw2.setPalette(new Uint8Array(samples));
-    for (let i=0;i<n;i++){ gw2.addFrame(frame(i), delay); bar.style.width=((i+1)/n*100)+"%"; st.textContent=`Building GIF: frame ${i+1} of ${n}`; if(i%2===0) await new Promise(r=>setTimeout(r)); }
+    for (let i=0;i<n;i++){ gw2.addFrame(frame(i), timing[i].delay); bar.style.width=((i+1)/n*100)+"%"; st.textContent=`Building GIF: frame ${i+1} of ${n}`; if(i%2===0) await new Promise(r=>setTimeout(r)); }
     const blob=new Blob([gw2.finish()],{type:"image/gif"}); made.gif={blob, name:fileBase(null, sn)+".gif", key:sn.key}; markAttach();
     const mb=(blob.size/1048576).toFixed(1);
     st.textContent=`GIF ready: ${dur} s loop, ${gw}×${gh}, ${mb} MB.` + (blob.size>10*1048576 ? " Over Discord's 10 MB limit: try 540 px or a shorter loop." : "");
@@ -1107,7 +1107,7 @@ function cleanDesign(d){
   const g=d.gif&&typeof d.gif==="object"?d.gif:{}, pick=(v,ok)=>ok.includes(String(v))?String(v):"";
   const ph=d.photos&&typeof d.photos==="object"?d.photos:{}, img=(v,max)=>typeof v==="string" && v.length<=max && IMG_RE.test(v) ? v : "";
   const extra={stage: Number.isInteger(d.stage)&&d.stage>=0&&d.stage<=5 ? d.stage : 2, caption:s(d.caption,1900), capKind:d.capKind==="facebook"?"facebook":"discord", capEdited:!!d.capEdited,
-    gif:{dur:pick(g.dur,["4","6","8","10"]), fps:pick(g.fps,["10","12","15"]), w:pick(g.w,["540","720","1080"])},
+    gif:{dur:pick(g.dur,["4","6","8","10"]), fps:pick(g.fps,["10","12","15","30","45","60"]), w:pick(g.w,["540","720","1080"])},
     photos:{bg:img(ph.bg,4000000), spk:(Array.isArray(ph.spk)?ph.spk:[]).slice(0,3).map(x=>img(x,1000000))}};
   return {...extra, custom: /^#[0-9A-F]{6}$/i.test(d.custom||"") ? d.custom.toUpperCase() : "", titleFont:fname(d.titleFont), bodyFont:fname(d.bodyFont), titleWeight: [400,700,800,900].includes(d.titleWeight)?d.titleWeight:800, tpl:d.tpl, style:s(d.style,20), theme:s(d.theme,20), font:s(d.font,20), motion:s(d.motion,20), grade:["natural","bw"].includes(d.grade)?d.grade:"zft", photoKey:PHOTOS.includes(d.photoKey)?d.photoKey:"", size:s(d.size,20), f};
 }
