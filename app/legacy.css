@@ -1543,3 +1543,7 @@ section.section + section.section::before { content: ''; position: absolute; top
 .tk-stats span { font-size: .75rem; }
 .fx-proof b { white-space: nowrap; }
 @media (max-width: 520px) { .fx-proof b { font-size: 1rem; } }
+
+/* Referral-link asterisk: points down to the footer disclosure (George, 19 Nov). */
+.fx-star { color: var(--gold); text-decoration: none; font-weight: 700; padding: 0 1px; }
+.fx-star:hover { text-decoration: underline; }

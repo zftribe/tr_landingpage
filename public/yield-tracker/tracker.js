@@ -156,12 +156,12 @@ function partner(r) {
 }
 // Partner/referral links live in the footer footnotes; rows and picks only link down to them.
 // Approved referral wording only. Bitget has no approved wording, so it shows none.
-const REBATE = { OKX: '20% trading-fee rebate (referral)', MEXC: '20% trading-fee rebate (referral)', Gate: '20% trading-fee rebate (referral)', Bybit: '15% trading-fee discount (referral)', Binance: '5% trading-fee rebate (referral)' };
+const REBATE = { OKX: '20% trading-fee rebate', MEXC: '20% trading-fee rebate', Gate: '20% trading-fee rebate', Bybit: '15% trading-fee discount', Binance: '5% trading-fee rebate' };
 const fnId = (p) => 'fn-' + String(p.name).toLowerCase().replace(/[^a-z0-9]+/g, '-');
-// Opens the partner's own link in a new tab; the button text is the disclosure ("Referral link" / "Partner link").
+// Opens the partner's own link in a new tab. No inline "commission"/"referral" tag (George, 19 Nov): the * links to the footer note.
 const fnLink = (p) => p.code
   ? `<span class="ref-code"><span class="ref-lbl">Referral code</span><code>${esc(p.code)}</code><button type="button" class="fn-copy" data-copy="${esc(p.code)}">Copy code</button></span><span class="ref-how">${esc(p.codeHow || 'Enter this referral code when you sign up.')}</span>`
-  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">${p.kind === 'bank' ? 'Referral' : 'Partner'} link ↗</a><span class="ref-how">We may earn a commission${FN('partner')}</span>`;
+  : `<a class="ref-btn" href="${esc(p.url)}" target="_blank" rel="sponsored noopener">Sign up ↗</a>${FN('partner')}`;
 function renderFootnotes() {
   const el = $('#partnerNotes'); if (!el || !DATA.partners) return;
   const list = Object.entries(DATA.partners).map(([name, p]) => ({ name, ...p }));
@@ -172,7 +172,7 @@ function renderFootnotes() {
   // Collapsed by default (George, 9 Nov); the heading and disclosure line always stay visible.
   el.innerHTML = `<div class="fn-head"><h3 class="fn-title">Partner &amp; referral links</h3>
     <button type="button" class="fn-toggle" id="fnToggle" aria-expanded="false" aria-controls="fnBody">Show all ${list.length} links <span aria-hidden="true">▾</span></button></div>
-    <p class="fn-lead">Some links on this page are partner or referral links. We may earn a commission or reward if you sign up. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
+    <p class="fn-lead">* Our partner and referral buttons and links are referral links: Trading Republic earns a commission or reward when you sign up through them, at no extra cost to you. It doesn't change the rankings: partners get no boost, and we list the cons as well as the pros.</p>
     <div class="fn-cols" id="fnBody" hidden>
       <div><h4>Banks (referral)</h4><ol class="fn-list">${banks.map(item).join('')}</ol><p class="fn-note">Referral link: we may earn a reward. Check the bank's referral terms and availability.</p></div>
       <div><h4>Crypto exchanges (partner)</h4><ol class="fn-list">${ex.map(item).join('')}</ol><p class="fn-note">Partner link: we may earn a commission. Where a fee rebate or discount applies, it is named next to the exchange; check the offer's terms and availability. Trading involves risk; this is education, not advice. Accounts are for adults (18 and over).</p></div>
